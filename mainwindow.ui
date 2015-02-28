@@ -123,6 +123,9 @@
        <property name="acceptDrops">
         <bool>false</bool>
        </property>
+       <property name="openLinks">
+        <bool>false</bool>
+       </property>
       </widget>
      </item>
      <item row="1" column="0">
@@ -155,6 +158,9 @@
     </property>
     <property name="title">
      <string>Control</string>
+    </property>
+    <property name="checkable">
+     <bool>true</bool>
     </property>
     <layout class="QGridLayout" name="gridLayout_4">
      <item row="0" column="8">
@@ -465,7 +471,14 @@
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
+   <widget class="QMenu" name="menuAbout">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionAbout"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuAbout"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -511,6 +524,14 @@
   <action name="actionSettings">
    <property name="text">
     <string>Settings</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
    </property>
   </action>
  </widget>

@@ -10,8 +10,10 @@
 #include <QTextStream>
 #include <QTimer>
 #include <QSettings>
+#include <QElapsedTimer>
 
 #include "settingswindow.h"
+#include "aboutwindow.h"
 
 
 namespace Ui {
@@ -30,6 +32,7 @@ public:
     QVector<QString> gcode;
     QTimer sendTimer;
     QTimer statusTimer;
+    QElapsedTimer sinceLastTemp;
     QSettings settings;
     QStringList recentFiles;
 
@@ -57,6 +60,7 @@ private slots:
     void printMsg(const char* text);
     void sendNext();
     void checkStatus();
+    void updateRecent();
 
     void xplus();
     void yplus();
@@ -85,6 +89,7 @@ private slots:
     void on_checktemp_stateChanged(int arg1);
     void on_actionSettings_triggered();
     void on_releasebtn_clicked();
+    void on_actionAbout_triggered();
 };
 
 #endif // MAINWINDOW_H

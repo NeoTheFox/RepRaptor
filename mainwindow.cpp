@@ -15,8 +15,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->consoleGroup->setDisabled(true);
     ui->pauseBtn->setDisabled("true");
 
-    //ui->extruderlcd->setSegmentStyle();
-
     ui->baudbox->addItem(QString::number(4800));
     ui->baudbox->addItem(QString::number(9600));
     ui->baudbox->addItem(QString::number(115200));
@@ -47,7 +45,7 @@ MainWindow::MainWindow(QWidget *parent) :
     statusTimer.start();
 
     if(settings.value("core/senderinterval").toInt()) sendTimer.setInterval(settings.value("core/senderinterval").toInt());
-    else sendTimer.setInterval(50);
+    else sendTimer.setInterval(5);
     sendTimer.start();
 }
 
@@ -70,7 +68,8 @@ MainWindow::~MainWindow()
 void MainWindow::open()
 {
     QString filename;
-    filename = QFileDialog::getOpenFileName(this, tr("Open GCODE"), "/home/", tr("GCODE (*.g *.gcode *.nc)"));
+    QDir home;
+    filename = QFileDialog::getOpenFileName(this, tr("Open GCODE"),home.home().absolutePath(), tr("GCODE (*.g *.gcode *.nc)"));
 
     gfile.setFileName(filename);
     if(!recentFiles.contains(filename))
@@ -327,6 +326,7 @@ void MainWindow::readSerial()
         {
            QString extmp = "";
            QString btmp = "";
+
            for(int i = 2; data.at(i) != '/'; i++)
            {
                extmp+=data.at(i);
@@ -338,6 +338,7 @@ void MainWindow::readSerial()
 
            ui->extruderlcd->display(extmp.toDouble());
            ui->bedlcd->display(btmp.toDouble());
+           sinceLastTemp.restart();
         }
         else if(data.startsWith("ok") || data.startsWith("wait")) commandDone = true;
         printMsg(QString(data));
@@ -431,7 +432,7 @@ void MainWindow::on_pauseBtn_clicked()
 
 void MainWindow::checkStatus()
 {
-    if(checkingTemperature) sendLine("M105");
+    if(checkingTemperature && sinceLastTemp.elapsed() < statusTimer.interval()) sendLine("M105");
 }
 
 void MainWindow::on_checktemp_stateChanged(int arg1)
@@ -450,4 +451,16 @@ void MainWindow::on_actionSettings_triggered()
 void MainWindow::on_releasebtn_clicked()
 {
     sendLine("M84");
+}
+
+void MainWindow::on_actionAbout_triggered()
+{
+    AboutWindow aboutwindow(this);
+
+    aboutwindow.exec();
+}
+
+void MainWindow::updateRecent()
+{
+
 }
