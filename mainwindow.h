@@ -46,7 +46,9 @@ private:
     bool paused;
     bool commandDone;
     bool checkingTemperature;
+    bool injectingCommand;
     int currentLine;
+    QString userCommand;
 
 
 private slots:
@@ -61,6 +63,7 @@ private slots:
     void sendNext();
     void checkStatus();
     void updateRecent();
+    void injectCommand(QString command);
 
     void xplus();
     void yplus();

@@ -33,6 +33,8 @@ MainWindow::MainWindow(QWidget *parent) :
     paused = false;
     commandDone = false;
     checkingTemperature = true;
+    injectingCommand = false;
+    userCommand = "";
     currentLine = 0;
 
     serialupdate();
@@ -419,7 +421,14 @@ void MainWindow::on_sendBtn_clicked()
 
 void MainWindow::sendNext()
 {
-    if(sending && !paused && printer.bytesToWrite() < 100 && commandDone)
+    if(injectingCommand && commandDone && printer.bytesToWrite() < 100)
+    {
+        sendLine(userCommand);
+        commandDone=false;
+        injectingCommand=false;
+        return;
+    }
+    else if(sending && !paused && printer.bytesToWrite() < 100 && commandDone)
     {
         if(currentLine >= gcode.size()) //check if we are at the end of array
         {
@@ -454,7 +463,7 @@ void MainWindow::on_pauseBtn_clicked()
 
 void MainWindow::checkStatus()
 {
-    if(checkingTemperature && (sinceLastTemp.elapsed() < statusTimer.interval())) sendLine("M105");
+    if(checkingTemperature && (sinceLastTemp.elapsed() < statusTimer.interval())) injectCommand("M105");
 }
 
 void MainWindow::on_checktemp_stateChanged(int arg1)
@@ -480,6 +489,12 @@ void MainWindow::on_actionAbout_triggered()
     AboutWindow aboutwindow(this);
 
     aboutwindow.exec();
+}
+
+void MainWindow::injectCommand(QString command)
+{
+    injectingCommand = true;
+    userCommand = command;
 }
 
 void MainWindow::updateRecent()
