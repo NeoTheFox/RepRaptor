@@ -10,6 +10,12 @@
     <height>498</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="windowTitle">
    <string>RepRaptor</string>
   </property>
@@ -673,8 +679,8 @@
    <slot>yminus()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>292</x>
-     <y>146</y>
+     <x>274</x>
+     <y>145</y>
     </hint>
     <hint type="destinationlabel">
      <x>383</x>
@@ -689,7 +695,7 @@
    <slot>yplus()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>292</x>
+     <x>274</x>
      <y>88</y>
     </hint>
     <hint type="destinationlabel">
@@ -705,7 +711,7 @@
    <slot>xminus()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>256</x>
+     <x>236</x>
      <y>120</y>
     </hint>
     <hint type="destinationlabel">
@@ -737,8 +743,8 @@
    <slot>zminus()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>362</x>
-     <y>156</y>
+     <x>353</x>
+     <y>153</y>
     </hint>
     <hint type="destinationlabel">
      <x>209</x>
@@ -826,6 +832,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>centerbtn</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>bedcenter()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>283</x>
+     <y>114</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>321</x>
+     <y>40</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>open()</slot>
@@ -844,5 +866,6 @@
   <slot>eminus()</slot>
   <slot>ezero()</slot>
   <slot>yhome()</slot>
+  <slot>bedcenter()</slot>
  </slots>
 </ui>

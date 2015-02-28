@@ -75,6 +75,7 @@ private slots:
     void zhome();
     void ezero();
     void homeall();
+    void bedcenter();
     void on_sendbtn_clicked();
     void on_fanonbtn_clicked();
     void on_fanoffbtn_clicked();

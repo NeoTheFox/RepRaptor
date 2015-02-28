@@ -315,6 +315,21 @@ void MainWindow::on_btmpoff_clicked()
 {
     sendLine("M140 S0");
 }
+
+void MainWindow::bedcenter()
+{
+    int x, y;
+
+    if(settings.value("printer/bedx").toInt()) x = settings.value("printer/bedx").toInt();
+    else x = 200;
+
+    if(settings.value("printer/bedy").toInt()) y = settings.value("printer/bedy").toInt();
+    else y = 200;
+
+    QString command = "G1 X" + QString::number(x/2) + "Y" + QString::number(y/2);
+    sendLine(command);
+}
+
 //Buttons end
 
 void MainWindow::readSerial()
