@@ -23,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->baudbox->addItem(QString::number(250000));
     ui->baudbox->addItem(QString::number(460800));
     ui->baudbox->addItem(QString::number(500000));
+    if(settings.value("printer/baudrateIndex").toInt()) ui->baudbox->setCurrentIndex(settings.value("printer/baudrateIndex").toInt());
     ui->baudbox->setCurrentIndex(2);
 
     ui->extruderlcd->setPalette(Qt::red);
@@ -47,6 +48,8 @@ MainWindow::MainWindow(QWidget *parent) :
     if(settings.value("core/senderinterval").toInt()) sendTimer.setInterval(settings.value("core/senderinterval").toInt());
     else sendTimer.setInterval(5);
     sendTimer.start();
+
+    sinceLastTemp.start();
 }
 
 MainWindow::~MainWindow()
@@ -115,7 +118,7 @@ bool MainWindow::sendLine(QString line)
     {
         if(printer.write(line.toUtf8()+'\n'))
         {
-            printMsg(line);
+            printMsg(line + '\n');
             return true;
         }
         else
@@ -167,7 +170,7 @@ void MainWindow::serialconnect()
             break;
 
             default:
-            printer.setBaudRate(QSerialPort::Baud115200);
+            printer.setBaudRate(ui->baudbox->currentText().toInt());
             break;
         }
 
@@ -370,7 +373,7 @@ void MainWindow::printMsg(const char* text)
 
     //cursor.insertBlock(bf, cf);
     cursor.insertText(text);
-    cursor.insertText("\n");
+    //cursor.insertText("\n");
 
     ui->terminal->setTextCursor(cursor);
 ;
@@ -386,7 +389,7 @@ void MainWindow::printMsg(QString text)
 
     //cursor.insertBlock(bf, cf);
     cursor.insertText(text);
-    cursor.insertText("\n");
+    //cursor.insertText("\n");
 
     ui->terminal->setTextCursor(cursor);
 }
@@ -397,13 +400,17 @@ void MainWindow::on_sendBtn_clicked()
     {
         sending = false;
         ui->sendBtn->setText("Send");
+        ui->pauseBtn->setText("Pause");
         ui->pauseBtn->setDisabled("true");
+        paused = false
     }
     else if(!sending)
     {
         sending=true;
         ui->sendBtn->setText("Stop");
+        ui->pauseBtn->setText("Pause");
         ui->pauseBtn->setEnabled("true");
+        paused = false
     }
 
     ui->progressBar->setValue(0);
@@ -447,7 +454,7 @@ void MainWindow::on_pauseBtn_clicked()
 
 void MainWindow::checkStatus()
 {
-    if(checkingTemperature && sinceLastTemp.elapsed() < statusTimer.interval()) sendLine("M105");
+    if(checkingTemperature && (sinceLastTemp.elapsed() < statusTimer.interval())) sendLine("M105");
 }
 
 void MainWindow::on_checktemp_stateChanged(int arg1)
