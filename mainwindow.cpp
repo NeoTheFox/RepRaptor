@@ -402,7 +402,7 @@ void MainWindow::on_sendBtn_clicked()
         ui->sendBtn->setText("Send");
         ui->pauseBtn->setText("Pause");
         ui->pauseBtn->setDisabled("true");
-        paused = false
+        paused = false;
     }
     else if(!sending)
     {
@@ -410,7 +410,7 @@ void MainWindow::on_sendBtn_clicked()
         ui->sendBtn->setText("Stop");
         ui->pauseBtn->setText("Pause");
         ui->pauseBtn->setEnabled("true");
-        paused = false
+        paused = false;
     }
 
     ui->progressBar->setValue(0);

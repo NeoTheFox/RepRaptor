@@ -405,7 +405,7 @@
      <rect>
       <x>10</x>
       <y>270</y>
-      <width>166</width>
+      <width>191</width>
       <height>121</height>
      </rect>
     </property>
@@ -423,7 +423,7 @@
      <item row="0" column="1">
       <widget class="QLCDNumber" name="extruderlcd">
        <property name="segmentStyle">
-        <enum>QLCDNumber::Outline</enum>
+        <enum>QLCDNumber::Filled</enum>
        </property>
       </widget>
      </item>
@@ -437,7 +437,7 @@
      <item row="1" column="1">
       <widget class="QLCDNumber" name="bedlcd">
        <property name="segmentStyle">
-        <enum>QLCDNumber::Outline</enum>
+        <enum>QLCDNumber::Filled</enum>
        </property>
       </widget>
      </item>
@@ -495,17 +495,6 @@
    </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <widget class="QToolBar" name="toolBar">
-   <property name="windowTitle">
-    <string>toolBar</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-  </widget>
   <action name="actionOpen">
    <property name="text">
     <string>Open...</string>
