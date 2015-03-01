@@ -111,8 +111,11 @@
        </item>
        <item row="5" column="0" colspan="4">
         <widget class="QDoubleSpinBox" name="estepspin">
+         <property name="locale">
+          <locale language="English" country="UnitedStates"/>
+         </property>
          <property name="minimum">
-          <double>0.100000000000000</double>
+          <double>1.000000000000000</double>
          </property>
          <property name="maximum">
           <double>150.000000000000000</double>
@@ -261,11 +264,17 @@
        </item>
        <item row="5" column="4" colspan="5">
         <widget class="QDoubleSpinBox" name="stepspin">
+         <property name="locale">
+          <locale language="English" country="UnitedStates"/>
+         </property>
          <property name="minimum">
           <double>0.100000000000000</double>
          </property>
          <property name="maximum">
           <double>100.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>1.000000000000000</double>
          </property>
         </widget>
        </item>
