@@ -27,3 +27,7 @@ FORMS    += mainwindow.ui \
 
 RESOURCES += \
     graphics.qrc
+
+DISTFILES += \
+    LICENCE \
+    README.md

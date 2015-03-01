@@ -18,4 +18,9 @@ qmake RepRaptor.pro
 
 make
 ```
+## Links
+![RepRap wiki](http://reprap.org/wiki/RepRaptor)
+![Windows dev builds](http://reprap.org/wiki/File:RepRaptor-000-windows.zip)
+
+[![Support via Gratipay](//img.shields.io/gratipay/NeoTheFox.svg)](https://gratipay.com/NeoTheFox/)
 
