@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>736</width>
+    <width>761</width>
     <height>433</height>
    </rect>
   </property>
@@ -18,6 +18,10 @@
   </property>
   <property name="windowTitle">
    <string>RepRaptor</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="graphics.qrc">
+    <normaloff>:/icons/icon.png</normaloff>:/icons/icon.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout_6">
@@ -464,7 +468,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>736</width>
+     <width>761</width>
      <height>20</height>
     </rect>
    </property>
@@ -525,7 +529,9 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="graphics.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>actionOpen</sender>
