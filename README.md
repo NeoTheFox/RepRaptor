@@ -1,3 +1,4 @@
+![RepRaptor logo](http://reprap.org/mediawiki/images/b/b0/RepRaptor_logo2.png)
 # RepRaptor
 A Qt RepRap gcode sender/host controller
 
