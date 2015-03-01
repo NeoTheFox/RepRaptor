@@ -19,6 +19,7 @@ qmake RepRaptor.pro
 make
 ```
 ## Links
+- [Binary release downloads](https://github.com/NeoTheFox/RepRaptor/releases)
 - [RepRap wiki](http://reprap.org/wiki/RepRaptor)
 - [Windows dev builds](http://reprap.org/wiki/File:RepRaptor-000-windows.zip)
 
