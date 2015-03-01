@@ -51,6 +51,8 @@ MainWindow::MainWindow(QWidget *parent) :
     else sendTimer.setInterval(5);
     sendTimer.start();
 
+    tempWarning.setInterval(10000);
+
     sinceLastTemp.start();
 }
 

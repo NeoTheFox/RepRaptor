@@ -32,6 +32,7 @@ public:
     QVector<QString> gcode;
     QTimer sendTimer;
     QTimer statusTimer;
+    QTimer tempWarning;
     QElapsedTimer sinceLastTemp;
     QSettings settings;
     QStringList recentFiles;
