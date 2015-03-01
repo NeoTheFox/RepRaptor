@@ -425,14 +425,14 @@ void MainWindow::on_sendBtn_clicked()
 
 void MainWindow::sendNext()
 {
-    if(injectingCommand && commandDone && printer.bytesToWrite() < 150)
+    if(injectingCommand && commandDone && printer.isWritable())
     {
         sendLine(userCommand);
         commandDone=false;
         injectingCommand=false;
         return;
     }
-    else if(sending && !paused && printer.bytesToWrite() < 150 && commandDone)
+    else if(sending && !paused && commandDone && printer.isWritable())
     {
         if(currentLine >= gcode.size()) //check if we are at the end of array
         {
