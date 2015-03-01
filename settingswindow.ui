@@ -55,7 +55,7 @@
        <string>A good default is 5, lower = fater, higher = less CPU load</string>
       </property>
       <property name="toolTipDuration">
-       <number>100</number>
+       <number>-1</number>
       </property>
       <property name="minimum">
        <number>1</number>
@@ -85,7 +85,7 @@
        <string>A good default is 5000. More = less interruptions, less = better temperature monitoring</string>
       </property>
       <property name="toolTipDuration">
-       <number>100</number>
+       <number>-1</number>
       </property>
       <property name="minimum">
        <number>500</number>

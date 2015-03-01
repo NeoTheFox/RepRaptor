@@ -112,7 +112,7 @@
        <item row="5" column="0" colspan="4">
         <widget class="QDoubleSpinBox" name="estepspin">
          <property name="minimum">
-          <double>1.000000000000000</double>
+          <double>0.100000000000000</double>
          </property>
          <property name="maximum">
           <double>150.000000000000000</double>
@@ -262,7 +262,7 @@
        <item row="5" column="4" colspan="5">
         <widget class="QDoubleSpinBox" name="stepspin">
          <property name="minimum">
-          <double>1.000000000000000</double>
+          <double>0.100000000000000</double>
          </property>
          <property name="maximum">
           <double>100.000000000000000</double>
@@ -502,6 +502,9 @@
    </property>
   </action>
   <action name="actionRecent">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Recent</string>
    </property>
@@ -556,8 +559,8 @@
    <slot>serialupdate()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>61</x>
-     <y>88</y>
+     <x>82</x>
+     <y>84</y>
     </hint>
     <hint type="destinationlabel">
      <x>247</x>
@@ -588,8 +591,8 @@
    <slot>serialconnect()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>61</x>
-     <y>117</y>
+     <x>82</x>
+     <y>116</y>
     </hint>
     <hint type="destinationlabel">
      <x>247</x>
@@ -604,8 +607,8 @@
    <slot>xhome()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>434</x>
-     <y>88</y>
+     <x>455</x>
+     <y>85</y>
     </hint>
     <hint type="destinationlabel">
      <x>383</x>
@@ -620,8 +623,8 @@
    <slot>clear()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>624</x>
-     <y>335</y>
+     <x>739</x>
+     <y>331</y>
     </hint>
     <hint type="destinationlabel">
      <x>654</x>
@@ -636,8 +639,8 @@
    <slot>xplus()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>327</x>
-     <y>117</y>
+     <x>323</x>
+     <y>118</y>
     </hint>
     <hint type="destinationlabel">
      <x>383</x>
@@ -652,12 +655,12 @@
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>540</x>
-     <y>369</y>
+     <x>739</x>
+     <y>360</y>
     </hint>
     <hint type="destinationlabel">
-     <x>548</x>
-     <y>397</y>
+     <x>739</x>
+     <y>389</y>
     </hint>
    </hints>
   </connection>
@@ -684,8 +687,8 @@
    <slot>yplus()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>274</x>
-     <y>88</y>
+     <x>285</x>
+     <y>85</y>
     </hint>
     <hint type="destinationlabel">
      <x>383</x>
@@ -700,8 +703,8 @@
    <slot>xminus()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>236</x>
-     <y>120</y>
+     <x>248</x>
+     <y>118</y>
     </hint>
     <hint type="destinationlabel">
      <x>189</x>
@@ -721,7 +724,7 @@
     </hint>
     <hint type="destinationlabel">
      <x>356</x>
-     <y>-10</y>
+     <y>0</y>
     </hint>
    </hints>
   </connection>
@@ -732,8 +735,8 @@
    <slot>zminus()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>353</x>
-     <y>153</y>
+     <x>367</x>
+     <y>151</y>
     </hint>
     <hint type="destinationlabel">
      <x>209</x>
@@ -748,8 +751,8 @@
    <slot>ezero()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>399</x>
-     <y>123</y>
+     <x>411</x>
+     <y>118</y>
     </hint>
     <hint type="destinationlabel">
      <x>220</x>
@@ -796,8 +799,8 @@
    <slot>eplus()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>397</x>
-     <y>93</y>
+     <x>411</x>
+     <y>85</y>
     </hint>
     <hint type="destinationlabel">
      <x>397</x>

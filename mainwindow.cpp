@@ -303,7 +303,7 @@ void MainWindow::on_atxoffbtn_clicked()
 
 void MainWindow::on_etmpset_clicked()
 {
-    QString command = "M104 S" + ui->etmpspin->text();
+    QString command = "M80\nM104 S" + ui->etmpspin->text();
     sendLine(command);
 }
 
@@ -314,7 +314,7 @@ void MainWindow::on_etmpoff_clicked()
 
 void MainWindow::on_btmpset_clicked()
 {
-    QString command = "M140 S" + ui->btmpspin->text();
+    QString command = "M80\nM140 S" + ui->btmpspin->text();
     sendLine(command);
 }
 
