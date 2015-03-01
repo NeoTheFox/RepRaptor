@@ -406,6 +406,7 @@ void MainWindow::on_sendBtn_clicked()
         ui->sendBtn->setText("Send");
         ui->pauseBtn->setText("Pause");
         ui->pauseBtn->setDisabled("true");
+        ui->controlBox->setChecked("true");
         paused = false;
     }
     else if(!sending)
@@ -414,6 +415,7 @@ void MainWindow::on_sendBtn_clicked()
         ui->sendBtn->setText("Stop");
         ui->pauseBtn->setText("Pause");
         ui->pauseBtn->setEnabled("true");
+        ui->controlBox->setChecked("false");
         paused = false;
     }
 
@@ -423,14 +425,14 @@ void MainWindow::on_sendBtn_clicked()
 
 void MainWindow::sendNext()
 {
-    if(injectingCommand && commandDone && printer.bytesToWrite() < 100)
+    if(injectingCommand && commandDone && printer.bytesToWrite() < 150)
     {
         sendLine(userCommand);
         commandDone=false;
         injectingCommand=false;
         return;
     }
-    else if(sending && !paused && printer.bytesToWrite() < 100 && commandDone)
+    else if(sending && !paused && printer.bytesToWrite() < 150 && commandDone)
     {
         if(currentLine >= gcode.size()) //check if we are at the end of array
         {
@@ -454,11 +456,13 @@ void MainWindow::on_pauseBtn_clicked()
     if(paused)
     {
         paused = false;
+        ui->controlBox->setChecked(false);
         ui->pauseBtn->setText("Pause");
     }
     else
     {
         paused = true;
+        ui->controlBox->setChecked(true);
         ui->pauseBtn->setText("Resume");
     }
 }

@@ -51,6 +51,15 @@
     </item>
     <item row="0" column="1">
      <widget class="QSpinBox" name="senderbox">
+      <property name="toolTip">
+       <string>A good default is 5, lower = fater, higher = less CPU load</string>
+      </property>
+      <property name="toolTipDuration">
+       <number>100</number>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
       <property name="maximum">
        <number>999</number>
       </property>
@@ -72,8 +81,17 @@
     </item>
     <item row="1" column="1">
      <widget class="QSpinBox" name="statusbox">
+      <property name="toolTip">
+       <string>A good default is 5000. More = less interruptions, less = better temperature monitoring</string>
+      </property>
+      <property name="toolTipDuration">
+       <number>100</number>
+      </property>
+      <property name="minimum">
+       <number>500</number>
+      </property>
       <property name="maximum">
-       <number>9999</number>
+       <number>99999</number>
       </property>
      </widget>
     </item>
