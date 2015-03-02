@@ -207,7 +207,7 @@ void MainWindow::serialconnect()
 //Buttons start
 void MainWindow::xplus()
 {
-    QString command = "G91\n G1 X" + ui->stepspin->text() + "\n G90";
+    QString command = "G91\nG1 X" + ui->stepspin->text() + "\nG90";
     sendLine(command);
 }
 
@@ -230,7 +230,7 @@ void MainWindow::yplus()
 
 void MainWindow::yminus()
 {
-    QString command = "G91\n G1 Y-" + ui->stepspin->text() + "\n G90";
+    QString command = "G91\nG1 Y-" + ui->stepspin->text() + "\nG90";
     sendLine(command);
 }
 
@@ -258,13 +258,13 @@ void MainWindow::zhome()
 
 void MainWindow::eplus()
 {
-    QString command = "G91\n G1 E" + ui->estepspin->text() + "\n G90";
+    QString command = "G91\nG1 E" + ui->estepspin->text() + "\nG90";
     sendLine(command);
 }
 
 void MainWindow::eminus()
 {
-    QString command = "G91\n G1 E-" + ui->estepspin->text() + "\n G90";
+    QString command = "G91\nG1 E-" + ui->estepspin->text() + "\nG90";
     sendLine(command);
 }
 
@@ -346,7 +346,8 @@ void MainWindow::readSerial()
     if(printer.canReadLine())
     {
         QByteArray data = printer.readLine();
-        if(data.startsWith("T:"))
+        if(data.startsWith("ok") || data.startsWith("wait")) commandDone = true;    //Can send next command
+        else if(data.startsWith("T:"))   //Parse temperature readings if any
         {
            QString extmp = "";
            QString btmp = "";
@@ -364,13 +365,13 @@ void MainWindow::readSerial()
            ui->bedlcd->display(btmp.toDouble());
            sinceLastTemp.restart();
         }
-        else if(data.startsWith("Resend"))
+        else if(data.startsWith("Resend"))  //Handle resend if requested
         {
             if(currentLine > 0) currentLine -= data.split(':')[1].toInt();
             if(currentLine < 0) currentLine = 0;
             commandDone = true;
         }
-        else if(data.startsWith("ok") || data.startsWith("wait")) commandDone = true;
+
         printMsg(QString(data));
     }
 }
@@ -380,12 +381,7 @@ void MainWindow::printMsg(const char* text)
     QTextCursor cursor = ui->terminal->textCursor();
     cursor.movePosition(QTextCursor::End);
 
-    //QTextBlockFormat bf;
-    //QTextCharFormat cf;
-
-    //cursor.insertBlock(bf, cf);
     cursor.insertText(text);
-    //cursor.insertText("\n");
 
     ui->terminal->setTextCursor(cursor);
 ;
@@ -396,12 +392,7 @@ void MainWindow::printMsg(QString text)
     QTextCursor cursor = ui->terminal->textCursor();
     cursor.movePosition(QTextCursor::End);
 
-    //QTextBlockFormat bf;
-    //QTextCharFormat cf;
-
-    //cursor.insertBlock(bf, cf);
     cursor.insertText(text);
-    //cursor.insertText("\n");
 
     ui->terminal->setTextCursor(cursor);
 }
