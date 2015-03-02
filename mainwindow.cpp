@@ -62,6 +62,8 @@ MainWindow::~MainWindow()
     if(gfile.isOpen()) gfile.close();
     if(printer.isOpen()) printer.close();
 
+    settings.setValue("printer/baudrateIndex", ui->baudbox->currentIndex());
+
     settings.beginWriteArray("user/recentfiles");
     for(int i = 0; i < recentFiles.size(); i++)
     {

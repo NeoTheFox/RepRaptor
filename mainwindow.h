@@ -11,6 +11,7 @@
 #include <QTimer>
 #include <QSettings>
 #include <QElapsedTimer>
+#include <QMessageBox>
 
 #include "settingswindow.h"
 #include "aboutwindow.h"
@@ -51,7 +52,6 @@ private:
     bool injectingCommand;
     int currentLine;
     QString userCommand;
-
 
 private slots:
     void open();
