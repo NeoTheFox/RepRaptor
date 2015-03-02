@@ -2,7 +2,7 @@
 # RepRaptor
 A Qt RepRap gcode sender/host controller aimed to be fast and minimalistic.
 
-Right now the project is in early stage, nigtly builds are available.
+Right now the project is in early stage.
 
 ## Screenshots
 ![RepRaptor printing a file](http://reprap.org/mediawiki/images/2/2d/RepRaptor_screenshot0.png)

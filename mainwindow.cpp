@@ -39,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     serialupdate();
 
+    connect(&printer, SIGNAL(error(QSerialPort::SerialPortError)), this, SLOT(serialError(QSerialPort::SerialPortError)));
     connect(&printer, SIGNAL(readyRead()), this, SLOT(readSerial()));
     connect(&statusTimer, SIGNAL(timeout()), this, SLOT(checkStatus()));
     connect(&sendTimer, SIGNAL(timeout()), this, SLOT(sendNext()));
@@ -199,6 +200,7 @@ void MainWindow::serialconnect()
         ui->progressBar->setValue(0);
         ui->controlBox->setDisabled(true);
         ui->consoleGroup->setDisabled(true);
+
      }
 }
 
@@ -440,6 +442,7 @@ void MainWindow::sendNext()
             currentLine = 0;
             ui->sendBtn->setText("Send");
             ui->pauseBtn->setDisabled("true");
+            ui->filelines->setText(QString::number(gcode.size()) + QString("/") + QString::number(currentLine) + QString(" Lines"));
             return;
         }
         sendLine(gcode.at(currentLine));
@@ -505,5 +508,59 @@ void MainWindow::injectCommand(QString command)
 
 void MainWindow::updateRecent()
 {
+    //TODO
+}
 
+void MainWindow::serialError(QSerialPort::SerialPortError error)
+{
+    if(error == QSerialPort::NoError) return;
+
+    if(printer.isOpen()) printer.close();
+
+    if(sending) paused = true;
+
+    ui->connectBtn->setText("Connect");
+    ui->sendBtn->setDisabled(true);
+    ui->pauseBtn->setDisabled(true);
+    ui->progressBar->setValue(0);
+    ui->controlBox->setDisabled(true);
+    ui->consoleGroup->setDisabled(true);
+
+    qDebug() << error;
+
+    QString errorMsg;
+    switch(error)
+    {
+    case QSerialPort::DeviceNotFoundError:
+        errorMsg = "Device not found";
+        break;
+
+    case QSerialPort::PermissionError:
+        errorMsg = "Insufficient permissions\nAlready opened?";
+        break;
+
+    case QSerialPort::OpenError:
+        errorMsg = "Cant open port\nAlready opened?";
+        break;
+
+    case QSerialPort::TimeoutError:
+        errorMsg = "Serial connection timed out";
+        break;
+
+    case QSerialPort::WriteError:
+    case QSerialPort::ReadError:
+        errorMsg = "I/O Error";
+        break;
+
+    case QSerialPort::ResourceError:
+        errorMsg = "Disconnected";
+        break;
+
+    default:
+        errorMsg = "Unknown error\nSomething went wrong";
+        break;
+    }
+
+    ErrorWindow errorwindow(this, errorMsg);
+    errorwindow.exec();
 }

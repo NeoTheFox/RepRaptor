@@ -16,15 +16,20 @@ CONFIG += static
 SOURCES += main.cpp\
         mainwindow.cpp \
     settingswindow.cpp \
-    aboutwindow.cpp
+    aboutwindow.cpp \
+    errorwindow.cpp \
+    erroricon.cpp
 
 HEADERS  += mainwindow.h \
     settingswindow.h \
-    aboutwindow.h
+    aboutwindow.h \
+    errorwindow.h \
+    erroricon.h
 
 FORMS    += mainwindow.ui \
     settingswindow.ui \
-    aboutwindow.ui
+    aboutwindow.ui \
+    errorwindow.ui
 
 RESOURCES += \
     graphics.qrc

@@ -14,6 +14,7 @@
 
 #include "settingswindow.h"
 #include "aboutwindow.h"
+#include "errorwindow.h"
 
 
 namespace Ui {
@@ -95,6 +96,7 @@ private slots:
     void on_actionSettings_triggered();
     void on_releasebtn_clicked();
     void on_actionAbout_triggered();
+    void serialError(QSerialPort::SerialPortError error);
 };
 
 #endif // MAINWINDOW_H
