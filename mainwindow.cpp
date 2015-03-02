@@ -414,10 +414,10 @@ void MainWindow::on_sendBtn_clicked()
 
 void MainWindow::sendNext()
 {
-    if(injectingCommand && printer.isWritable())
+    if(injectingCommand && printer.isWritable() && commandDone)
     {
         sendLine(userCommand);
-        //commandDone=false;
+        commandDone=false;
         injectingCommand=false;
         return;
     }
@@ -459,7 +459,7 @@ void MainWindow::on_pauseBtn_clicked()
 
 void MainWindow::checkStatus()
 {
-    if(checkingTemperature && (sinceLastTemp.elapsed() < statusTimer.interval())) injectCommand("M105");
+    if(checkingTemperature && (sinceLastTemp.elapsed() > statusTimer.interval())) injectCommand("M105");
 }
 
 void MainWindow::on_checktemp_stateChanged(int arg1)
