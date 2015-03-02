@@ -213,7 +213,7 @@ void MainWindow::xplus()
 
 void MainWindow::xminus()
 {
-    QString command = "G91\n G1 X-" + ui->stepspin->text() + "\n G90";
+    QString command = "G91\nG1 X-" + ui->stepspin->text() + "\nG90";
     sendLine(command);
 }
 
@@ -224,7 +224,7 @@ void MainWindow::xhome()
 
 void MainWindow::yplus()
 {
-    QString command = "G91\n G1 Y" + ui->stepspin->text() + "\n G90";
+    QString command = "G91\nG1 Y" + ui->stepspin->text() + "\nG90";
     sendLine(command);
 }
 
@@ -241,13 +241,13 @@ void MainWindow::yhome()
 
 void MainWindow::zplus()
 {
-    QString command = "G91\n G1 Z" + ui->stepspin->text() + "\n G90";
+    QString command = "G91\nG1 Z" + ui->stepspin->text() + "\nG90";
     sendLine(command);
 }
 
 void MainWindow::zminus()
 {
-    QString command = "G91\n G1 Z-" + ui->stepspin->text() + "\n G90";
+    QString command = "G91\nG1 Z-" + ui->stepspin->text() + "\nG90";
     sendLine(command);
 }
 
@@ -363,6 +363,12 @@ void MainWindow::readSerial()
            ui->extruderlcd->display(extmp.toDouble());
            ui->bedlcd->display(btmp.toDouble());
            sinceLastTemp.restart();
+        }
+        else if(data.startsWith("Resend"))
+        {
+            if(currentLine > 0) currentLine -= data.split(':')[1].toInt();
+            if(currentLine < 0) currentLine = 0;
+            commandDone = true;
         }
         else if(data.startsWith("ok") || data.startsWith("wait")) commandDone = true;
         printMsg(QString(data));
