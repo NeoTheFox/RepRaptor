@@ -117,7 +117,7 @@
         </widget>
        </item>
        <item row="5" column="0" colspan="4">
-        <widget class="QDoubleSpinBox" name="estepspin">
+        <widget class="QDoubleSpinBox" name="stepspin">
          <property name="locale">
           <locale language="English" country="UnitedStates"/>
          </property>
@@ -129,10 +129,10 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="0" colspan="2">
-        <widget class="QLabel" name="label_3">
+       <item row="6" column="7" colspan="2">
+        <widget class="QPushButton" name="etmpoff">
          <property name="text">
-          <string>E tmp</string>
+          <string>OFF</string>
          </property>
         </widget>
        </item>
@@ -143,10 +143,10 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="7" colspan="2">
-        <widget class="QPushButton" name="etmpoff">
+       <item row="6" column="0" colspan="2">
+        <widget class="QLabel" name="label_3">
          <property name="text">
-          <string>OFF</string>
+          <string>E tmp</string>
          </property>
         </widget>
        </item>
@@ -192,17 +192,17 @@
          </property>
         </widget>
        </item>
-       <item row="9" column="6" colspan="3">
-        <widget class="QPushButton" name="atxoffbtn">
-         <property name="text">
-          <string>ATX OFF</string>
-         </property>
-        </widget>
-       </item>
        <item row="0" column="6">
         <widget class="QPushButton" name="eplusbtn">
          <property name="text">
           <string>E+</string>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="6" colspan="3">
+        <widget class="QPushButton" name="atxoffbtn">
+         <property name="text">
+          <string>ATX OFF</string>
          </property>
         </widget>
        </item>
@@ -269,22 +269,6 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="4" colspan="5">
-        <widget class="QDoubleSpinBox" name="stepspin">
-         <property name="locale">
-          <locale language="English" country="UnitedStates"/>
-         </property>
-         <property name="minimum">
-          <double>0.100000000000000</double>
-         </property>
-         <property name="maximum">
-          <double>100.000000000000000</double>
-         </property>
-         <property name="value">
-          <double>1.000000000000000</double>
-         </property>
-        </widget>
-       </item>
        <item row="3" column="0" colspan="4">
         <widget class="QPushButton" name="homeallbtn">
          <property name="text">
@@ -296,6 +280,22 @@
         <widget class="QPushButton" name="releasebtn">
          <property name="text">
           <string>Release</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="4" colspan="5">
+        <widget class="QDoubleSpinBox" name="estepspin">
+         <property name="locale">
+          <locale language="English" country="UnitedStates"/>
+         </property>
+         <property name="minimum">
+          <double>0.100000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>100.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>1.000000000000000</double>
          </property>
         </widget>
        </item>
@@ -315,7 +315,7 @@
           </size>
          </property>
          <property name="text">
-          <string>E Step</string>
+          <string>Step</string>
          </property>
         </widget>
        </item>
@@ -328,9 +328,25 @@
           </size>
          </property>
          <property name="text">
-          <string>Step</string>
+          <string>E Step</string>
          </property>
         </widget>
+       </item>
+       <item row="10" column="2">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Expanding</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>60</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>
@@ -405,6 +421,12 @@
        </item>
        <item row="2" column="0" colspan="2">
         <widget class="QProgressBar" name="progressBar">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>20</height>
+          </size>
+         </property>
          <property name="value">
           <number>24</number>
          </property>
@@ -412,6 +434,12 @@
        </item>
        <item row="3" column="0">
         <widget class="QPushButton" name="sendBtn">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>23</height>
+          </size>
+         </property>
          <property name="text">
           <string>Send</string>
          </property>
@@ -419,6 +447,12 @@
        </item>
        <item row="3" column="1">
         <widget class="QPushButton" name="pauseBtn">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>23</height>
+          </size>
+         </property>
          <property name="text">
           <string>Pause</string>
          </property>
