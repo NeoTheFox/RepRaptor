@@ -163,7 +163,7 @@ void MainWindow::serialconnect()
         }
 
         printer.setPort(printerinfo);
-        printer.setFlowControl(QSerialPort::HardwareControl);
+        printer.setFlowControl(QSerialPort::NoFlowControl);
 
         switch(ui->baudbox->currentText().toInt())
         {
@@ -501,6 +501,7 @@ void MainWindow::updateRecent()
 void MainWindow::serialError(QSerialPort::SerialPortError error)
 {
     if(error == QSerialPort::NoError) return;
+    if(error == QSerialPort::NotOpenError) return;
 
     if(printer.isOpen()) printer.close();
 
