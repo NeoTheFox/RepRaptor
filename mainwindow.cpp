@@ -29,10 +29,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->extruderlcd->setPalette(Qt::red);
     ui->bedlcd->setPalette(Qt::red);
 
+    checkingTemperature = settings.value("core/checktemperature").toBool();
+    ui->checktemp->setChecked(checkingTemperature);
+
     sending = false;
     paused = false;
     commandDone = false;
-    checkingTemperature = true;
     injectingCommand = false;
     userCommand = "";
     currentLine = 0;
@@ -63,6 +65,7 @@ MainWindow::~MainWindow()
     if(printer.isOpen()) printer.close();
 
     settings.setValue("printer/baudrateIndex", ui->baudbox->currentIndex());
+    settings.setValue("core/checktemperature", ui->checktemp->isChecked());
 
     settings.beginWriteArray("user/recentfiles");
     for(int i = 0; i < recentFiles.size(); i++)
@@ -349,23 +352,9 @@ void MainWindow::readSerial()
     {
         QByteArray data = printer.readLine();
         if(data.startsWith("ok") || data.startsWith("wait")) commandDone = true;    //Can send next command
-        else if(data.startsWith("T:"))   //Parse temperature readings if any
+        else if(checkingTemperature && data.startsWith("T:"))   //Parse temperature readings if any
         {
-           QString extmp = "";
-           QString btmp = "";
-
-           for(int i = 2; data.at(i) != '/'; i++)
-           {
-               extmp+=data.at(i);
-           }
-           for(int i = data.indexOf("B:")+2; data.at(i) != '/'; i++)
-           {
-               btmp+=data.at(i);
-           }
-
-           ui->extruderlcd->display(extmp.toDouble());
-           ui->bedlcd->display(btmp.toDouble());
-           sinceLastTemp.restart();
+            parseStatus(data);
         }
         else if(data.startsWith("Resend"))  //Handle resend if requested
         {
@@ -562,3 +551,23 @@ void MainWindow::serialError(QSerialPort::SerialPortError error)
     ErrorWindow errorwindow(this, errorMsg);
     errorwindow.exec();
 }
+
+void MainWindow::parseStatus(QByteArray data)
+{
+    QString extmp = "";
+    QString btmp = "";
+
+    for(int i = 2; data.at(i) != '/'; i++)
+    {
+        extmp+=data.at(i);
+    }
+    for(int i = data.indexOf("B:")+2; data.at(i) != '/'; i++)
+    {
+        btmp+=data.at(i);
+    }
+
+    ui->extruderlcd->display(extmp.toDouble());
+    ui->bedlcd->display(btmp.toDouble());
+    sinceLastTemp.restart();
+}
+

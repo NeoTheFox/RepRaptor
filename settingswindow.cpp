@@ -7,8 +7,7 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    if(settings.value("core/senderinterval").toFloat()) ui->senderbox->setValue(settings.value("core/senderinterval").toFloat());
-    else ui->senderbox->setValue(1);
+    ui->senderbox->setValue(settings.value("core/senderinterval").toFloat());
 
     if(settings.value("core/statusinterval").toInt()) ui->statusbox->setValue(settings.value("core/statusinterval").toInt());
     else ui->senderbox->setValue(3000);

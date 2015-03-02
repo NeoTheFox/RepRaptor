@@ -89,7 +89,7 @@
     <item row="0" column="1">
      <widget class="QDoubleSpinBox" name="senderbox">
       <property name="toolTip">
-       <string>A good default is 2, lower = fater, higher = less CPU load</string>
+       <string>A good default is 2, lower = fater, higher = less CPU load. 0 would execute as soon as possible.</string>
       </property>
       <property name="toolTipDuration">
        <number>-1</number>
@@ -98,7 +98,7 @@
        <locale language="English" country="UnitedStates"/>
       </property>
       <property name="minimum">
-       <double>0.100000000000000</double>
+       <double>0.000000000000000</double>
       </property>
       <property name="maximum">
        <double>999.990000000000009</double>

@@ -66,6 +66,7 @@ private slots:
     void checkStatus();
     void updateRecent();
     void injectCommand(QString command);
+    void parseStatus(QByteArray data);
 
     void xplus();
     void yplus();
