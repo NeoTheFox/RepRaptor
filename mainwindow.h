@@ -98,6 +98,7 @@ private slots:
     void on_releasebtn_clicked();
     void on_actionAbout_triggered();
     void serialError(QSerialPort::SerialPortError error);
+    void on_actionPrint_from_SD_triggered();
 };
 
 #endif // MAINWINDOW_H

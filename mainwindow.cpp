@@ -192,6 +192,8 @@ void MainWindow::serialconnect()
             ui->progressBar->setValue(0);
             ui->controlBox->setDisabled(false);
             ui->consoleGroup->setDisabled(false);
+            commandDone = true;
+            if(checkingTemperature) injectCommand("M105");
         }
     }
 
@@ -352,10 +354,7 @@ void MainWindow::readSerial()
     {
         QByteArray data = printer.readLine();
         if(data.startsWith("ok") || data.startsWith("wait")) commandDone = true;    //Can send next command
-        else if(checkingTemperature && data.startsWith("T:"))   //Parse temperature readings if any
-        {
-            parseStatus(data);
-        }
+        else if(checkingTemperature && data.startsWith("T:")) parseStatus(data);  //Parse temperature readings if any
         else if(data.startsWith("Resend"))  //Handle resend if requested
         {
             if(currentLine > 0) currentLine -= data.split(':')[1].toInt();
@@ -571,3 +570,8 @@ void MainWindow::parseStatus(QByteArray data)
     sinceLastTemp.restart();
 }
 
+
+void MainWindow::on_actionPrint_from_SD_triggered()
+{
+    //TODO
+}

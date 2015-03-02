@@ -129,13 +129,6 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="7" colspan="2">
-        <widget class="QPushButton" name="etmpoff">
-         <property name="text">
-          <string>OFF</string>
-         </property>
-        </widget>
-       </item>
        <item row="6" column="5" colspan="2">
         <widget class="QPushButton" name="etmpset">
          <property name="text">
@@ -348,6 +341,13 @@
          </property>
         </spacer>
        </item>
+       <item row="6" column="7" colspan="2">
+        <widget class="QPushButton" name="etmpoff">
+         <property name="text">
+          <string>OFF</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </item>
@@ -539,7 +539,17 @@
     </property>
     <addaction name="actionAbout"/>
    </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="actionPrint_from_SD"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuTools"/>
    <addaction name="menuAbout"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -578,6 +588,14 @@
   <action name="actionAbout">
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="actionPrint_from_SD">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Print from SD...</string>
    </property>
   </action>
  </widget>
