@@ -522,7 +522,6 @@ void MainWindow::serialError(QSerialPort::SerialPortError error)
     ui->connectBtn->setText("Connect");
     ui->sendBtn->setDisabled(true);
     ui->pauseBtn->setDisabled(true);
-    ui->progressBar->setValue(0);
     ui->controlBox->setDisabled(true);
     ui->consoleGroup->setDisabled(true);
 
