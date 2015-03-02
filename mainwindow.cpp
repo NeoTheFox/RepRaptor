@@ -415,10 +415,10 @@ void MainWindow::on_sendBtn_clicked()
 
 void MainWindow::sendNext()
 {
-    if(injectingCommand && commandDone && printer.isWritable())
+    if(injectingCommand && printer.isWritable())
     {
         sendLine(userCommand);
-        commandDone=false;
+        //commandDone=false;
         injectingCommand=false;
         return;
     }
