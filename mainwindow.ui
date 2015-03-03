@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>761</width>
-    <height>433</height>
+    <height>456</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -206,6 +206,19 @@
         </widget>
        </item>
        <item row="2" column="0" colspan="2">
+        <widget class="QLabel" name="tempLine">
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>15</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" colspan="2">
         <widget class="QCheckBox" name="checktemp">
          <property name="text">
           <string>Check temperature</string>
@@ -555,7 +568,6 @@
    <addaction name="menuTools"/>
    <addaction name="menuAbout"/>
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
   <widget class="QToolBar" name="toolBar">
    <property name="minimumSize">
     <size>

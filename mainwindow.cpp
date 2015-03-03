@@ -385,6 +385,7 @@ void MainWindow::readSerial()
         {
             QFuture<TemperatureReadings> parseThread = QtConcurrent::run(this, &MainWindow::parseStatus, data);
             statusWatcher.setFuture(parseThread); //parseThread is very costly operation
+            ui->tempLine->setText(data);
         }
         else if(data.startsWith("Resend"))  //Handle resend if requested
         {
@@ -403,7 +404,6 @@ void MainWindow::readSerial()
             readingFiles = true; //start reading files from SD
         }
 
-        commandDone = true;
         printMsg(QString(data)); //echo
     }
 }
