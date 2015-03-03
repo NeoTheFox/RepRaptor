@@ -138,6 +138,7 @@ void MainWindow::parseFile(QFile &file)
 
 bool MainWindow::sendLine(QString line)
 {
+
     if(printer.isOpen())
     {
         if(printer.write(line.toUtf8()+'\n'))
@@ -151,6 +152,7 @@ bool MainWindow::sendLine(QString line)
         }
     }
     else return false;
+
 }
 
 void MainWindow::serialupdate()
@@ -229,121 +231,121 @@ void MainWindow::serialconnect()
 void MainWindow::xplus()
 {
     QString command = "G91\nG1 X" + ui->stepspin->text() + "\nG90";
-    sendLine(command);
+    injectCommand(command);
 }
 
 void MainWindow::xminus()
 {
     QString command = "G91\nG1 X-" + ui->stepspin->text() + "\nG90";
-    sendLine(command);
+    injectCommand(command);
 }
 
 void MainWindow::xhome()
 {
-    sendLine("G28 X0");
+    injectCommand("G28 X0");
 }
 
 void MainWindow::yplus()
 {
     QString command = "G91\nG1 Y" + ui->stepspin->text() + "\nG90";
-    sendLine(command);
+    injectCommand(command);
 }
 
 void MainWindow::yminus()
 {
     QString command = "G91\nG1 Y-" + ui->stepspin->text() + "\nG90";
-    sendLine(command);
+    injectCommand(command);
 }
 
 void MainWindow::yhome()
 {
-    sendLine("G28 Y0");
+    injectCommand("G28 Y0");
 }
 
 void MainWindow::zplus()
 {
     QString command = "G91\nG1 Z" + ui->stepspin->text() + "\nG90";
-    sendLine(command);
+    injectCommand(command);
 }
 
 void MainWindow::zminus()
 {
     QString command = "G91\nG1 Z-" + ui->stepspin->text() + "\nG90";
-    sendLine(command);
+    injectCommand(command);
 }
 
 void MainWindow::zhome()
 {
-    sendLine("G28 Z0");
+    injectCommand("G28 Z0");
 }
 
 void MainWindow::eplus()
 {
     QString command = "G91\nG1 E" + ui->estepspin->text() + "\nG90";
-    sendLine(command);
+    injectCommand(command);
 }
 
 void MainWindow::eminus()
 {
     QString command = "G91\nG1 E-" + ui->estepspin->text() + "\nG90";
-    sendLine(command);
+    injectCommand(command);
 }
 
 void MainWindow::ezero()
 {
-    sendLine("G92 E0");
+    injectCommand("G92 E0");
 }
 
 void MainWindow::homeall()
 {
-    sendLine("G28");
+    injectCommand("G28");
 }
 
 void MainWindow::on_sendbtn_clicked()
 {
-    sendLine(ui->sendtext->text());
+    injectCommand(ui->sendtext->text());
 }
 
 void MainWindow::on_fanonbtn_clicked()
 {
-    sendLine("M106");
+    injectCommand("M106");
 }
 
 void MainWindow::on_fanoffbtn_clicked()
 {
-    sendLine("M107");
+    injectCommand("M107");
 }
 
 void MainWindow::on_atxonbtn_clicked()
 {
-    sendLine("M80");
+    injectCommand("M80");
 }
 
 void MainWindow::on_atxoffbtn_clicked()
 {
-    sendLine("M81");
+    injectCommand("M81");
 }
 
 void MainWindow::on_etmpset_clicked()
 {
     QString command = "M80\nM104 S" + ui->etmpspin->text();
-    sendLine(command);
+    injectCommand(command);
 }
 
 void MainWindow::on_etmpoff_clicked()
 {
-    sendLine("M104 S0");
+    injectCommand("M104 S0");
 }
 
 void MainWindow::on_btmpset_clicked()
 {
     QString command = "M80\nM140 S" + ui->btmpspin->text();
-    sendLine(command);
+    injectCommand(command);
 }
 
 void MainWindow::on_btmpoff_clicked()
 {
-    sendLine("M140 S0");
+    injectCommand("M140 S0");
 }
 
 void MainWindow::bedcenter()
@@ -357,7 +359,7 @@ void MainWindow::bedcenter()
     else y = 200;
 
     QString command = "G1 X" + QString::number(x/2) + "Y" + QString::number(y/2);
-    sendLine(command);
+    injectCommand(command);
 }
 
 //Buttons end
@@ -506,7 +508,7 @@ void MainWindow::on_pauseBtn_clicked()
     }
     else if(sdprinting)
     {
-        sendLine("M25");
+        injectCommand("M25");
     }
 }
 
@@ -530,7 +532,7 @@ void MainWindow::on_actionSettings_triggered()
 
 void MainWindow::on_releasebtn_clicked()
 {
-    sendLine("M84");
+    injectCommand("M84");
 }
 
 void MainWindow::on_actionAbout_triggered()
@@ -641,7 +643,7 @@ void MainWindow::updateStatus()
 
 void MainWindow::on_actionPrint_from_SD_triggered()
 {
-    sendLine("M20");
+    injectCommand("M20");
 }
 
 void MainWindow::initSDprinting()
