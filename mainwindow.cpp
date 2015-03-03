@@ -98,7 +98,10 @@ void MainWindow::open()
 {
     QString filename;
     QDir home;
-    filename = QFileDialog::getOpenFileName(this, tr("Open GCODE"),home.home().absolutePath(), tr("GCODE (*.g *.gcode *.nc)"));
+    filename = QFileDialog::getOpenFileName(this,
+                                            tr("Open GCODE"),
+                                            home.home().absolutePath(),
+                                            tr("GCODE (*.g *.gcode *.nc)"));
 
     gfile.setFileName(filename);
     if(!recentFiles.contains(filename))
@@ -480,14 +483,20 @@ void MainWindow::sendNext()
             currentLine = 0;
             ui->sendBtn->setText("Send");
             ui->pauseBtn->setDisabled("true");
-            ui->filelines->setText(QString::number(gcode.size()) + QString("/") + QString::number(currentLine) + QString(" Lines"));
+            ui->filelines->setText(QString::number(gcode.size())
+                                   + QString("/")
+                                   + QString::number(currentLine)
+                                   + QString(" Lines"));
             return;
         }
         sendLine(gcode.at(currentLine));
         currentLine++;
         readyRecieve--;
 
-        ui->filelines->setText(QString::number(gcode.size()) + QString("/") + QString::number(currentLine) + QString(" Lines"));
+        ui->filelines->setText(QString::number(gcode.size())
+                               + QString("/")
+                               + QString::number(currentLine)
+                               + QString(" Lines"));
         ui->progressBar->setValue(((float)currentLine/gcode.size()) * 100);
     }
 }
@@ -514,7 +523,9 @@ void MainWindow::on_pauseBtn_clicked()
 
 void MainWindow::checkStatus()
 {
-    if(checkingTemperature && (sinceLastTemp.elapsed() > statusTimer.interval())) injectCommand("M105");
+    if(checkingTemperature &&
+            (sinceLastTemp.elapsed() > statusTimer.interval())
+            && statusWatcher.isFinished()) injectCommand("M105");
 }
 
 void MainWindow::on_checktemp_stateChanged(int arg1)
@@ -682,7 +693,10 @@ void MainWindow::selectSDfile(QString file)
 void MainWindow::updateSDStatus()
 {
     double currentSDbytes = sdWatcher.future().result();
-    ui->filelines->setText(QString::number(sdBytes) + QString("/") + QString::number(currentSDbytes) + QString(" bytes"));
+    ui->filelines->setText(QString::number(sdBytes)
+                           + QString("/")
+                           + QString::number(currentSDbytes)
+                           + QString(" bytes"));
     ui->progressBar->setValue(currentSDbytes/sdBytes * 100);
     if(currentSDbytes == sdBytes) sdprinting = false;
 }
