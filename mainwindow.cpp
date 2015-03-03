@@ -37,6 +37,8 @@ MainWindow::MainWindow(QWidget *parent) :
     commandDone = false;
     injectingCommand = false;
     readingFiles = false;
+    sdprinting = false;
+    sdBytes = 0;
     userCommand = "";
     currentLine = 0;
 
@@ -47,7 +49,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&statusTimer, SIGNAL(timeout()), this, SLOT(checkStatus()));
     connect(&sendTimer, SIGNAL(timeout()), this, SLOT(sendNext()));
     connect(&statusWatcher, SIGNAL(finished()), this, SLOT(updateStatus()));
+    connect(&sdWatcher, SIGNAL(finished()), this, SLOT(updateSDStatus()));
     connect(this, SIGNAL(sdReady()), this, SLOT(initSDprinting()));
+    connect(&progressSDTimer, SIGNAL(timeout()), this, SLOT(checkSDStatus()));
 
     if(settings.value("core/statusinterval").toInt()) statusTimer.setInterval(settings.value("core/statusinterval").toInt());
     else statusTimer.setInterval(3000);
@@ -56,6 +60,9 @@ MainWindow::MainWindow(QWidget *parent) :
     if(settings.value("core/senderinterval").toInt()) sendTimer.setInterval(settings.value("core/senderinterval").toInt());
     else sendTimer.setInterval(5);
     sendTimer.start();
+
+    progressSDTimer.setInterval(1000);
+    progressSDTimer.start();
 
     tempWarning.setInterval(10000);
 
@@ -119,6 +126,7 @@ void MainWindow::parseFile(QFile &file)
 
         }
         file.close();
+        sdprinting = false;
         ui->fileBox->setEnabled(true);
         ui->filename->setText(file.fileName().split("/").last());
         ui->filelines->setText(QString::number(gcode.size()) + QString("/0 lines"));
@@ -377,7 +385,12 @@ void MainWindow::readSerial()
         {
             if(currentLine > 0) currentLine -= data.split(':')[1].toInt();
             if(currentLine < 0) currentLine = 0;
-            commandDone = true;
+        }
+        else if(datd.startsWith("Done")) sdprinting = false;
+        else if(data.startsWith("SD printing byte"))
+        {
+            QFuture<double> parseSDThread = QtConcurrent::run(this, &MainWindow::parseSDStatus, data);
+            sdWatcher.setFuture(parseSDThread);
         }
         else if(data.contains("Begin file list"))
         {
@@ -385,6 +398,7 @@ void MainWindow::readSerial()
             readingFiles = true; //start reading files from SD
         }
 
+        commandDone = true;
         printMsg(QString(data)); //echo
     }
 }
@@ -412,7 +426,7 @@ void MainWindow::printMsg(QString text)
 
 void MainWindow::on_sendBtn_clicked()
 {
-    if(sending)
+    if(sending && !sdprinting)
     {
         sending = false;
         ui->sendBtn->setText("Send");
@@ -421,13 +435,22 @@ void MainWindow::on_sendBtn_clicked()
         ui->controlBox->setChecked("true");
         paused = false;
     }
-    else if(!sending)
+    else if(!sending && !sdprinting)
     {
         sending=true;
         ui->sendBtn->setText("Stop");
         ui->pauseBtn->setText("Pause");
         ui->pauseBtn->setEnabled("true");
         ui->controlBox->setChecked("false");
+        paused = false;
+    }
+    else if(sdprinting)
+    {
+        sending = false;
+        sendLine("M24");
+        ui->sendBtn->setText("Send");
+        ui->pauseBtn->setText("Pause");
+        ui->controlBox->setChecked("true");
         paused = false;
     }
 
@@ -444,7 +467,7 @@ void MainWindow::sendNext()
         injectingCommand=false;
         return;
     }
-    else if(sending && !paused && commandDone && printer.isWritable())
+    else if(sending && !paused && commandDone && !sdprinting && printer.isWritable())
     {
         if(currentLine >= gcode.size()) //check if we are at the end of array
         {
@@ -466,17 +489,21 @@ void MainWindow::sendNext()
 
 void MainWindow::on_pauseBtn_clicked()
 {
-    if(paused)
+    if(paused && !sdprinting)
     {
         paused = false;
         ui->controlBox->setChecked(false);
         ui->pauseBtn->setText("Pause");
     }
-    else
+    else if(!paused && !sdprinting)
     {
         paused = true;
         ui->controlBox->setChecked(true);
         ui->pauseBtn->setText("Resume");
+    }
+    else if(sdprinting)
+    {
+        sendLine("M25");
     }
 }
 
@@ -600,14 +627,6 @@ TemperatureReadings MainWindow::parseStatus(QByteArray data)
     return t;
 }
 
-void MainWindow::updateStatus(TemperatureReadings r)
-{
-    ui->extruderlcd->display(r.e);
-    ui->bedlcd->display(r.b);
-
-    sinceLastTemp.restart();
-}
-
 void MainWindow::updateStatus()
 {
     TemperatureReadings r = statusWatcher.future().result();
@@ -626,12 +645,44 @@ void MainWindow::initSDprinting()
 {
     SDWindow sdwindow(sdFiles, this);
 
-    connect(&sdwindow, SIGNAL(fileSelected(QString)), this, SLOT(startSDprinting(QString)));
+    connect(&sdwindow, SIGNAL(fileSelected(QString)), this, SLOT(selectSDfile(QString)));
 
     sdwindow.exec();
 }
 
-void MainWindow::startSDprinting(QString file)
+double MainWindow::parseSDStatus(QByteArray data)
 {
-    sendLine("M23 " + file.split(" ")[0] + '\nM24');
+    QString tmp;
+    QString fragment = data.split(' ').at(3);
+    for(int i = 0; fragment.at(i) != '/'; ++i)
+    {
+        tmp += fragment.at(i);
+    }
+
+    return tmp.toDouble();
+}
+
+void MainWindow::selectSDfile(QString file)
+{
+    ui->filename->setText(file.split(" ")[0]);
+    ui->filelines->setText(file.split(" ")[1] + QString("/0 bytes"));
+    ui->progressBar->setValue(0);
+    sdBytes = file.split(" ")[1].toDouble();
+
+    sendLine("M23 " + file.split(" ")[0]);
+    sdprinting = true;
+    ui->fileBox->setDisabled(false);
+}
+
+void MainWindow::updateSDStatus()
+{
+    double currentSDbytes = sdWatcher.future().result();
+    ui->filelines->setText(QString::number(sdBytes) + QString("/") + QString::number(currentSDbytes) + QString(" bytes"));
+    ui->progressBar->setValue(currentSDbytes/sdBytes * 100);
+    if(currentSDbytes == sdBytes) sdprinting = false;
+}
+
+void MainWindow::checkSDStatus()
+{
+    if(sdWatcher.isFinished() && sdprinting) injectCommand("M27");
 }

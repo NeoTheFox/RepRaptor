@@ -39,6 +39,7 @@ public:
     QFile gfile;
     QVector<QString> gcode;
     QTimer sendTimer;
+    QTimer progressSDTimer;
     QTimer statusTimer;
     QTimer tempWarning;
     QElapsedTimer sinceLastTemp;
@@ -46,6 +47,7 @@ public:
     QStringList recentFiles;
     QStringList sdFiles;
     QFutureWatcher<TemperatureReadings> statusWatcher;
+    QFutureWatcher<double> sdWatcher;
 
 private:
     Ui::MainWindow *ui;
@@ -59,7 +61,9 @@ private:
     bool checkingTemperature;
     bool injectingCommand;
     bool readingFiles;
+    bool sdprinting;
     int currentLine;
+    double sdBytes;
     QString userCommand;
 
 private slots:
@@ -76,6 +80,7 @@ private slots:
     void updateRecent();
     void injectCommand(QString command);
     TemperatureReadings parseStatus(QByteArray data);
+    double parseSDStatus(QByteArray data);
 
     void xplus();
     void yplus();
@@ -108,10 +113,11 @@ private slots:
     void on_actionAbout_triggered();
     void serialError(QSerialPort::SerialPortError error);
     void on_actionPrint_from_SD_triggered();
-    void updateStatus(TemperatureReadings r);
     void updateStatus();
     void initSDprinting();
-    void startSDprinting(QString file);
+    void selectSDfile(QString file);
+    void checkSDStatus();
+    void updateSDStatus();
 
 signals:
     void sdReady();
