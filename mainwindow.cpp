@@ -34,15 +34,18 @@ MainWindow::MainWindow(QWidget *parent) :
     checkingTemperature = settings.value("core/checktemperature").toBool();
     ui->checktemp->setChecked(checkingTemperature);
 
+    if(!firstrun) echo = settings.value("core/echo").toBool();
+    else echo = false;
+
     sending = false;
     paused = false;
-    commandDone = false;
     injectingCommand = false;
     readingFiles = false;
     sdprinting = false;
     sdBytes = 0;
     userCommand = "";
     currentLine = 0;
+    readyRecieve = 0;
 
     serialupdate();
 
@@ -143,13 +146,10 @@ bool MainWindow::sendLine(QString line)
     {
         if(printer.write(line.toUtf8()+'\n'))
         {
-            printMsg(line + '\n');
+            if(echo) printMsg(line + '\n');
             return true;
         }
-        else
-        {
-            return false;
-        }
+        else return false;
     }
     else return false;
 
@@ -208,7 +208,6 @@ void MainWindow::serialconnect()
             ui->progressBar->setValue(0);
             ui->controlBox->setDisabled(false);
             ui->consoleGroup->setDisabled(false);
-            commandDone = true;
             if(checkingTemperature) injectCommand("M105");
         }
     }
@@ -380,7 +379,8 @@ void MainWindow::readSerial()
             }
         }
 
-        if(data.startsWith("ok") || data.startsWith("wait")) commandDone = true;    //Can send next command
+        if(data.startsWith("ok")) readyRecieve++;
+        else if(data.startsWith("wait")) readyRecieve = 1;
         else if(checkingTemperature && data.startsWith("T:"))
         {
             QFuture<TemperatureReadings> parseThread = QtConcurrent::run(this, &MainWindow::parseStatus, data);
@@ -393,7 +393,7 @@ void MainWindow::readSerial()
             if(currentLine < 0) currentLine = 0;
         }
         else if(data.startsWith("Done")) sdprinting = false;
-        else if(data.startsWith("SD printing byte"))
+        else if(data.startsWith("SD printing byte") && sdWatcher.isFinished())
         {
             QFuture<double> parseSDThread = QtConcurrent::run(this, &MainWindow::parseSDStatus, data);
             sdWatcher.setFuture(parseSDThread);
@@ -465,14 +465,14 @@ void MainWindow::on_sendBtn_clicked()
 
 void MainWindow::sendNext()
 {
-    if(injectingCommand && printer.isWritable() && commandDone)
+    if(injectingCommand && printer.isWritable() && readyRecieve > 0)
     {
         sendLine(userCommand);
-        commandDone=false;
+        readyRecieve--;
         injectingCommand=false;
         return;
     }
-    else if(sending && !paused && commandDone && !sdprinting && printer.isWritable())
+    else if(sending && !paused && readyRecieve > 0 && !sdprinting && printer.isWritable())
     {
         if(currentLine >= gcode.size()) //check if we are at the end of array
         {
@@ -485,7 +485,7 @@ void MainWindow::sendNext()
         }
         sendLine(gcode.at(currentLine));
         currentLine++;
-        commandDone = false;
+        readyRecieve--;
 
         ui->filelines->setText(QString::number(gcode.size()) + QString("/") + QString::number(currentLine) + QString(" Lines"));
         ui->progressBar->setValue(((float)currentLine/gcode.size()) * 100);

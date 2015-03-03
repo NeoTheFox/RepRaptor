@@ -58,12 +58,13 @@ private:
     bool firstrun;
     bool sending;
     bool paused;
-    bool commandDone;
     bool checkingTemperature;
     bool injectingCommand;
     bool readingFiles;
     bool sdprinting;
+    bool echo;
     int currentLine;
+    int readyRecieve;
     double sdBytes;
     QString userCommand;
 

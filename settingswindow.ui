@@ -29,23 +29,45 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QGroupBox" name="intervalsGroup">
+  <widget class="QGroupBox" name="internalGroup">
    <property name="geometry">
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>201</width>
-     <height>96</height>
+     <width>171</width>
+     <height>123</height>
     </rect>
    </property>
    <property name="title">
-    <string>Intervals</string>
+    <string>Internal</string>
    </property>
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
      <widget class="QLabel" name="label">
       <property name="text">
        <string>Sender</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QDoubleSpinBox" name="senderbox">
+      <property name="toolTip">
+       <string>A good default is 2, lower = fater, higher = less CPU load. 0 would execute as soon as possible.</string>
+      </property>
+      <property name="toolTipDuration">
+       <number>-1</number>
+      </property>
+      <property name="locale">
+       <locale language="English" country="UnitedStates"/>
+      </property>
+      <property name="minimum">
+       <double>0.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>999.990000000000009</double>
+      </property>
+      <property name="singleStep">
+       <double>0.100000000000000</double>
       </property>
      </widget>
     </item>
@@ -86,25 +108,10 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="1">
-     <widget class="QDoubleSpinBox" name="senderbox">
-      <property name="toolTip">
-       <string>A good default is 2, lower = fater, higher = less CPU load. 0 would execute as soon as possible.</string>
-      </property>
-      <property name="toolTipDuration">
-       <number>-1</number>
-      </property>
-      <property name="locale">
-       <locale language="English" country="UnitedStates"/>
-      </property>
-      <property name="minimum">
-       <double>0.000000000000000</double>
-      </property>
-      <property name="maximum">
-       <double>999.990000000000009</double>
-      </property>
-      <property name="singleStep">
-       <double>0.100000000000000</double>
+    <item row="2" column="0" colspan="3">
+     <widget class="QCheckBox" name="echobox">
+      <property name="text">
+       <string>Echo commands</string>
       </property>
      </widget>
     </item>
@@ -114,7 +121,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>110</y>
+     <y>130</y>
      <width>201</width>
      <height>66</height>
     </rect>
