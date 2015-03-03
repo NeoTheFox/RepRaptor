@@ -120,9 +120,9 @@ private slots:
     void checkSDStatus();
     void updateSDStatus();
 
-    void on_stepspin_valueChanged(double arg1);
+    void on_stepspin_valueChanged(const QString &arg1);
 
-    void on_estepspin_valueChanged(double arg1);
+    void on_estepspin_valueChanged(const QString &arg1);
 
 signals:
     void sdReady();
