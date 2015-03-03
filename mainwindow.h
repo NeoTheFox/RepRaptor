@@ -81,6 +81,11 @@ private slots:
     void checkStatus();
     void updateRecent();
     void injectCommand(QString command);
+    void updateStatus();
+    void initSDprinting();
+    void selectSDfile(QString file);
+    void checkSDStatus();
+    void updateSDStatus();
     TemperatureReadings parseStatus(QByteArray data);
     double parseSDStatus(QByteArray data);
 
@@ -111,19 +116,12 @@ private slots:
     void on_pauseBtn_clicked();
     void on_checktemp_stateChanged(int arg1);
     void on_actionSettings_triggered();
+    void on_stepspin_valueChanged(const QString &arg1);
+    void on_estepspin_valueChanged(const QString &arg1);
     void on_releasebtn_clicked();
     void on_actionAbout_triggered();
     void serialError(QSerialPort::SerialPortError error);
     void on_actionPrint_from_SD_triggered();
-    void updateStatus();
-    void initSDprinting();
-    void selectSDfile(QString file);
-    void checkSDStatus();
-    void updateSDStatus();
-
-    void on_stepspin_valueChanged(const QString &arg1);
-
-    void on_estepspin_valueChanged(const QString &arg1);
 
 signals:
     void sdReady();
