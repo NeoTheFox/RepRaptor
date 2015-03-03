@@ -29,6 +29,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->extruderlcd->setPalette(Qt::red);
     ui->bedlcd->setPalette(Qt::red);
 
+    if(!settings.value("core/firstrun").toBool()) firstrun = true;
+
     checkingTemperature = settings.value("core/checktemperature").toBool();
     ui->checktemp->setChecked(checkingTemperature);
 
@@ -76,6 +78,7 @@ MainWindow::~MainWindow()
 
     settings.setValue("printer/baudrateIndex", ui->baudbox->currentIndex());
     settings.setValue("core/checktemperature", ui->checktemp->isChecked());
+    if(firstrun) settings.setValue("core/firstrun", true);
 
     settings.beginWriteArray("user/recentfiles");
     for(int i = 0; i < recentFiles.size(); i++)

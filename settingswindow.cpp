@@ -7,10 +7,11 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->senderbox->setValue(settings.value("core/senderinterval").toFloat());
+    if(!settings.value("core/firstrun").toBool()) ui->senderbox->setValue(2);
+    else ui->senderbox->setValue(settings.value("core/senderinterval").toFloat());
 
     if(settings.value("core/statusinterval").toInt()) ui->statusbox->setValue(settings.value("core/statusinterval").toInt());
-    else ui->senderbox->setValue(3000);
+    else ui->statusbox->setValue(1500);
 
     if(settings.value("printer/bedx").toInt()) ui->bedxbox->setValue(settings.value("printer/bedx").toInt());
     else ui->bedxbox->setValue(200);

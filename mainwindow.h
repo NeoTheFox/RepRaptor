@@ -55,6 +55,7 @@ private:
     void parseFile(QFile &file);
     QSerialPort printer;
     QSerialPortInfo printerinfo;
+    bool firstrun;
     bool sending;
     bool paused;
     bool commandDone;
