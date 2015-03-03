@@ -16,6 +16,7 @@
 #include "settingswindow.h"
 #include "aboutwindow.h"
 #include "errorwindow.h"
+#include "sdwindow.h"
 
 
 namespace Ui {
@@ -43,6 +44,7 @@ public:
     QElapsedTimer sinceLastTemp;
     QSettings settings;
     QStringList recentFiles;
+    QStringList sdFiles;
     QFutureWatcher<TemperatureReadings> statusWatcher;
 
 private:
@@ -56,6 +58,7 @@ private:
     bool commandDone;
     bool checkingTemperature;
     bool injectingCommand;
+    bool readingFiles;
     int currentLine;
     QString userCommand;
 
@@ -107,6 +110,11 @@ private slots:
     void on_actionPrint_from_SD_triggered();
     void updateStatus(TemperatureReadings r);
     void updateStatus();
+    void initSDprinting();
+    void startSDprinting(QString file);
+
+signals:
+    void sdReady();
 };
 
 #endif // MAINWINDOW_H

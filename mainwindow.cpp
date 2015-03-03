@@ -36,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent) :
     paused = false;
     commandDone = false;
     injectingCommand = false;
+    readingFiles = false;
     userCommand = "";
     currentLine = 0;
 
@@ -46,6 +47,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&statusTimer, SIGNAL(timeout()), this, SLOT(checkStatus()));
     connect(&sendTimer, SIGNAL(timeout()), this, SLOT(sendNext()));
     connect(&statusWatcher, SIGNAL(finished()), this, SLOT(updateStatus()));
+    connect(this, SIGNAL(sdReady()), this, SLOT(initSDprinting()));
 
     if(settings.value("core/statusinterval").toInt()) statusTimer.setInterval(settings.value("core/statusinterval").toInt());
     else statusTimer.setInterval(3000);
@@ -354,6 +356,17 @@ void MainWindow::readSerial()
     if(printer.canReadLine())
     {
         QByteArray data = printer.readLine();
+
+        if(readingFiles)
+        {
+            if(!data.contains("End file list")) sdFiles.append(data);
+            else
+            {
+                readingFiles = false;
+                emit sdReady();
+            }
+        }
+
         if(data.startsWith("ok") || data.startsWith("wait")) commandDone = true;    //Can send next command
         else if(checkingTemperature && data.startsWith("T:"))
         {
@@ -365,6 +378,11 @@ void MainWindow::readSerial()
             if(currentLine > 0) currentLine -= data.split(':')[1].toInt();
             if(currentLine < 0) currentLine = 0;
             commandDone = true;
+        }
+        else if(data.contains("Begin file list"))
+        {
+            sdFiles.clear();
+            readingFiles = true; //start reading files from SD
         }
 
         printMsg(QString(data)); //echo
@@ -601,5 +619,19 @@ void MainWindow::updateStatus()
 
 void MainWindow::on_actionPrint_from_SD_triggered()
 {
-    //TODO
+    sendLine("M20");
+}
+
+void MainWindow::initSDprinting()
+{
+    SDWindow sdwindow(sdFiles, this);
+
+    connect(&sdwindow, SIGNAL(fileSelected(QString)), this, SLOT(startSDprinting(QString)));
+
+    sdwindow.exec();
+}
+
+void MainWindow::startSDprinting(QString file)
+{
+    sendLine("M23 " + file.split(" ")[0] + '\nM24');
 }

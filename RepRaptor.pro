@@ -18,18 +18,21 @@ SOURCES += main.cpp\
     settingswindow.cpp \
     aboutwindow.cpp \
     errorwindow.cpp \
-    erroricon.cpp
+    erroricon.cpp \
+    sdwindow.cpp
 
 HEADERS  += mainwindow.h \
     settingswindow.h \
     aboutwindow.h \
     errorwindow.h \
-    erroricon.h
+    erroricon.h \
+    sdwindow.h
 
 FORMS    += mainwindow.ui \
     settingswindow.ui \
     aboutwindow.ui \
-    errorwindow.ui
+    errorwindow.ui \
+    sdwindow.ui
 
 RESOURCES += \
     graphics.qrc
