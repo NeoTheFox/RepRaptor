@@ -689,3 +689,17 @@ void MainWindow::checkSDStatus()
 {
     if(sdWatcher.isFinished() && sdprinting) injectCommand("M27");
 }
+
+void MainWindow::on_stepspin_valueChanged(double arg1)
+{
+    if(arg1 < 1) ui->stepspin->setSingleStep(0.1);
+    else if(arg1 >=10) ui->stepspin->setSingleStep(10);
+    else if((int)arg1 >= 1) ui->stepspin->setSingleStep(1);
+}
+
+void MainWindow::on_estepspin_valueChanged(double arg1)
+{
+    if(arg1 < 1l) ui->estepspin->setSingleStep(0.1);
+    else if(arg1 >=10) ui->estepspin->setSingleStep(10);
+    else if((int)arg1 >= 1) ui->estepspin->setSingleStep(1);
+}

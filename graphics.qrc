@@ -4,5 +4,8 @@
         <file>icons/logo.png</file>
         <file>icons/error_a.png</file>
         <file>icons/error_b.png</file>
+        <file>icons/g.png</file>
+        <file>icons/sd.png</file>
+        <file>icons/settings.png</file>
     </qresource>
 </RCC>
