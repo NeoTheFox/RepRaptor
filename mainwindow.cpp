@@ -358,7 +358,7 @@ void MainWindow::readSerial()
         else if(checkingTemperature && data.startsWith("T:"))
         {
             QFuture<TemperatureReadings> parseThread = QtConcurrent::run(this, &MainWindow::parseStatus, data);
-            statusWatcher.setFuture(parseThread);
+            statusWatcher.setFuture(parseThread); //parseThread is very costly operation
         }
         else if(data.startsWith("Resend"))  //Handle resend if requested
         {
@@ -367,7 +367,7 @@ void MainWindow::readSerial()
             commandDone = true;
         }
 
-        printMsg(QString(data));
+        printMsg(QString(data)); //echo
     }
 }
 
@@ -571,7 +571,7 @@ TemperatureReadings MainWindow::parseStatus(QByteArray data)
         btmp+=data.at(i);
     }
 
-    //ui->extruderlcd->display(extmp.toDouble());
+    //ui->extruderlcd->display(extmp.toDouble()); //Not needed here, moved to updateStatus();
     //ui->bedlcd->display(btmp.toDouble());
     //sinceLastTemp.restart();
 
