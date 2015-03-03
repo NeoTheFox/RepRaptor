@@ -88,6 +88,9 @@
       </item>
       <item row="2" column="0" colspan="3">
        <widget class="QCheckBox" name="echobox">
+        <property name="toolTip">
+         <string>Show every sent command in console</string>
+        </property>
         <property name="text">
          <string>Echo commands</string>
         </property>

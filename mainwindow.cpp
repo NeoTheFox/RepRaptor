@@ -34,6 +34,9 @@ MainWindow::MainWindow(QWidget *parent) :
     checkingTemperature = settings.value("core/checktemperature").toBool();
     ui->checktemp->setChecked(checkingTemperature);
 
+    ui->etmpspin->setValue(settings.value("user/extrudertemp").toInt());
+    ui->btmpspin->setValue(settings.value("user/bedtemp").toInt());
+
     if(!firstrun) echo = settings.value("core/echo").toBool();
     else echo = false;
 
@@ -81,6 +84,8 @@ MainWindow::~MainWindow()
 
     settings.setValue("printer/baudrateIndex", ui->baudbox->currentIndex());
     settings.setValue("core/checktemperature", ui->checktemp->isChecked());
+    settings.setValue("user/extrudertemp", ui->estepspin->value());
+    settings.setValue("user/bedtemp", ui->btmpspin->value());
     if(firstrun) settings.setValue("core/firstrun", true);
 
     settings.beginWriteArray("user/recentfiles");
