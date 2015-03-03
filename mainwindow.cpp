@@ -61,7 +61,7 @@ MainWindow::MainWindow(QWidget *parent) :
     else sendTimer.setInterval(5);
     sendTimer.start();
 
-    progressSDTimer.setInterval(1000);
+    progressSDTimer.setInterval(1500);
     progressSDTimer.start();
 
     tempWarning.setInterval(10000);
@@ -386,7 +386,7 @@ void MainWindow::readSerial()
             if(currentLine > 0) currentLine -= data.split(':')[1].toInt();
             if(currentLine < 0) currentLine = 0;
         }
-        else if(datd.startsWith("Done")) sdprinting = false;
+        else if(data.startsWith("Done")) sdprinting = false;
         else if(data.startsWith("SD printing byte"))
         {
             QFuture<double> parseSDThread = QtConcurrent::run(this, &MainWindow::parseSDStatus, data);
