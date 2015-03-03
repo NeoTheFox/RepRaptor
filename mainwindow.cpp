@@ -45,6 +45,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&printer, SIGNAL(readyRead()), this, SLOT(readSerial()));
     connect(&statusTimer, SIGNAL(timeout()), this, SLOT(checkStatus()));
     connect(&sendTimer, SIGNAL(timeout()), this, SLOT(sendNext()));
+    connect(&statusWatcher, SIGNAL(finished()), this, SLOT(updateStatus()));
 
     if(settings.value("core/statusinterval").toInt()) statusTimer.setInterval(settings.value("core/statusinterval").toInt());
     else statusTimer.setInterval(3000);
@@ -354,7 +355,11 @@ void MainWindow::readSerial()
     {
         QByteArray data = printer.readLine();
         if(data.startsWith("ok") || data.startsWith("wait")) commandDone = true;    //Can send next command
-        else if(checkingTemperature && data.startsWith("T:")) parseStatus(data);  //Parse temperature readings if any
+        else if(checkingTemperature && data.startsWith("T:"))
+        {
+            QFuture<TemperatureReadings> parseThread = QtConcurrent::run(this, &MainWindow::parseStatus, data);
+            statusWatcher.setFuture(parseThread);
+        }
         else if(data.startsWith("Resend"))  //Handle resend if requested
         {
             if(currentLine > 0) currentLine -= data.split(':')[1].toInt();
@@ -552,7 +557,7 @@ void MainWindow::serialError(QSerialPort::SerialPortError error)
     errorwindow.exec();
 }
 
-void MainWindow::parseStatus(QByteArray data)
+TemperatureReadings MainWindow::parseStatus(QByteArray data)
 {
     QString extmp = "";
     QString btmp = "";
@@ -566,11 +571,33 @@ void MainWindow::parseStatus(QByteArray data)
         btmp+=data.at(i);
     }
 
-    ui->extruderlcd->display(extmp.toDouble());
-    ui->bedlcd->display(btmp.toDouble());
+    //ui->extruderlcd->display(extmp.toDouble());
+    //ui->bedlcd->display(btmp.toDouble());
+    //sinceLastTemp.restart();
+
+    TemperatureReadings t;
+    t.e = extmp.toDouble();
+    t.b = btmp.toDouble();
+
+    return t;
+}
+
+void MainWindow::updateStatus(TemperatureReadings r)
+{
+    ui->extruderlcd->display(r.e);
+    ui->bedlcd->display(r.b);
+
     sinceLastTemp.restart();
 }
 
+void MainWindow::updateStatus()
+{
+    TemperatureReadings r = statusWatcher.future().result();
+    ui->extruderlcd->display(r.e);
+    ui->bedlcd->display(r.b);
+
+    sinceLastTemp.restart();
+}
 
 void MainWindow::on_actionPrint_from_SD_triggered()
 {

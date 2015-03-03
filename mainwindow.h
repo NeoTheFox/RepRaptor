@@ -8,7 +8,7 @@
 #include <QFuture>
 #include <QVector>
 #include <QTextStream>
-#include <QTimer>
+#include <QtConcurrent/QtConcurrent>
 #include <QSettings>
 #include <QElapsedTimer>
 #include <QMessageBox>
@@ -21,6 +21,11 @@
 namespace Ui {
 class MainWindow;
 }
+
+typedef struct
+{
+    double e, b;
+} TemperatureReadings;
 
 class MainWindow : public QMainWindow
 {
@@ -38,6 +43,7 @@ public:
     QElapsedTimer sinceLastTemp;
     QSettings settings;
     QStringList recentFiles;
+    QFutureWatcher<TemperatureReadings> statusWatcher;
 
 private:
     Ui::MainWindow *ui;
@@ -66,7 +72,7 @@ private slots:
     void checkStatus();
     void updateRecent();
     void injectCommand(QString command);
-    void parseStatus(QByteArray data);
+    TemperatureReadings parseStatus(QByteArray data);
 
     void xplus();
     void yplus();
@@ -99,6 +105,8 @@ private slots:
     void on_actionAbout_triggered();
     void serialError(QSerialPort::SerialPortError error);
     void on_actionPrint_from_SD_triggered();
+    void updateStatus(TemperatureReadings r);
+    void updateStatus();
 };
 
 #endif // MAINWINDOW_H
