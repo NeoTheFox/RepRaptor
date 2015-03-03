@@ -380,13 +380,13 @@ void MainWindow::readSerial()
         }
 
         if(data.startsWith("ok")) readyRecieve++;
-        else if(data.startsWith("wait")) readyRecieve = 1;
         else if(checkingTemperature && data.startsWith("T:"))
         {
             QFuture<TemperatureReadings> parseThread = QtConcurrent::run(this, &MainWindow::parseStatus, data);
             statusWatcher.setFuture(parseThread); //parseThread is very costly operation
             ui->tempLine->setText(data);
         }
+        else if(data.startsWith("wait")) readyRecieve = 1;
         else if(data.startsWith("Resend"))  //Handle resend if requested
         {
             if(currentLine > 0) currentLine -= data.split(':')[1].toInt();
