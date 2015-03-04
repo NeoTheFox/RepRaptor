@@ -111,14 +111,8 @@ void MainWindow::open()
     gfile.setFileName(filename);
     if(!recentFiles.contains(filename))
     {
-        if(recentFiles.size() < 5)
-        {
-            recentFiles.append(filename);
-        }
-        else
-        {
-           recentFiles.push_front(filename);
-        }
+        if(recentFiles.size() < 5) recentFiles.append(filename);
+        else recentFiles.push_front(filename);
     }
 
     parseFile(gfile);
@@ -369,6 +363,45 @@ void MainWindow::bedcenter()
     injectCommand(command);
 }
 
+void MainWindow::on_speedslider_valueChanged(int value)
+{
+    ui->speededit->setText(QString::number(value));
+}
+
+void MainWindow::on_speededit_textChanged(const QString &arg1)
+{
+    if(arg1.toInt()) ui->speedslider->setValue(arg1.toInt());
+    else ui->speededit->setText(QString::number(ui->speedslider->value()));
+}
+
+void MainWindow::on_speedsetbtn_clicked()
+{
+    QString command = "M220 S" + QString::number(ui->speedslider->value());
+    injectCommand(command);
+}
+
+void MainWindow::on_flowedit_textChanged(const QString &arg1)
+{
+    if(arg1.toInt()) ui->flowslider->setValue(arg1.toInt());
+    else ui->flowedit->setText(QString::number(ui->flowslider->value()));
+}
+
+void MainWindow::on_flowslider_valueChanged(int value)
+{
+    ui->flowedit->setText(QString::number(value));
+}
+
+void MainWindow::on_flowbutton_clicked()
+{
+    QString command = "M221 S" + QString::number(ui->flowslider->value());
+    injectCommand(command);
+}
+
+void MainWindow::on_haltbtn_clicked()
+{
+    if(sending && !paused)ui->pauseBtn->click();
+    injectCommand("M112");
+}
 //Buttons end
 
 void MainWindow::readSerial()
@@ -662,9 +695,14 @@ void MainWindow::on_actionPrint_from_SD_triggered()
     injectCommand("M20");
 }
 
+void MainWindow::on_actionAbout_Qt_triggered()
+{
+    qApp->aboutQt();
+}
+
 void MainWindow::initSDprinting()
 {
-    SDWindow sdwindow(sdFiles, this);
+    SDWindow sdwindow(sdFiles, this); //Made it to 666 lines!
 
     connect(&sdwindow, SIGNAL(fileSelected(QString)), this, SLOT(selectSDfile(QString)));
 
@@ -723,9 +761,4 @@ void MainWindow::on_estepspin_valueChanged(const QString &arg1)
     if(arg1.toFloat() < 1) ui->estepspin->setSingleStep(0.1);
     else if(arg1.toFloat() >=10) ui->estepspin->setSingleStep(10);
     else if(arg1.toFloat() >= 1) ui->estepspin->setSingleStep(1);
-}
-
-void MainWindow::on_actionAbout_Qt_triggered()
-{
-    qApp->aboutQt();
 }

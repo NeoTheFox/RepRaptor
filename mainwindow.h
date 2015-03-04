@@ -114,6 +114,14 @@ private slots:
     void on_btmpoff_clicked();
     void on_sendBtn_clicked();
     void on_pauseBtn_clicked();
+    void on_haltbtn_clicked();
+    void on_actionAbout_Qt_triggered();
+    void on_speedslider_valueChanged(int value);
+    void on_speededit_textChanged(const QString &arg1);
+    void on_speedsetbtn_clicked();
+    void on_flowedit_textChanged(const QString &arg1);
+    void on_flowslider_valueChanged(int value);
+    void on_flowbutton_clicked();
     void on_checktemp_stateChanged(int arg1);
     void on_actionSettings_triggered();
     void on_stepspin_valueChanged(const QString &arg1);
@@ -122,8 +130,6 @@ private slots:
     void on_actionAbout_triggered();
     void serialError(QSerialPort::SerialPortError error);
     void on_actionPrint_from_SD_triggered();
-
-    void on_actionAbout_Qt_triggered();
 
 signals:
     void sdReady();
