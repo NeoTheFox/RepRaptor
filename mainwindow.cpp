@@ -210,7 +210,7 @@ void MainWindow::serialconnect()
             ui->progressBar->setValue(0);
             ui->controlBox->setDisabled(false);
             ui->consoleGroup->setDisabled(false);
-            if(checkingTemperature) injectCommand("M105");
+            //if(checkingTemperature) injectCommand("M105");
         }
     }
 
@@ -669,10 +669,6 @@ TemperatureReadings MainWindow::parseStatus(QByteArray data)
     {
         btmp+=data.at(i);
     }
-
-    //ui->extruderlcd->display(extmp.toDouble()); //Not needed here, moved to updateStatus();
-    //ui->bedlcd->display(btmp.toDouble());
-    //sinceLastTemp.restart();
 
     TemperatureReadings t;
     t.e = extmp.toDouble();
