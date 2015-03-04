@@ -23,8 +23,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->baudbox->addItem(QString::number(250000));
     ui->baudbox->addItem(QString::number(460800));
     ui->baudbox->addItem(QString::number(500000));
-    if(settings.value("printer/baudrateIndex").toInt()) ui->baudbox->setCurrentIndex(settings.value("printer/baudrateIndex").toInt());
-    ui->baudbox->setCurrentIndex(2);
+    if(settings.value("printer/baudrateindex").toInt()) ui->baudbox->setCurrentIndex(settings.value("printer/baudrateindex").toInt());
+    else ui->baudbox->setCurrentIndex(2);
 
     ui->extruderlcd->setPalette(Qt::red);
     ui->bedlcd->setPalette(Qt::red);
@@ -82,9 +82,9 @@ MainWindow::~MainWindow()
     if(gfile.isOpen()) gfile.close();
     if(printer.isOpen()) printer.close();
 
-    settings.setValue("printer/baudrateIndex", ui->baudbox->currentIndex());
+    settings.setValue("printer/baudrateindex", ui->baudbox->currentIndex());
     settings.setValue("core/checktemperature", ui->checktemp->isChecked());
-    settings.setValue("user/extrudertemp", ui->estepspin->value());
+    settings.setValue("user/extrudertemp", ui->etmpspin->value());
     settings.setValue("user/bedtemp", ui->btmpspin->value());
     if(firstrun) settings.setValue("core/firstrun", true);
 

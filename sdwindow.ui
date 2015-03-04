@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="graphics.qrc">
+    <normaloff>:/icons/sd.png</normaloff>:/icons/sd.png</iconset>
+  </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
     <widget class="QLabel" name="label">
@@ -43,7 +47,9 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="graphics.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>

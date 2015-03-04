@@ -7,5 +7,6 @@
         <file>icons/g.png</file>
         <file>icons/sd.png</file>
         <file>icons/settings.png</file>
+        <file>icons/about.png</file>
     </qresource>
 </RCC>
