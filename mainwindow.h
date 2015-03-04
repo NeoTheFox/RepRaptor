@@ -123,6 +123,8 @@ private slots:
     void serialError(QSerialPort::SerialPortError error);
     void on_actionPrint_from_SD_triggered();
 
+    void on_actionAbout_Qt_triggered();
+
 signals:
     void sdReady();
 };

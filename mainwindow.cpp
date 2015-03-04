@@ -724,3 +724,8 @@ void MainWindow::on_estepspin_valueChanged(const QString &arg1)
     else if(arg1.toFloat() >=10) ui->estepspin->setSingleStep(10);
     else if(arg1.toFloat() >= 1) ui->estepspin->setSingleStep(1);
 }
+
+void MainWindow::on_actionAbout_Qt_triggered()
+{
+    qApp->aboutQt();
+}
