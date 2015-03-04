@@ -210,7 +210,7 @@ void MainWindow::serialconnect()
             ui->progressBar->setValue(0);
             ui->controlBox->setDisabled(false);
             ui->consoleGroup->setDisabled(false);
-            //if(checkingTemperature) injectCommand("M105");
+            if(checkingTemperature) injectCommand("M105");
         }
     }
 
