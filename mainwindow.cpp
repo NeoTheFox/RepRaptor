@@ -52,6 +52,14 @@ MainWindow::MainWindow(QWidget *parent) :
     currentLine = 0;
     readyRecieve = 0;
 
+    temperatureRegxp.setCaseSensitivity(Qt::CaseInsensitive);
+    temperatureRegxp.setPatternSyntax(QRegExp::RegExp);
+    temperatureRegxp.setPattern("\\d+\\.\\d+");
+
+    SDStatusRegxp.setCaseSensitivity(Qt::CaseInsensitive);
+    SDStatusRegxp.setPatternSyntax(QRegExp::RegExp);
+    SDStatusRegxp.setPattern("\\d+");
+
     serialupdate();
 
     connect(&printer, SIGNAL(error(QSerialPort::SerialPortError)), this, SLOT(serialError(QSerialPort::SerialPortError)));
@@ -71,7 +79,7 @@ MainWindow::MainWindow(QWidget *parent) :
     else sendTimer.setInterval(5);
     sendTimer.start();
 
-    progressSDTimer.setInterval(1500);
+    progressSDTimer.setInterval(2000);
     progressSDTimer.start();
 
     tempWarning.setInterval(10000);
@@ -228,7 +236,8 @@ void MainWindow::serialconnect()
         ui->progressBar->setValue(0);
         ui->controlBox->setDisabled(true);
         ui->consoleGroup->setDisabled(true);
-
+        ui->actionPrint_from_SD->setDisabled("true");
+        ui->actionSet_SD_printing_mode->setDisabled("true");
      }
 }
 
@@ -665,6 +674,7 @@ void MainWindow::serialError(QSerialPort::SerialPortError error)
 
 TemperatureReadings MainWindow::parseStatus(QByteArray data)
 {
+    /* Old parsing
     QString tmp;
     TemperatureReadings t;
 
@@ -683,8 +693,25 @@ TemperatureReadings MainWindow::parseStatus(QByteArray data)
     }
 
     t.b = tmp.toDouble();
+    */
 
-    return t;
+    TemperatureReadings r;
+
+    if(temperatureRegxp.indexIn(QString(data)) != -1)
+    {
+        r.e = temperatureRegxp.cap(0).toDouble();
+    }
+    if(temperatureRegxp.indexIn(QString(data), temperatureRegxp.matchedLength()) != -1)
+    {
+        r.b = temperatureRegxp.cap(0).toDouble();
+    }
+    else
+    {
+        r.e = -1;
+        r.b = -1;
+    }
+
+    return r;
 }
 
 void MainWindow::updateStatus()
@@ -717,24 +744,31 @@ void MainWindow::initSDprinting()
 
 double MainWindow::parseSDStatus(QByteArray data)
 {
+    /* Old parsing
     QString tmp;
     QString fragment = data.split(' ').at(3);
     for(int i = 0; fragment.at(i) != '/'; ++i)
     {
         tmp += fragment.at(i);
     }
+    */
 
-    return tmp.toDouble();
+    if(SDStatusRegxp.indexIn(QString(data)) != 0) return SDStatusRegxp.cap(0).toDouble();
+    else return -1;
 }
 
 void MainWindow::selectSDfile(QString file)
 {
-    ui->filename->setText(file.split(" ")[0]);
-    ui->filelines->setText(file.split(" ")[1] + QString("/0 bytes"));
-    ui->progressBar->setValue(0);
-    sdBytes = file.split(" ")[1].toDouble();
+    QStringList split = file.split(' ');
+    QString bytes = split.at(split.size()-1);
+    QString filename = file.remove(" "+bytes);
 
-    sendLine("M23 " + file.split(" ")[0]);
+    ui->filename->setText(filename);
+    ui->filelines->setText(bytes + QString("/0 bytes"));
+    ui->progressBar->setValue(0);
+    sdBytes = bytes.toDouble();
+
+    sendLine("M23 " + filename);
     sdprinting = true;
     ui->fileBox->setDisabled(false);
 }

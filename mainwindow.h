@@ -12,6 +12,7 @@
 #include <QSettings>
 #include <QElapsedTimer>
 #include <QMessageBox>
+#include <QRegExp>
 
 #include "settingswindow.h"
 #include "aboutwindow.h"
@@ -48,6 +49,8 @@ public:
     QStringList sdFiles;
     QFutureWatcher<TemperatureReadings> statusWatcher;
     QFutureWatcher<double> sdWatcher;
+    QRegExp temperatureRegxp;
+    QRegExp SDStatusRegxp;
 
 private:
     Ui::MainWindow *ui;

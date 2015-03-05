@@ -999,6 +999,12 @@ STOP</string>
        </item>
        <item row="2" column="0" colspan="2">
         <widget class="QLabel" name="tempLine">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>14</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>200</width>
