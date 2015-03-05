@@ -14,6 +14,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->controlBox->setDisabled(true);
     ui->consoleGroup->setDisabled(true);
     ui->pauseBtn->setDisabled("true");
+    ui->actionPrint_from_SD->setDisabled("true");
+    ui->actionSet_SD_printing_mode->setDisabled("true");
 
     ui->baudbox->addItem(QString::number(4800));
     ui->baudbox->addItem(QString::number(9600));
@@ -210,6 +212,8 @@ void MainWindow::serialconnect()
             ui->progressBar->setValue(0);
             ui->controlBox->setDisabled(false);
             ui->consoleGroup->setDisabled(false);
+            ui->actionPrint_from_SD->setEnabled("true");
+            ui->actionSet_SD_printing_mode->setEnabled("true");
             if(checkingTemperature) injectCommand("M105");
         }
     }
@@ -439,6 +443,7 @@ void MainWindow::readSerial()
             QFuture<double> parseSDThread = QtConcurrent::run(this, &MainWindow::parseSDStatus, data);
             sdWatcher.setFuture(parseSDThread);
         }
+        else if(sdprinting && data.startsWith("Not SD ")) sdprinting = false;
         else if(data.contains("Begin file list"))
         {
             sdFiles.clear();
@@ -616,6 +621,8 @@ void MainWindow::serialError(QSerialPort::SerialPortError error)
     ui->pauseBtn->setDisabled(true);
     ui->controlBox->setDisabled(true);
     ui->consoleGroup->setDisabled(true);
+    ui->actionPrint_from_SD->setDisabled("true");
+    ui->actionSet_SD_printing_mode->setDisabled("true");
 
     qDebug() << error;
 
@@ -658,21 +665,24 @@ void MainWindow::serialError(QSerialPort::SerialPortError error)
 
 TemperatureReadings MainWindow::parseStatus(QByteArray data)
 {
-    QString extmp = "";
-    QString btmp = "";
+    QString tmp;
+    TemperatureReadings t;
 
     for(int i = 2; data.at(i) != '/'; i++)
     {
-        extmp+=data.at(i);
-    }
-    for(int i = data.indexOf("B:")+2; data.at(i) != '/'; i++)
-    {
-        btmp+=data.at(i);
+        tmp+=data.at(i);
     }
 
-    TemperatureReadings t;
-    t.e = extmp.toDouble();
-    t.b = btmp.toDouble();
+    t.e = tmp.toDouble();
+
+    tmp.clear();
+
+    for(int i = data.indexOf("B:")+2; data.at(i) != '/'; i++)
+    {
+        tmp+=data.at(i);
+    }
+
+    t.b = tmp.toDouble();
 
     return t;
 }
@@ -757,4 +767,10 @@ void MainWindow::on_estepspin_valueChanged(const QString &arg1)
     if(arg1.toFloat() < 1) ui->estepspin->setSingleStep(0.1);
     else if(arg1.toFloat() >=10) ui->estepspin->setSingleStep(10);
     else if(arg1.toFloat() >= 1) ui->estepspin->setSingleStep(1);
+}
+
+void MainWindow::on_actionSet_SD_printing_mode_triggered()
+{
+    sdprinting = true;
+    ui->fileBox->setDisabled(false);
 }

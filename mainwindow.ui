@@ -1063,6 +1063,7 @@ STOP</string>
      <string>Tools</string>
     </property>
     <addaction name="actionPrint_from_SD"/>
+    <addaction name="actionSet_SD_printing_mode"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuTools"/>
@@ -1180,6 +1181,11 @@ STOP</string>
   <action name="actionAbout_Qt">
    <property name="text">
     <string>About Qt</string>
+   </property>
+  </action>
+  <action name="actionSet_SD_printing_mode">
+   <property name="text">
+    <string>Set SD printing mode</string>
    </property>
   </action>
  </widget>
