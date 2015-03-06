@@ -473,7 +473,7 @@ void MainWindow::readSerial()
         }
         else if(data.startsWith("Done")) sdprinting = false;
         else if(data.startsWith("start") && checkingTemperature) injectCommand("M105");
-        else if(data.startsWith("SD printing byte") && sdWatcher.isFinished())
+        else if(data.startsWith("SD printing byte"))
         {
             QFuture<double> parseSDThread = QtConcurrent::run(this, &MainWindow::parseSDStatus, data);
             sdWatcher.setFuture(parseSDThread);
@@ -767,18 +767,17 @@ void MainWindow::initSDprinting()
 
 double MainWindow::parseSDStatus(QByteArray data)
 {
-    /* Old parsing
+    // Old parsing
     QString tmp;
     QString fragment = data.split(' ').at(3);
     for(int i = 0; fragment.at(i) != '/'; ++i)
     {
         tmp += fragment.at(i);
     }
-    */
-
-    if(SDStatusRegxp.indexIn(QString(data)) != 0)
-        return SDStatusRegxp.cap(0).toDouble();
-    else return -1;
+    return tmp.toDouble();
+    //if(SDStatusRegxp.indexIn(QString(data)) != 0)
+      //  return SDStatusRegxp.cap(0).toDouble();
+    //else return -1;
 }
 
 void MainWindow::selectSDfile(QString file)
