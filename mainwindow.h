@@ -59,6 +59,7 @@ private:
     QSerialPort printer;
     QSerialPortInfo printerinfo;
     bool firstrun;
+    bool autolock;
     bool sending;
     bool paused;
     bool checkingTemperature;

@@ -42,6 +42,8 @@ MainWindow::MainWindow(QWidget *parent) :
     if(!firstrun) echo = settings.value("core/echo").toBool();
     else echo = false;
 
+    autolock = settings.value("core/lockcontrols").toBool();
+
     sending = false;
     paused = false;
     injectingCommand = false;
@@ -492,7 +494,7 @@ void MainWindow::on_sendBtn_clicked()
         ui->sendBtn->setText("Send");
         ui->pauseBtn->setText("Pause");
         ui->pauseBtn->setDisabled("true");
-        ui->controlBox->setChecked("true");
+        if(autolock) ui->controlBox->setChecked("true");
         paused = false;
     }
     else if(!sending && !sdprinting)
@@ -501,7 +503,7 @@ void MainWindow::on_sendBtn_clicked()
         ui->sendBtn->setText("Stop");
         ui->pauseBtn->setText("Pause");
         ui->pauseBtn->setEnabled("true");
-        ui->controlBox->setChecked("false");
+        if(autolock) ui->controlBox->setChecked("false");
         paused = false;
     }
     else if(sdprinting)
@@ -510,7 +512,7 @@ void MainWindow::on_sendBtn_clicked()
         sendLine("M24");
         ui->sendBtn->setText("Send");
         ui->pauseBtn->setText("Pause");
-        ui->controlBox->setChecked("true");
+        if(autolock) ui->controlBox->setChecked("true");
         paused = false;
     }
 
@@ -558,13 +560,13 @@ void MainWindow::on_pauseBtn_clicked()
     if(paused && !sdprinting)
     {
         paused = false;
-        ui->controlBox->setChecked(false);
+        if(autolock) ui->controlBox->setChecked(false);
         ui->pauseBtn->setText("Pause");
     }
     else if(!paused && !sdprinting)
     {
         paused = true;
-        ui->controlBox->setChecked(true);
+        if(autolock) ui->controlBox->setChecked(true);
         ui->pauseBtn->setText("Resume");
     }
     else if(sdprinting)

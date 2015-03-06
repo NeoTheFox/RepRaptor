@@ -22,6 +22,8 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
     if(settings.value("printer/bedy").toInt()) ui->bedybox->setValue(settings.value("printer/bedy").toInt());
     else ui->bedybox->setValue(200);
 
+    ui->lockbox->setChecked(settings.value("core/lockcontrols").toBool());
+
 }
 
 SettingsWindow::~SettingsWindow()
@@ -36,4 +38,5 @@ void SettingsWindow::on_buttonBox_accepted()
     settings.setValue("printer/bedy", ui->bedybox->value());
     settings.setValue("printer/bedx", ui->bedxbox->value());
     settings.setValue("core/echo", ui->echobox->isChecked());
+    settings.setValue("core/lockcontrols", ui->lockbox->isChecked());
 }
