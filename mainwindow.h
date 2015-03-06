@@ -70,7 +70,7 @@ private:
     bool sendingChecksum;
     long int currentLine;
     int readyRecieve;
-    double sdBytes;
+    unsigned long int sdBytes;
     QString userCommand;
 
 private slots:

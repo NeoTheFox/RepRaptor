@@ -82,7 +82,7 @@ MainWindow::MainWindow(QWidget *parent) :
     else sendTimer.setInterval(5);
     sendTimer.start();
 
-    progressSDTimer.setInterval(2000);
+    progressSDTimer.setInterval(3000);
     progressSDTimer.start();
 
     tempWarning.setInterval(10000);
@@ -446,6 +446,8 @@ void MainWindow::readSerial()
                 readingFiles = false;
                 emit sdReady();
             }
+            printMsg(QString(data)); //echo
+            return;
         }
 
         if(data.startsWith("ok")) readyRecieve++;
@@ -471,9 +473,20 @@ void MainWindow::readSerial()
             }
             else  injectCommand(gcode.at(err));
         }
-        else if(data.startsWith("Done")) sdprinting = false;
+        else if(data.startsWith("!!"))
+        {
+            ErrorWindow errorwindow(this,"Hardware failure");
+            errorwindow.exec();
+        }
+        else if(data.startsWith("Done"))
+        {
+            sdprinting=false;
+            ui->progressBar->setValue(0);
+            ui->filename->setText("");
+            ui->fileBox->setDisabled("true");
+        }
         else if(data.startsWith("start") && checkingTemperature) injectCommand("M105");
-        else if(data.startsWith("SD printing byte"))
+        else if(data.startsWith("SD pr"))
         {
             QFuture<double> parseSDThread = QtConcurrent::run(this, &MainWindow::parseSDStatus, data);
             sdWatcher.setFuture(parseSDThread);
@@ -534,7 +547,8 @@ void MainWindow::on_sendBtn_clicked()
     else if(sdprinting)
     {
         sending = false;
-        sendLine("M24");
+        injectCommand("M24");
+        injectCommand("M27");
         ui->sendBtn->setText("Send");
         ui->pauseBtn->setText("Pause");
         if(autolock) ui->controlBox->setChecked("true");
@@ -603,7 +617,8 @@ void MainWindow::checkStatus()
 {
     if(checkingTemperature &&
             (sinceLastTemp.elapsed() > statusTimer.interval())
-            && statusWatcher.isFinished()) injectCommand("M105");
+            && statusWatcher.isFinished()
+            && !readingFiles) injectCommand("M105");
 }
 
 void MainWindow::on_checktemp_stateChanged(int arg1)
@@ -775,9 +790,11 @@ double MainWindow::parseSDStatus(QByteArray data)
         tmp += fragment.at(i);
     }
     return tmp.toDouble();
-    //if(SDStatusRegxp.indexIn(QString(data)) != 0)
-      //  return SDStatusRegxp.cap(0).toDouble();
-    //else return -1;
+    /*
+    if(SDStatusRegxp.indexIn(QString(data)) != 0)
+        return SDStatusRegxp.cap(0).toDouble();
+    else return 0;
+    */
 }
 
 void MainWindow::selectSDfile(QString file)
@@ -791,7 +808,8 @@ void MainWindow::selectSDfile(QString file)
     ui->progressBar->setValue(0);
     sdBytes = bytes.toDouble();
 
-    sendLine("M23 " + filename);
+    userCommands.clear();
+    injectCommand("M23 " + filename);
     sdprinting = true;
     ui->fileBox->setDisabled(false);
 }
@@ -809,7 +827,7 @@ void MainWindow::updateSDStatus()
 
 void MainWindow::checkSDStatus()
 {
-    if(sdWatcher.isFinished() && sdprinting) injectCommand("M27");
+    if(sdprinting && sdWatcher.isFinished()) injectCommand("M27");
 }
 
 void MainWindow::on_stepspin_valueChanged(const QString &arg1)
