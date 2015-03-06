@@ -37,6 +37,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+protected:
     QFile gfile;
     QVector<QString> gcode;
     QQueue <QString> userCommands;
@@ -68,6 +69,7 @@ private:
     bool sdprinting;
     bool echo;
     bool sendingChecksum;
+    bool chekingSDStatus;
     long int currentLine;
     int readyRecieve;
     unsigned long int sdBytes;

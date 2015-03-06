@@ -965,6 +965,12 @@ STOP</string>
     </item>
     <item row="2" column="0">
      <widget class="QGroupBox" name="statusGroup">
+      <property name="maximumSize">
+       <size>
+        <width>190</width>
+        <height>16777215</height>
+       </size>
+      </property>
       <property name="title">
        <string>Status</string>
       </property>
@@ -1223,8 +1229,8 @@ STOP</string>
    <slot>serialupdate()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>82</x>
-     <y>84</y>
+     <x>100</x>
+     <y>110</y>
     </hint>
     <hint type="destinationlabel">
      <x>247</x>
@@ -1255,8 +1261,8 @@ STOP</string>
    <slot>serialconnect()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>82</x>
-     <y>116</y>
+     <x>100</x>
+     <y>142</y>
     </hint>
     <hint type="destinationlabel">
      <x>247</x>
@@ -1271,8 +1277,8 @@ STOP</string>
    <slot>xhome()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>455</x>
-     <y>81</y>
+     <x>454</x>
+     <y>108</y>
     </hint>
     <hint type="destinationlabel">
      <x>383</x>
@@ -1288,7 +1294,7 @@ STOP</string>
    <hints>
     <hint type="sourcelabel">
      <x>739</x>
-     <y>331</y>
+     <y>376</y>
     </hint>
     <hint type="destinationlabel">
      <x>654</x>
@@ -1303,8 +1309,8 @@ STOP</string>
    <slot>xplus()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>323</x>
-     <y>110</y>
+     <x>329</x>
+     <y>138</y>
     </hint>
     <hint type="destinationlabel">
      <x>383</x>
@@ -1320,11 +1326,11 @@ STOP</string>
    <hints>
     <hint type="sourcelabel">
      <x>739</x>
-     <y>360</y>
+     <y>405</y>
     </hint>
     <hint type="destinationlabel">
      <x>739</x>
-     <y>389</y>
+     <y>434</y>
     </hint>
    </hints>
   </connection>
@@ -1335,8 +1341,8 @@ STOP</string>
    <slot>yminus()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>285</x>
-     <y>139</y>
+     <x>289</x>
+     <y>168</y>
     </hint>
     <hint type="destinationlabel">
      <x>383</x>
@@ -1351,8 +1357,8 @@ STOP</string>
    <slot>yplus()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>285</x>
-     <y>81</y>
+     <x>289</x>
+     <y>108</y>
     </hint>
     <hint type="destinationlabel">
      <x>383</x>
@@ -1367,8 +1373,8 @@ STOP</string>
    <slot>xminus()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>248</x>
-     <y>110</y>
+     <x>250</x>
+     <y>138</y>
     </hint>
     <hint type="destinationlabel">
      <x>189</x>
@@ -1383,8 +1389,8 @@ STOP</string>
    <slot>zplus()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>367</x>
-     <y>81</y>
+     <x>368</x>
+     <y>108</y>
     </hint>
     <hint type="destinationlabel">
      <x>356</x>
@@ -1399,8 +1405,8 @@ STOP</string>
    <slot>zminus()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>367</x>
-     <y>139</y>
+     <x>368</x>
+     <y>168</y>
     </hint>
     <hint type="destinationlabel">
      <x>209</x>
@@ -1415,8 +1421,8 @@ STOP</string>
    <slot>ezero()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>411</x>
-     <y>110</y>
+     <x>408</x>
+     <y>138</y>
     </hint>
     <hint type="destinationlabel">
      <x>220</x>
@@ -1431,8 +1437,8 @@ STOP</string>
    <slot>zhome()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>455</x>
-     <y>139</y>
+     <x>454</x>
+     <y>168</y>
     </hint>
     <hint type="destinationlabel">
      <x>209</x>
@@ -1447,8 +1453,8 @@ STOP</string>
    <slot>yhome()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>455</x>
-     <y>110</y>
+     <x>454</x>
+     <y>138</y>
     </hint>
     <hint type="destinationlabel">
      <x>383</x>
@@ -1463,8 +1469,8 @@ STOP</string>
    <slot>eplus()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>411</x>
-     <y>81</y>
+     <x>408</x>
+     <y>108</y>
     </hint>
     <hint type="destinationlabel">
      <x>397</x>
@@ -1479,8 +1485,8 @@ STOP</string>
    <slot>eminus()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>411</x>
-     <y>139</y>
+     <x>408</x>
+     <y>168</y>
     </hint>
     <hint type="destinationlabel">
      <x>475</x>
@@ -1495,8 +1501,8 @@ STOP</string>
    <slot>bedcenter()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>285</x>
-     <y>110</y>
+     <x>289</x>
+     <y>138</y>
     </hint>
     <hint type="destinationlabel">
      <x>321</x>
@@ -1511,12 +1517,28 @@ STOP</string>
    <slot>homeall()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>257</x>
-     <y>165</y>
+     <x>329</x>
+     <y>198</y>
     </hint>
     <hint type="destinationlabel">
      <x>200</x>
      <y>291</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sendtext</sender>
+   <signal>returnPressed()</signal>
+   <receiver>sendtext</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>558</x>
+     <y>394</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>494</x>
+     <y>397</y>
     </hint>
    </hints>
   </connection>

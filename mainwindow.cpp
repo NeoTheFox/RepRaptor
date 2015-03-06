@@ -13,9 +13,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->progressBar->setValue(0);
     ui->controlBox->setDisabled(true);
     ui->consoleGroup->setDisabled(true);
-    ui->pauseBtn->setDisabled("true");
-    ui->actionPrint_from_SD->setDisabled("true");
-    ui->actionSet_SD_printing_mode->setDisabled("true");
+    ui->pauseBtn->setDisabled(true);
+    ui->actionPrint_from_SD->setDisabled(true);
+    ui->actionSet_SD_printing_mode->setDisabled(true);
 
     ui->baudbox->addItem(QString::number(4800));
     ui->baudbox->addItem(QString::number(9600));
@@ -45,6 +45,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     autolock = settings.value("core/lockcontrols").toBool();
     sendingChecksum = settings.value("core/checksums").toBool();
+    chekingSDStatus = settings.value("core/checksdstatus").toBool();
 
     sending = false;
     paused = false;
@@ -83,7 +84,7 @@ MainWindow::MainWindow(QWidget *parent) :
     sendTimer.start();
 
     progressSDTimer.setInterval(3000);
-    progressSDTimer.start();
+    if(chekingSDStatus)progressSDTimer.start();
 
     tempWarning.setInterval(10000);
 
@@ -146,6 +147,7 @@ void MainWindow::parseFile(QFile &file)
             {
                 if(sendingChecksum)
                 {
+                    //Checksum algorithm from RepRap wiki
                     line = "N"+QString::number(n)+line+"*";
                     int cs = 0;
                     for(int i = 0; line.at(i) != '*'; i++) cs = cs ^ line.at(i).toLatin1();
@@ -160,6 +162,8 @@ void MainWindow::parseFile(QFile &file)
         file.close();
         sdprinting = false;
         ui->fileBox->setEnabled(true);
+        ui->progressBar->setEnabled(true);
+        ui->sendBtn->setText("Send");
         ui->filename->setText(file.fileName().split("/").last());
         ui->filelines->setText(QString::number(gcode.size()) + QString("/0 lines"));
     }
@@ -234,8 +238,8 @@ void MainWindow::serialconnect()
             ui->progressBar->setValue(0);
             ui->controlBox->setDisabled(false);
             ui->consoleGroup->setDisabled(false);
-            ui->actionPrint_from_SD->setEnabled("true");
-            ui->actionSet_SD_printing_mode->setEnabled("true");
+            ui->actionPrint_from_SD->setEnabled(true);
+            ui->actionSet_SD_printing_mode->setEnabled(true);
             //if(checkingTemperature) injectCommand("M105");
         }
     }
@@ -250,8 +254,8 @@ void MainWindow::serialconnect()
         ui->progressBar->setValue(0);
         ui->controlBox->setDisabled(true);
         ui->consoleGroup->setDisabled(true);
-        ui->actionPrint_from_SD->setDisabled("true");
-        ui->actionSet_SD_printing_mode->setDisabled("true");
+        ui->actionPrint_from_SD->setDisabled(true);
+        ui->actionSet_SD_printing_mode->setDisabled(true);
      }
 }
 
@@ -483,7 +487,7 @@ void MainWindow::readSerial()
             sdprinting=false;
             ui->progressBar->setValue(0);
             ui->filename->setText("");
-            ui->fileBox->setDisabled("true");
+            ui->fileBox->setDisabled(true);
         }
         else if(data.startsWith("start") && checkingTemperature) injectCommand("M105");
         else if(data.startsWith("SD pr"))
@@ -531,8 +535,8 @@ void MainWindow::on_sendBtn_clicked()
         sending = false;
         ui->sendBtn->setText("Send");
         ui->pauseBtn->setText("Pause");
-        ui->pauseBtn->setDisabled("true");
-        if(autolock) ui->controlBox->setChecked("true");
+        ui->pauseBtn->setDisabled(true);
+        if(autolock) ui->controlBox->setChecked(true);
         paused = false;
     }
     else if(!sending && !sdprinting)
@@ -540,8 +544,8 @@ void MainWindow::on_sendBtn_clicked()
         sending=true;
         ui->sendBtn->setText("Stop");
         ui->pauseBtn->setText("Pause");
-        ui->pauseBtn->setEnabled("true");
-        if(autolock) ui->controlBox->setChecked("false");
+        ui->pauseBtn->setEnabled(true);
+        if(autolock) ui->controlBox->setChecked(false);
         paused = false;
     }
     else if(sdprinting)
@@ -551,7 +555,7 @@ void MainWindow::on_sendBtn_clicked()
         injectCommand("M27");
         ui->sendBtn->setText("Send");
         ui->pauseBtn->setText("Pause");
-        if(autolock) ui->controlBox->setChecked("true");
+        if(autolock) ui->controlBox->setChecked(true);
         paused = false;
     }
 
@@ -574,7 +578,7 @@ void MainWindow::sendNext()
             sending = false;
             currentLine = 0;
             ui->sendBtn->setText("Send");
-            ui->pauseBtn->setDisabled("true");
+            ui->pauseBtn->setDisabled(true);
             ui->filelines->setText(QString::number(gcode.size())
                                    + QString("/")
                                    + QString::number(currentLine)
@@ -672,8 +676,8 @@ void MainWindow::serialError(QSerialPort::SerialPortError error)
     ui->pauseBtn->setDisabled(true);
     ui->controlBox->setDisabled(true);
     ui->consoleGroup->setDisabled(true);
-    ui->actionPrint_from_SD->setDisabled("true");
-    ui->actionSet_SD_printing_mode->setDisabled("true");
+    ui->actionPrint_from_SD->setDisabled(true);
+    ui->actionSet_SD_printing_mode->setDisabled(true);
 
     qDebug() << error;
 
@@ -804,8 +808,14 @@ void MainWindow::selectSDfile(QString file)
     QString filename = file.remove(" "+bytes);
 
     ui->filename->setText(filename);
-    ui->filelines->setText(bytes + QString("/0 bytes"));
-    ui->progressBar->setValue(0);
+    if(chekingSDStatus)
+    {
+        ui->filelines->setText(bytes + QString("/0 bytes"));
+        ui->progressBar->setEnabled(true);
+        ui->progressBar->setValue(0);
+    }
+    else ui->progressBar->setDisabled(true);
+    ui->sendBtn->setText("Start");
     sdBytes = bytes.toDouble();
 
     userCommands.clear();
@@ -827,7 +837,7 @@ void MainWindow::updateSDStatus()
 
 void MainWindow::checkSDStatus()
 {
-    if(sdprinting && sdWatcher.isFinished()) injectCommand("M27");
+    if(sdprinting && chekingSDStatus && sdWatcher.isFinished()) injectCommand("M27");
 }
 
 void MainWindow::on_stepspin_valueChanged(const QString &arg1)

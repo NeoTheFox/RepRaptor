@@ -26,6 +26,7 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
 
     ui->lockbox->setChecked(settings.value("core/lockcontrols").toBool());
     ui->checksumbox->setChecked(settings.value("core/checksums").toBool());
+    ui->sdbox->setChecked(settings.value("core/checksdstatus").toBool());
 
 }
 
@@ -43,4 +44,5 @@ void SettingsWindow::on_buttonBox_accepted()
     settings.setValue("core/echo", ui->echobox->isChecked());
     settings.setValue("core/lockcontrols", ui->lockbox->isChecked());
     settings.setValue("core/checksums", ui->checksumbox->isChecked());
+    settings.setValue("core/checksdstatus", ui->sdbox->isChecked());
 }
