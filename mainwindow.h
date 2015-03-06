@@ -39,6 +39,7 @@ public:
 
     QFile gfile;
     QVector<QString> gcode;
+    QQueue <QString> userCommands;
     QTimer sendTimer;
     QTimer progressSDTimer;
     QTimer statusTimer;
@@ -63,11 +64,11 @@ private:
     bool sending;
     bool paused;
     bool checkingTemperature;
-    bool injectingCommand;
     bool readingFiles;
     bool sdprinting;
     bool echo;
-    int currentLine;
+    bool sendingChecksum;
+    long int currentLine;
     int readyRecieve;
     double sdBytes;
     QString userCommand;

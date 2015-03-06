@@ -25,13 +25,14 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->baudbox->addItem(QString::number(250000));
     ui->baudbox->addItem(QString::number(460800));
     ui->baudbox->addItem(QString::number(500000));
-    if(settings.value("printer/baudrateindex").toInt()) ui->baudbox->setCurrentIndex(settings.value("printer/baudrateindex").toInt());
+    if(settings.value("printer/baudrateindex").toInt())
+        ui->baudbox->setCurrentIndex(settings.value("printer/baudrateindex").toInt());
     else ui->baudbox->setCurrentIndex(2);
 
     ui->extruderlcd->setPalette(Qt::red);
     ui->bedlcd->setPalette(Qt::red);
 
-    if(!settings.value("core/firstrun").toBool()) firstrun = true;
+    firstrun = !settings.value("core/firstrun").toBool(); //firstrun is inverted!
 
     checkingTemperature = settings.value("core/checktemperature").toBool();
     ui->checktemp->setChecked(checkingTemperature);
@@ -43,10 +44,10 @@ MainWindow::MainWindow(QWidget *parent) :
     else echo = false;
 
     autolock = settings.value("core/lockcontrols").toBool();
+    sendingChecksum = settings.value("core/checksums").toBool();
 
     sending = false;
     paused = false;
-    injectingCommand = false;
     readingFiles = false;
     sdprinting = false;
     sdBytes = 0;
@@ -56,11 +57,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     temperatureRegxp.setCaseSensitivity(Qt::CaseInsensitive);
     temperatureRegxp.setPatternSyntax(QRegExp::RegExp);
-    temperatureRegxp.setPattern("\\d+\\.\\d+");
+    temperatureRegxp.setPattern("\\d+\\.\\d+"); // Find float in string
 
     SDStatusRegxp.setCaseSensitivity(Qt::CaseInsensitive);
     SDStatusRegxp.setPatternSyntax(QRegExp::RegExp);
-    SDStatusRegxp.setPattern("\\d+");
+    SDStatusRegxp.setPattern("\\d+"); //First number
 
     serialupdate();
 
@@ -94,11 +95,12 @@ MainWindow::~MainWindow()
     if(gfile.isOpen()) gfile.close();
     if(printer.isOpen()) printer.close();
 
+    if(firstrun) settings.setValue("core/firstrun", true); //firstrun is inverted!
+
     settings.setValue("printer/baudrateindex", ui->baudbox->currentIndex());
     settings.setValue("core/checktemperature", ui->checktemp->isChecked());
     settings.setValue("user/extrudertemp", ui->etmpspin->value());
     settings.setValue("user/bedtemp", ui->btmpspin->value());
-    if(firstrun) settings.setValue("core/firstrun", true);
 
     settings.beginWriteArray("user/recentfiles");
     for(int i = 0; i < recentFiles.size(); i++)
@@ -136,11 +138,21 @@ void MainWindow::parseFile(QFile &file)
     if (file.open(QIODevice::ReadOnly))
     {
         QTextStream in(&file);
+        int n = 0;
         while (!in.atEnd())
         {
             QString line = in.readLine();
             if(!line.startsWith(";"))
             {
+                if(sendingChecksum)
+                {
+                    line = "N"+QString::number(n)+line+"*";
+                    int cs = 0;
+                    for(int i = 0; line.at(i) != '*'; i++) cs = cs ^ line.at(i).toLatin1();
+                    cs &= 0xff;
+                    line += QString::number(cs);
+                    n++;
+                }
                 gcode.append(line);
             }
 
@@ -174,13 +186,13 @@ void MainWindow::serialupdate()
     ui->serialBox->clear();
     QList<QSerialPortInfo> list = QSerialPortInfo::availablePorts();
     for(int i = 0; i < list.size(); i++)
-    {
         ui->serialBox->addItem(list.at(i).portName());
-    }
 }
 
 void MainWindow::serialconnect()
 {
+    userCommands.clear();
+
     if(!printer.isOpen())
     {
         foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts())
@@ -224,7 +236,7 @@ void MainWindow::serialconnect()
             ui->consoleGroup->setDisabled(false);
             ui->actionPrint_from_SD->setEnabled("true");
             ui->actionSet_SD_printing_mode->setEnabled("true");
-            if(checkingTemperature) injectCommand("M105");
+            //if(checkingTemperature) injectCommand("M105");
         }
     }
 
@@ -415,6 +427,7 @@ void MainWindow::on_flowbutton_clicked()
 void MainWindow::on_haltbtn_clicked()
 {
     if(sending && !paused)ui->pauseBtn->click();
+    userCommands.clear();
     injectCommand("M112");
 }
 //Buttons end
@@ -445,10 +458,21 @@ void MainWindow::readSerial()
         else if(data.startsWith("wait")) readyRecieve = 1;
         else if(data.startsWith("Resend"))  //Handle resend if requested
         {
-            if(currentLine > 0) currentLine -= data.split(':')[1].toInt();
-            if(currentLine < 0) currentLine = 0;
+            if(gcode.isEmpty())
+            {
+                injectCommand("M110"); //This means we rebooted, file is gone, so we need to reset counter
+                return;
+            }
+            int err = data.split(':')[1].toInt();
+            if(!sendingChecksum)
+            {
+                if(currentLine > 0) currentLine -= err;
+                if(currentLine < 0) currentLine = 0;
+            }
+            else  injectCommand(gcode.at(err));
         }
         else if(data.startsWith("Done")) sdprinting = false;
+        else if(data.startsWith("start") && checkingTemperature) injectCommand("M105");
         else if(data.startsWith("SD printing byte") && sdWatcher.isFinished())
         {
             QFuture<double> parseSDThread = QtConcurrent::run(this, &MainWindow::parseSDStatus, data);
@@ -488,6 +512,7 @@ void MainWindow::printMsg(QString text)
 
 void MainWindow::on_sendBtn_clicked()
 {
+    userCommands.clear();
     if(sending && !sdprinting)
     {
         sending = false;
@@ -522,11 +547,10 @@ void MainWindow::on_sendBtn_clicked()
 
 void MainWindow::sendNext()
 {
-    if(injectingCommand && printer.isWritable() && readyRecieve > 0)
+    if(!userCommands.isEmpty() && printer.isWritable() && readyRecieve > 0)
     {
-        sendLine(userCommand);
+        sendLine(userCommands.dequeue());
         readyRecieve--;
-        injectingCommand=false;
         return;
     }
     else if(sending && !paused && readyRecieve > 0 && !sdprinting && printer.isWritable())
@@ -609,8 +633,7 @@ void MainWindow::on_actionAbout_triggered()
 
 void MainWindow::injectCommand(QString command)
 {
-    injectingCommand = true;
-    userCommand = command;
+    userCommands.enqueue(command);
 }
 
 void MainWindow::updateRecent()
@@ -626,6 +649,8 @@ void MainWindow::serialError(QSerialPort::SerialPortError error)
     if(printer.isOpen()) printer.close();
 
     if(sending) paused = true;
+
+    userCommands.clear();
 
     ui->connectBtn->setText("Connect");
     ui->sendBtn->setDisabled(true);
@@ -700,13 +725,9 @@ TemperatureReadings MainWindow::parseStatus(QByteArray data)
     TemperatureReadings r;
 
     if(temperatureRegxp.indexIn(QString(data)) != -1)
-    {
         r.e = temperatureRegxp.cap(0).toDouble();
-    }
     if(temperatureRegxp.indexIn(QString(data), temperatureRegxp.matchedLength()) != -1)
-    {
         r.b = temperatureRegxp.cap(0).toDouble();
-    }
     else
     {
         r.e = -1;
@@ -755,7 +776,8 @@ double MainWindow::parseSDStatus(QByteArray data)
     }
     */
 
-    if(SDStatusRegxp.indexIn(QString(data)) != 0) return SDStatusRegxp.cap(0).toDouble();
+    if(SDStatusRegxp.indexIn(QString(data)) != 0)
+        return SDStatusRegxp.cap(0).toDouble();
     else return -1;
 }
 
