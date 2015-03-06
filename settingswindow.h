@@ -3,6 +3,9 @@
 
 #include <QDialog>
 #include <QSettings>
+#include "repraptor.h"
+
+using namespace RepRaptor;
 
 namespace Ui {
 class SettingsWindow;

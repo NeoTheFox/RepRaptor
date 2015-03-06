@@ -20,20 +20,24 @@ SOURCES += main.cpp\
     aboutwindow.cpp \
     errorwindow.cpp \
     erroricon.cpp \
-    sdwindow.cpp
+    sdwindow.cpp \
+    eepromwindow.cpp
 
 HEADERS  += mainwindow.h \
     settingswindow.h \
     aboutwindow.h \
     errorwindow.h \
     erroricon.h \
-    sdwindow.h
+    sdwindow.h \
+    repraptor.h \
+    eepromwindow.h
 
 FORMS    += mainwindow.ui \
     settingswindow.ui \
     aboutwindow.ui \
     errorwindow.ui \
-    sdwindow.ui
+    sdwindow.ui \
+    eepromwindow.ui
 
 RESOURCES += \
     graphics.qrc

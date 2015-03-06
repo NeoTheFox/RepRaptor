@@ -18,16 +18,14 @@
 #include "aboutwindow.h"
 #include "errorwindow.h"
 #include "sdwindow.h"
+#include "repraptor.h"
+#include "eepromwindow.h"
 
+using namespace RepRaptor;
 
 namespace Ui {
 class MainWindow;
 }
-
-typedef struct
-{
-    double e, b;
-} TemperatureReadings;
 
 class MainWindow : public QMainWindow
 {
@@ -49,6 +47,7 @@ protected:
     QSettings settings;
     QStringList recentFiles;
     QStringList sdFiles;
+    QStringList EEPROMSettings;
     QFutureWatcher<TemperatureReadings> statusWatcher;
     QFutureWatcher<double> sdWatcher;
     QRegExp temperatureRegxp;
@@ -66,10 +65,13 @@ private:
     bool paused;
     bool checkingTemperature;
     bool readingFiles;
+    bool readingEEPROM;
+    bool EEPROMReadingStarted;
     bool sdprinting;
     bool echo;
     bool sendingChecksum;
     bool chekingSDStatus;
+    int firmware;
     long int currentLine;
     int readyRecieve;
     unsigned long int sdBytes;
@@ -95,6 +97,9 @@ private slots:
     void updateSDStatus();
     TemperatureReadings parseStatus(QByteArray data);
     double parseSDStatus(QByteArray data);
+    void requestEEPROMSettings();
+    void openEEPROMeditor();
+    void sendEEPROMsettings(QStringList changes);
 
     void xplus();
     void yplus();
@@ -140,8 +145,11 @@ private slots:
 
     void on_actionSet_SD_printing_mode_triggered();
 
+    void on_actionEEPROM_editor_triggered();
+
 signals:
     void sdReady();
+    void eepromReady();
 };
 
 #endif // MAINWINDOW_H

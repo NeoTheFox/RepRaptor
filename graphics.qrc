@@ -9,5 +9,6 @@
         <file>icons/settings.png</file>
         <file>icons/about.png</file>
         <file>icons/exit.png</file>
+        <file>icons/eeprom.png</file>
     </qresource>
 </RCC>

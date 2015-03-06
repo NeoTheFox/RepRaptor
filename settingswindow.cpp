@@ -28,6 +28,19 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
     ui->checksumbox->setChecked(settings.value("core/checksums").toBool());
     ui->sdbox->setChecked(settings.value("core/checksdstatus").toBool());
 
+    ui->firmwarecombo->addItem("Marlin");
+    ui->firmwarecombo->addItem("Repetier");
+    ui->firmwarecombo->addItem("Other");
+
+    if(firstrun) ui->firmwarecombo->setCurrentIndex(OtherFirmware);
+    else ui->firmwarecombo->setCurrentIndex(settings.value("printer/firmware").toInt());
+
+    #ifdef QT_DEBUG
+    ui->checksumbox->setEnabled(true);
+    #else
+    ui->checksumbox->setDisabled(true);
+    #endif
+
 }
 
 SettingsWindow::~SettingsWindow()
@@ -45,4 +58,5 @@ void SettingsWindow::on_buttonBox_accepted()
     settings.setValue("core/lockcontrols", ui->lockbox->isChecked());
     settings.setValue("core/checksums", ui->checksumbox->isChecked());
     settings.setValue("core/checksdstatus", ui->sdbox->isChecked());
+    settings.setValue("printer/firmware", ui->firmwarecombo->currentIndex());
 }

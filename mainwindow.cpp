@@ -16,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->pauseBtn->setDisabled(true);
     ui->actionPrint_from_SD->setDisabled(true);
     ui->actionSet_SD_printing_mode->setDisabled(true);
+    ui->actionEEPROM_editor->setDisabled(true);
 
     ui->baudbox->addItem(QString::number(4800));
     ui->baudbox->addItem(QString::number(9600));
@@ -47,6 +48,9 @@ MainWindow::MainWindow(QWidget *parent) :
     sendingChecksum = settings.value("core/checksums").toBool();
     chekingSDStatus = settings.value("core/checksdstatus").toBool();
 
+    if(firstrun) firmware = OtherFirmware;
+    else firmware = settings.value("printer/firmware").toInt();
+
     sending = false;
     paused = false;
     readingFiles = false;
@@ -55,6 +59,8 @@ MainWindow::MainWindow(QWidget *parent) :
     userCommand = "";
     currentLine = 0;
     readyRecieve = 0;
+    readingEEPROM = false;
+    EEPROMReadingStarted = false;
 
     temperatureRegxp.setCaseSensitivity(Qt::CaseInsensitive);
     temperatureRegxp.setPatternSyntax(QRegExp::RegExp);
@@ -74,6 +80,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&sdWatcher, SIGNAL(finished()), this, SLOT(updateSDStatus()));
     connect(this, SIGNAL(sdReady()), this, SLOT(initSDprinting()));
     connect(&progressSDTimer, SIGNAL(timeout()), this, SLOT(checkSDStatus()));
+    connect(this, SIGNAL(eepromReady()), this, SLOT(openEEPROMeditor()));
 
     if(settings.value("core/statusinterval").toInt()) statusTimer.setInterval(settings.value("core/statusinterval").toInt());
     else statusTimer.setInterval(3000);
@@ -89,6 +96,12 @@ MainWindow::MainWindow(QWidget *parent) :
     tempWarning.setInterval(10000);
 
     sinceLastTemp.start();
+
+    #ifdef QT_DEBUG
+    ui->actionEEPROM_editor->setEnabled(true);
+    #else
+    ui->actionEEPROM_editor->setDisabled(true);
+    #endif
 }
 
 MainWindow::~MainWindow()
@@ -240,6 +253,7 @@ void MainWindow::serialconnect()
             ui->consoleGroup->setDisabled(false);
             ui->actionPrint_from_SD->setEnabled(true);
             ui->actionSet_SD_printing_mode->setEnabled(true);
+            if(firmware != OtherFirmware) ui->actionEEPROM_editor->setDisabled(false);
             //if(checkingTemperature) injectCommand("M105");
         }
     }
@@ -256,6 +270,7 @@ void MainWindow::serialconnect()
         ui->consoleGroup->setDisabled(true);
         ui->actionPrint_from_SD->setDisabled(true);
         ui->actionSet_SD_printing_mode->setDisabled(true);
+        ui->actionEEPROM_editor->setDisabled(false);
      }
 }
 
@@ -454,6 +469,27 @@ void MainWindow::readSerial()
             return;
         }
 
+        if(readingEEPROM)
+        {
+            if(firmware == Repetier)
+            {
+                if(data.startsWith("EPR"))
+                {
+                    EEPROMSettings.append(data);
+                    EEPROMReadingStarted = true;
+                }
+                else if(EEPROMReadingStarted)
+                {
+                    readingEEPROM = false;
+                    EEPROMReadingStarted = false;
+                    emit eepromReady();
+                }
+
+                printMsg(QString(data)); //echo
+                return;
+            }
+        }
+
         if(data.startsWith("ok")) readyRecieve++;
         else if(checkingTemperature && data.startsWith("T:"))
         {
@@ -466,7 +502,7 @@ void MainWindow::readSerial()
         {
             if(gcode.isEmpty())
             {
-                injectCommand("M110"); //This means we rebooted, file is gone, so we need to reset counter
+                injectCommand("M110 N0"); //This means we rebooted, file is gone, so we need to reset counter
                 return;
             }
             int err = data.split(':')[1].toInt();
@@ -583,6 +619,7 @@ void MainWindow::sendNext()
                                    + QString("/")
                                    + QString::number(currentLine)
                                    + QString(" Lines"));
+            if(sendingChecksum) injectCommand("M110 N0");
             return;
         }
         sendLine(gcode.at(currentLine));
@@ -619,10 +656,11 @@ void MainWindow::on_pauseBtn_clicked()
 
 void MainWindow::checkStatus()
 {
-    if(checkingTemperature &&
-            (sinceLastTemp.elapsed() > statusTimer.interval())
+    if(checkingTemperature
+            &&(sinceLastTemp.elapsed() > statusTimer.interval())
             && statusWatcher.isFinished()
-            && !readingFiles) injectCommand("M105");
+            && !readingFiles
+            && !readingEEPROM) injectCommand("M105");
 }
 
 void MainWindow::on_checktemp_stateChanged(int arg1)
@@ -678,6 +716,7 @@ void MainWindow::serialError(QSerialPort::SerialPortError error)
     ui->consoleGroup->setDisabled(true);
     ui->actionPrint_from_SD->setDisabled(true);
     ui->actionSet_SD_printing_mode->setDisabled(true);
+    ui->actionEEPROM_editor->setDisabled(true);
 
     qDebug() << error;
 
@@ -858,4 +897,42 @@ void MainWindow::on_actionSet_SD_printing_mode_triggered()
 {
     sdprinting = true;
     ui->fileBox->setDisabled(false);
+}
+
+void MainWindow::requestEEPROMSettings()
+{
+    userCommands.clear();
+
+    switch(firmware)
+    {
+    case Marlin:
+        injectCommand("M501");
+        break;
+    case Repetier:
+        injectCommand("M205");
+        break;
+    case OtherFirmware:
+        return;
+    }
+
+   readingEEPROM = true;
+}
+
+void MainWindow::on_actionEEPROM_editor_triggered()
+{
+    requestEEPROMSettings();
+}
+
+void MainWindow::openEEPROMeditor()
+{
+    EEPROMWindow eepromwindow(EEPROMSettings, this);
+
+    connect(&eepromwindow, SIGNAL(changesComplete(QStringList)), this, SLOT(sendEEPROMsettings(QStringList)));
+
+    eepromwindow.exec();
+}
+
+void MainWindow::sendEEPROMsettings(QStringList changes)
+{
+
 }

@@ -1076,6 +1076,8 @@ STOP</string>
     </property>
     <addaction name="actionPrint_from_SD"/>
     <addaction name="actionSet_SD_printing_mode"/>
+    <addaction name="separator"/>
+    <addaction name="actionEEPROM_editor"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuTools"/>
@@ -1198,6 +1200,21 @@ STOP</string>
   <action name="actionSet_SD_printing_mode">
    <property name="text">
     <string>Set SD printing mode</string>
+   </property>
+  </action>
+  <action name="actionEEPROM_editor">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="graphics.qrc">
+     <normaloff>:/icons/eeprom.png</normaloff>:/icons/eeprom.png</iconset>
+   </property>
+   <property name="text">
+    <string>EEPROM editor</string>
+   </property>
+   <property name="toolTip">
+    <string>To use EEPROM editor you need to set firmware in settings</string>
    </property>
   </action>
  </widget>
@@ -1561,5 +1578,6 @@ STOP</string>
   <slot>ezero()</slot>
   <slot>yhome()</slot>
   <slot>bedcenter()</slot>
+  <slot>requestEEPROMSettings()</slot>
  </slots>
 </ui>
