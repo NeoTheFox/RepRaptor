@@ -28,24 +28,34 @@ EEPROMWindow::EEPROMWindow(QStringList eepromLines, QWidget *parent) :
         QString msg;
         for(int i = 3; i < tmp.size(); i++) msg+=(tmp.at(i) + " ");
 
-        QLayout *line = new QHBoxLayout();
+        QLayout *line = new QGridLayout();
 
         QLabel *label = new QLabel(msg, this);
         QLineEdit *edit = new QLineEdit(currentLine.S,this);
-        //QCheckBox *changebox = new QCheckBox("Save", this);
 
-        //changebox->setObjectName("b"+QString::number(j));
+        QFrame* hline = new QFrame();
+        hline->setFrameShape(QFrame::HLine);
+        hline->setFrameShadow(QFrame::Sunken);
+        line->addWidget(hline);
+
         edit->setObjectName("e"+QString::number(j));
+
+        QIntValidator *intvalidator = new QIntValidator(this);
+        QRegExpValidator *doublevalidator = new QRegExpValidator(
+                                                QRegExp("^\\-?\\d+\\.?\\d+(e\\-?\\d+)?$",
+                                                Qt::CaseInsensitive), this);
+        intvalidator->setLocale(QLocale::English);
+        doublevalidator->setLocale(QLocale::English);
 
         switch(currentLine.T) // set right validator for the line
         {
         case 0:
         case 1:
         case 2:
-            edit->setValidator(new QIntValidator(this));
+            edit->setValidator(intvalidator);
             break;
         case 3:
-            //edit->setValidator(new QDoubleValidator(this));
+            edit->setValidator(doublevalidator);
             break;
         default:
             break;
@@ -82,22 +92,23 @@ void EEPROMWindow::lineChanged(QString s)
 
 void EEPROMWindow::on_buttonBox_accepted()
 {
+    QStringList gcode;
     for(int i=0; i < changed.size(); i++)
     {
         if(changed.at(i))
         {
-            QString tmp;
+            QString command;
 
-            tmp+=QString("M206");
-            tmp+=QString("T");
-            tmp+=QString::number(lines.at(i).T);
-            tmp+=QString("P");
-            tmp+=QString::number(lines.at(i).P);
-            if(lines.at(i).T == 3) tmp+=QString("X");
-            else tmp+=QString("S");
-            tmp+=lines.at(i).S;
+            command+=QString("M206");
+            command+=QString("T");
+            command+=QString::number(lines.at(i).T);
+            command+=QString("P");
+            command+=QString::number(lines.at(i).P);
+            if(lines.at(i).T == 3) command+=QString("X");
+            else command+=QString("S");
+            command+=lines.at(i).S;
 
-            gcode.append(tmp);
+            gcode.append(command);
         }
     }
 

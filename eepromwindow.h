@@ -24,7 +24,6 @@ private:
     Ui::EEPROMWindow *ui;
     QVector <repetierEEPROMline> lines;
     QVector <bool> changed;
-    QStringList gcode;
 
 signals:
     void changesComplete(QStringList changed);
