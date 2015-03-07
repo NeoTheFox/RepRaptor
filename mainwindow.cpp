@@ -605,7 +605,7 @@ void MainWindow::on_sendBtn_clicked()
         sending = false;
         injectCommand("M24");
         injectCommand("M27");
-        ui->sendBtn->setText("Send");
+        ui->sendBtn->setText("Start");
         ui->pauseBtn->setText("Pause");
         if(autolock) ui->controlBox->setChecked(true);
         paused = false;
@@ -898,7 +898,7 @@ void MainWindow::sendEEPROMsettings(QStringList changes)
 {
     userCommands.clear();
     foreach (QString str, changes) {
-        sendLine(str);
+        injectCommand(str);
         //printMsg(str);
     }
 }
