@@ -934,6 +934,7 @@ void MainWindow::openEEPROMeditor()
 {
     EEPROMWindow eepromwindow(EEPROMSettings, this);
 
+    eepromwindow.setWindowModality(Qt::NonModal);
     connect(&eepromwindow, SIGNAL(changesComplete(QStringList)), this, SLOT(sendEEPROMsettings(QStringList)));
 
     eepromwindow.exec();
@@ -943,6 +944,7 @@ void MainWindow::sendEEPROMsettings(QStringList changes)
 {
     userCommands.clear();
     foreach (QString str, changes) {
-        injectCommand(str);
+        sendLine(str);
+        //printMsg(str);
     }
 }

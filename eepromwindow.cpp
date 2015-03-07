@@ -12,10 +12,9 @@ EEPROMWindow::EEPROMWindow(QStringList eepromLines, QWidget *parent) :
     int j = 0;
     foreach (QString str, eepromLines)
     {
-        j++;
-        str.remove("EPR:");
+        str.remove("EPR:"); // Clear the unneeded part
 
-        repetierEEPROMline currentLine;
+        repetierEEPROMline currentLine; //Storage for EEPROM values
 
         QStringList tmp = str.split(' ');
 
@@ -26,7 +25,7 @@ EEPROMWindow::EEPROMWindow(QStringList eepromLines, QWidget *parent) :
         lines.append(currentLine);
 
         QString msg;
-        for(int i = 3; i < tmp.size(); i++) msg+=(tmp.at(i) + " ");
+        for(int i = 3; i < tmp.size(); i++) msg+=(tmp.at(i) + " "); //Rejoin the rest
 
         QLayout *line = new QGridLayout();
 
@@ -60,17 +59,16 @@ EEPROMWindow::EEPROMWindow(QStringList eepromLines, QWidget *parent) :
             break;
         }
 
-        //connect(edit, SIGNAL(returnPressed()), changebox, SLOT(toggle()));
         connect(edit, SIGNAL(textChanged(QString)), this, SLOT(lineChanged(QString)));
-        //connect(changebox, SIGNAL(toggled(bool)), this, SLOT(lineChanged()));
 
         line->addWidget(label);
         line->addWidget(edit);
-        //line->addWidget(changebox);
 
         line->setMargin(2);
 
         layout->addItem(line);
+
+        j++; // increase counter
     }
     for(int i = 0; i < lines.size(); i++) changed.append(false);
     ui->eepromWidgets->setLayout(layout);
