@@ -20,6 +20,7 @@
 #include "sdwindow.h"
 #include "repraptor.h"
 #include "eepromwindow.h"
+#include "parser.h"
 
 using namespace RepRaptor;
 
@@ -35,6 +36,9 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    Parser *parser;
+    QThread *parserThread;
+
 protected:
     QFile gfile;
     QVector<QString> gcode;
@@ -46,7 +50,6 @@ protected:
     QElapsedTimer sinceLastTemp;
     QSettings settings;
     QStringList recentFiles;
-    QStringList sdFiles;
     QStringList EEPROMSettings;
     QFutureWatcher<TemperatureReadings> statusWatcher;
     QFutureWatcher<double> sdWatcher;
@@ -73,6 +76,7 @@ private:
     bool chekingSDStatus;
     int firmware;
     long int currentLine;
+    unsigned long int lastRecieved;
     int readyRecieve;
     unsigned long int sdBytes;
     QString userCommand;
@@ -91,15 +95,22 @@ private slots:
     void updateRecent();
     void injectCommand(QString command);
     void updateStatus();
-    void initSDprinting();
+    void initSDprinting(QStringList sdFiles);
     void selectSDfile(QString file);
     void checkSDStatus();
-    void updateSDStatus();
+    void updateSDStatus(double currentSDbytes);
     TemperatureReadings parseStatus(QByteArray data);
     double parseSDStatus(QByteArray data);
     void requestEEPROMSettings();
     void openEEPROMeditor();
     void sendEEPROMsettings(QStringList changes);
+    void updateTemperature(TemperatureReadings r);
+    void EEPROMSettingRecieved(QString esetting);
+    void recievedOkNum(int num);
+    void recievedWait();
+    void recievedError();
+    void recievedSDDone();
+    void recievedResend(int num);
 
     void xplus();
     void yplus();
@@ -150,6 +161,8 @@ private slots:
 signals:
     void sdReady();
     void eepromReady();
+    void recievedData(QByteArray);
+    void startedReadingEEPROM();
 };
 
 #endif // MAINWINDOW_H

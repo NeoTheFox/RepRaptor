@@ -37,7 +37,7 @@ EEPROMWindow::EEPROMWindow(QStringList eepromLines, QWidget *parent) :
         hline->setFrameShadow(QFrame::Sunken);
         line->addWidget(hline);
 
-        edit->setObjectName("e"+QString::number(j));
+        edit->setObjectName("e"+QString::number(j)); //Name the LineEdit, so when it emits signal we know where it came from
 
         QRegExpValidator *doublevalidator = new QRegExpValidator(
                                                 QRegExp("^\\-?\\d+\\.?\\d+(e\\-?\\d+)?$",

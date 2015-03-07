@@ -59,6 +59,7 @@ MainWindow::MainWindow(QWidget *parent) :
     userCommand = "";
     currentLine = 0;
     readyRecieve = 0;
+    lastRecieved = 0;
     readingEEPROM = false;
     EEPROMReadingStarted = false;
 
@@ -77,10 +78,27 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&statusTimer, SIGNAL(timeout()), this, SLOT(checkStatus()));
     connect(&sendTimer, SIGNAL(timeout()), this, SLOT(sendNext()));
     connect(&statusWatcher, SIGNAL(finished()), this, SLOT(updateStatus()));
-    connect(&sdWatcher, SIGNAL(finished()), this, SLOT(updateSDStatus()));
-    connect(this, SIGNAL(sdReady()), this, SLOT(initSDprinting()));
     connect(&progressSDTimer, SIGNAL(timeout()), this, SLOT(checkSDStatus()));
     connect(this, SIGNAL(eepromReady()), this, SLOT(openEEPROMeditor()));
+
+    qRegisterMetaType<TemperatureReadings>("TemperatureReadings");
+    parser = new Parser();
+    parserThread = new QThread();
+    parser->moveToThread(parserThread);
+    connect(parserThread, &QThread::finished, parser, &QObject::deleteLater);
+    connect(this, &MainWindow::recievedData, parser, &Parser::parse);
+    connect(this, &MainWindow::startedReadingEEPROM, parser, &Parser::setEEPROMReadingMode);
+    connect(parser, &Parser::recievedTemperature, this, &MainWindow::updateTemperature);
+    connect(parser, &Parser::recievedOkNum, this, &MainWindow::recievedOkNum);
+    connect(parser, &Parser::recievedOkWait, this, &MainWindow::recievedWait);
+    connect(parser, &Parser::recievedSDFilesList, this, &MainWindow::initSDprinting);
+    connect(parser, &Parser::recievedEEPROMLine, this, &MainWindow::EEPROMSettingRecieved);
+    connect(parser, &Parser::recievingEEPROMDone, this, &MainWindow::openEEPROMeditor);
+    connect(parser, &Parser::recievedError, this, &MainWindow::recievedError);
+    connect(parser, &Parser::recievedSDDone, this, &MainWindow::recievedSDDone);
+    connect(parser, &Parser::recievedResend, this, &MainWindow::recievedResend);
+    connect(parser, &Parser::recievedSDUpdate, this, &MainWindow::updateSDStatus);
+    parserThread->start();
 
     if(settings.value("core/statusinterval").toInt()) statusTimer.setInterval(settings.value("core/statusinterval").toInt());
     else statusTimer.setInterval(3000);
@@ -108,6 +126,8 @@ MainWindow::~MainWindow()
 {
     if(gfile.isOpen()) gfile.close();
     if(printer.isOpen()) printer.close();
+    parserThread->quit();
+    parserThread->wait();
 
     if(firstrun) settings.setValue("core/firstrun", true); //firstrun is inverted!
 
@@ -457,6 +477,8 @@ void MainWindow::on_haltbtn_clicked()
 
 void MainWindow::readSerial()
 {
+    QByteArray data = printer.readLine();
+    /*
     if(printer.canReadLine())
     {
         QByteArray data = printer.readLine();
@@ -541,9 +563,9 @@ void MainWindow::readSerial()
             sdFiles.clear();
             readingFiles = true; //start reading files from SD
         }
-
-        printMsg(QString(data)); //echo
-    }
+*/
+    emit recievedData(data);
+    printMsg(QString(data)); //echo
 }
 
 void MainWindow::printMsg(const char* text)
@@ -805,10 +827,14 @@ TemperatureReadings MainWindow::parseStatus(QByteArray data)
 void MainWindow::updateStatus()
 {
     TemperatureReadings r = statusWatcher.future().result();
+    updateTemperature(r);
+    sinceLastTemp.restart();
+}
+
+void MainWindow::updateTemperature(TemperatureReadings r)
+{
     ui->extruderlcd->display(r.e);
     ui->bedlcd->display(r.b);
-
-    sinceLastTemp.restart();
 }
 
 void MainWindow::on_actionPrint_from_SD_triggered()
@@ -821,7 +847,7 @@ void MainWindow::on_actionAbout_Qt_triggered()
     qApp->aboutQt();
 }
 
-void MainWindow::initSDprinting()
+void MainWindow::initSDprinting(QStringList sdFiles)
 {
     SDWindow sdwindow(sdFiles, this); //Made it to 666 lines!
 
@@ -870,9 +896,8 @@ void MainWindow::selectSDfile(QString file)
     ui->fileBox->setDisabled(false);
 }
 
-void MainWindow::updateSDStatus()
+void MainWindow::updateSDStatus(double currentSDbytes)
 {
-    double currentSDbytes = sdWatcher.future().result();
     ui->filelines->setText(QString::number(sdBytes)
                            + QString("/")
                            + QString::number(currentSDbytes)
@@ -909,6 +934,7 @@ void MainWindow::on_actionSet_SD_printing_mode_triggered()
 void MainWindow::requestEEPROMSettings()
 {
     userCommands.clear();
+    EEPROMSettings.clear();
 
     switch(firmware)
     {
@@ -922,7 +948,7 @@ void MainWindow::requestEEPROMSettings()
         return;
     }
 
-   readingEEPROM = true;
+   emit startedReadingEEPROM();
 }
 
 void MainWindow::on_actionEEPROM_editor_triggered()
@@ -947,4 +973,39 @@ void MainWindow::sendEEPROMsettings(QStringList changes)
         sendLine(str);
         //printMsg(str);
     }
+}
+
+void MainWindow::recievedOkNum(int num)
+{
+    readyRecieve++;
+    lastRecieved = num;
+}
+
+void MainWindow::recievedWait()
+{
+    readyRecieve = 1;
+}
+
+void MainWindow::EEPROMSettingRecieved(QString esetting)
+{
+    EEPROMSettings.append(esetting);
+}
+
+void MainWindow::recievedError()
+{
+    ErrorWindow errorwindow(this,"Hardware failure");
+    errorwindow.exec();
+}
+
+void MainWindow::recievedSDDone()
+{
+    sdprinting=false;
+    ui->progressBar->setValue(0);
+    ui->filename->setText("");
+    ui->fileBox->setDisabled(true);
+}
+
+void MainWindow::recievedResend(int num)
+{
+    if(!sendingChecksum) currentLine--;
 }

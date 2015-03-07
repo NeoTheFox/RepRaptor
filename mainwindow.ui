@@ -897,6 +897,12 @@ STOP</string>
     </item>
     <item row="1" column="0">
      <widget class="QGroupBox" name="fileBox">
+      <property name="maximumSize">
+       <size>
+        <width>190</width>
+        <height>16777215</height>
+       </size>
+      </property>
       <property name="title">
        <string>File</string>
       </property>

@@ -21,7 +21,8 @@ SOURCES += main.cpp\
     errorwindow.cpp \
     erroricon.cpp \
     sdwindow.cpp \
-    eepromwindow.cpp
+    eepromwindow.cpp \
+    parser.cpp
 
 HEADERS  += mainwindow.h \
     settingswindow.h \
@@ -30,7 +31,8 @@ HEADERS  += mainwindow.h \
     erroricon.h \
     sdwindow.h \
     repraptor.h \
-    eepromwindow.h
+    eepromwindow.h \
+    parser.h
 
 FORMS    += mainwindow.ui \
     settingswindow.ui \
