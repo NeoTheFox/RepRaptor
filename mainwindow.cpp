@@ -140,7 +140,11 @@ void MainWindow::open()
     if(!recentFiles.contains(filename))
     {
         if(recentFiles.size() < 5) recentFiles.append(filename);
-        else recentFiles.push_front(filename);
+        else
+        {
+            recentFiles.push_front(filename);
+            recentFiles.removeAt(5);
+        }
     }
 
     parseFile(gfile);

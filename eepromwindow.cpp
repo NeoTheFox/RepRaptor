@@ -40,19 +40,18 @@ EEPROMWindow::EEPROMWindow(QStringList eepromLines, QWidget *parent) :
 
         edit->setObjectName("e"+QString::number(j));
 
-        QIntValidator *intvalidator = new QIntValidator(this);
         QRegExpValidator *doublevalidator = new QRegExpValidator(
                                                 QRegExp("^\\-?\\d+\\.?\\d+(e\\-?\\d+)?$",
                                                 Qt::CaseInsensitive), this);
-        intvalidator->setLocale(QLocale::English);
         doublevalidator->setLocale(QLocale::English);
 
         switch(currentLine.T) // set right validator for the line
         {
         case 0:
+            edit->setValidator(new QIntValidator(-128, 255, this));
         case 1:
         case 2:
-            edit->setValidator(intvalidator);
+            edit->setValidator(new QIntValidator(this));
             break;
         case 3:
             edit->setValidator(doublevalidator);
