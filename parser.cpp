@@ -57,7 +57,12 @@ void Parser::parse(QByteArray data)
         }
 
         if(data.startsWith("ok"))
-            emit recievedOkNum(data.split(' ').at(1).toInt());
+        {
+            QStringList tmp = QString(data).split(' ');
+            if(tmp.size() > 1)
+                emit recievedOkNum(tmp.at(1).toInt());
+            else emit recievedOkNum(0);
+        }
         else if(data.startsWith("T:"))
         {
             TemperatureReadings r;
@@ -79,6 +84,7 @@ void Parser::parse(QByteArray data)
         else if(data.startsWith("start")) emit recievedStart();
         else if(data.startsWith("SD pr"))
         {
+            /*
             QString tmp;
             QString fragment = data.split(' ').at(3);
             for(int i = 0; fragment.at(i) != '/'; ++i)
@@ -86,6 +92,22 @@ void Parser::parse(QByteArray data)
                 tmp += fragment.at(i);
             }
             emit recievedSDUpdate(tmp.toDouble());
+            */
+            SDProgress p;
+            QRegExp rxp("\\d+/\\d+");
+            QStringList tmp;
+
+            if(rxp.indexIn(data) != -1)
+            {
+                tmp = rxp.cap(0).split('/');
+
+                p.progress = tmp.at(0).toLong();
+                p.total = tmp.at(1).toLong();
+            }
+            else return;
+
+            emit recievedSDUpdate(p);
+
         }
         else if(data.startsWith("Not SD "));
         else if(data.contains("Begin file list"))
@@ -95,7 +117,6 @@ void Parser::parse(QByteArray data)
         }
         else if(data.contains("REPETIER")) emit recievedFirmware(Repetier);
         else if(data.contains("MARLIN")) emit recievedFirmware(Marlin);
-
     }
 }
 

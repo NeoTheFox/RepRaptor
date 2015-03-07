@@ -91,7 +91,7 @@ private slots:
     void initSDprinting(QStringList sdFiles);
     void selectSDfile(QString file);
     void checkSDStatus();
-    void updateSDStatus(double currentSDbytes);
+    void updateSDStatus(SDProgress p);
     void requestEEPROMSettings();
     void openEEPROMeditor();
     void sendEEPROMsettings(QStringList changes);

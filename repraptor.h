@@ -22,6 +22,11 @@ namespace RepRaptor
         int T, P;
         QString S;
     } repetierEEPROMline;
+
+    typedef struct
+    {
+        unsigned long int progress, total;
+    } SDProgress;
 }
 
 #endif // REPRAPTOR_H

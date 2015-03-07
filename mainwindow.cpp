@@ -71,6 +71,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, SIGNAL(eepromReady()), this, SLOT(openEEPROMeditor()));
 
     qRegisterMetaType<TemperatureReadings>("TemperatureReadings");
+    qRegisterMetaType<SDProgress>("SDProgress");
     parser = new Parser();
     parserThread = new QThread();
     parser->moveToThread(parserThread);
@@ -97,7 +98,7 @@ MainWindow::MainWindow(QWidget *parent) :
     else sendTimer.setInterval(5);
     sendTimer.start();
 
-    progressSDTimer.setInterval(3000);
+    progressSDTimer.setInterval(2000);
     if(chekingSDStatus)progressSDTimer.start();
 
     tempWarning.setInterval(10000);
@@ -822,14 +823,15 @@ void MainWindow::selectSDfile(QString file)
     ui->fileBox->setDisabled(false);
 }
 
-void MainWindow::updateSDStatus(double currentSDbytes)
+void MainWindow::updateSDStatus(SDProgress p)
 {
-    ui->filelines->setText(QString::number(sdBytes)
+    ui->filelines->setText(QString::number(p.progress)
                            + QString("/")
-                           + QString::number(currentSDbytes)
+                           + QString::number(p.total)
                            + QString(" bytes"));
-    ui->progressBar->setValue(currentSDbytes/sdBytes * 100);
-    if(currentSDbytes == sdBytes) sdprinting = false;
+    if(p.progress != 0) ui->progressBar->setValue(((double)p.progress/p.total) * 100);
+    else ui->progressBar->setValue(0);
+    if(p.total == p.progress) sdprinting = false;
 }
 
 void MainWindow::checkSDStatus()

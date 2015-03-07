@@ -27,7 +27,7 @@ protected:
 
 signals:
     void recievedTemperature(TemperatureReadings);
-    void recievedSDUpdate(double);
+    void recievedSDUpdate(SDProgress);
     void recievedEEPROMLine(QString);
     void recievingEEPROMDone();
     void recievedSDFilesList(QStringList);
