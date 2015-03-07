@@ -60,16 +60,6 @@ MainWindow::MainWindow(QWidget *parent) :
     currentLine = 0;
     readyRecieve = 0;
     lastRecieved = 0;
-    readingEEPROM = false;
-    EEPROMReadingStarted = false;
-
-    temperatureRegxp.setCaseSensitivity(Qt::CaseInsensitive);
-    temperatureRegxp.setPatternSyntax(QRegExp::RegExp);
-    temperatureRegxp.setPattern("\\d+\\.\\d+"); // Find float in string
-
-    SDStatusRegxp.setCaseSensitivity(Qt::CaseInsensitive);
-    SDStatusRegxp.setPatternSyntax(QRegExp::RegExp);
-    SDStatusRegxp.setPattern("\\d+"); //First number
 
     serialupdate();
 
@@ -77,7 +67,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&printer, SIGNAL(readyRead()), this, SLOT(readSerial()));
     connect(&statusTimer, SIGNAL(timeout()), this, SLOT(checkStatus()));
     connect(&sendTimer, SIGNAL(timeout()), this, SLOT(sendNext()));
-    connect(&statusWatcher, SIGNAL(finished()), this, SLOT(updateStatus()));
     connect(&progressSDTimer, SIGNAL(timeout()), this, SLOT(checkSDStatus()));
     connect(this, SIGNAL(eepromReady()), this, SLOT(openEEPROMeditor()));
 
@@ -683,10 +672,7 @@ void MainWindow::on_pauseBtn_clicked()
 void MainWindow::checkStatus()
 {
     if(checkingTemperature
-            &&(sinceLastTemp.elapsed() > statusTimer.interval())
-            && statusWatcher.isFinished()
-            && !readingFiles
-            && !readingEEPROM) injectCommand("M105");
+            &&(sinceLastTemp.elapsed() > statusTimer.interval())) injectCommand("M105");
 }
 
 void MainWindow::on_checktemp_stateChanged(int arg1)
@@ -786,55 +772,11 @@ void MainWindow::serialError(QSerialPort::SerialPortError error)
     errorwindow.exec();
 }
 
-TemperatureReadings MainWindow::parseStatus(QByteArray data)
-{
-    /* Old parsing
-    QString tmp;
-    TemperatureReadings t;
-
-    for(int i = 2; data.at(i) != '/'; i++)
-    {
-        tmp+=data.at(i);
-    }
-
-    t.e = tmp.toDouble();
-
-    tmp.clear();
-
-    for(int i = data.indexOf("B:")+2; data.at(i) != '/'; i++)
-    {
-        tmp+=data.at(i);
-    }
-
-    t.b = tmp.toDouble();
-    */
-
-    TemperatureReadings r;
-
-    if(temperatureRegxp.indexIn(QString(data)) != -1)
-        r.e = temperatureRegxp.cap(0).toDouble();
-    if(temperatureRegxp.indexIn(QString(data), temperatureRegxp.matchedLength()) != -1)
-        r.b = temperatureRegxp.cap(0).toDouble();
-    else
-    {
-        r.e = -1;
-        r.b = -1;
-    }
-
-    return r;
-}
-
-void MainWindow::updateStatus()
-{
-    TemperatureReadings r = statusWatcher.future().result();
-    updateTemperature(r);
-    sinceLastTemp.restart();
-}
-
 void MainWindow::updateTemperature(TemperatureReadings r)
 {
     ui->extruderlcd->display(r.e);
     ui->bedlcd->display(r.b);
+    sinceLastTemp.restart();
 }
 
 void MainWindow::on_actionPrint_from_SD_triggered()
@@ -856,22 +798,6 @@ void MainWindow::initSDprinting(QStringList sdFiles)
     sdwindow.exec();
 }
 
-double MainWindow::parseSDStatus(QByteArray data)
-{
-    // Old parsing
-    QString tmp;
-    QString fragment = data.split(' ').at(3);
-    for(int i = 0; fragment.at(i) != '/'; ++i)
-    {
-        tmp += fragment.at(i);
-    }
-    return tmp.toDouble();
-    /*
-    if(SDStatusRegxp.indexIn(QString(data)) != 0)
-        return SDStatusRegxp.cap(0).toDouble();
-    else return 0;
-    */
-}
 
 void MainWindow::selectSDfile(QString file)
 {
@@ -908,7 +834,7 @@ void MainWindow::updateSDStatus(double currentSDbytes)
 
 void MainWindow::checkSDStatus()
 {
-    if(sdprinting && chekingSDStatus && sdWatcher.isFinished()) injectCommand("M27");
+    if(sdprinting && chekingSDStatus) injectCommand("M27");
 }
 
 void MainWindow::on_stepspin_valueChanged(const QString &arg1)

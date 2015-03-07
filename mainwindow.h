@@ -51,10 +51,6 @@ protected:
     QSettings settings;
     QStringList recentFiles;
     QStringList EEPROMSettings;
-    QFutureWatcher<TemperatureReadings> statusWatcher;
-    QFutureWatcher<double> sdWatcher;
-    QRegExp temperatureRegxp;
-    QRegExp SDStatusRegxp;
 
 private:
     Ui::MainWindow *ui;
@@ -68,8 +64,6 @@ private:
     bool paused;
     bool checkingTemperature;
     bool readingFiles;
-    bool readingEEPROM;
-    bool EEPROMReadingStarted;
     bool sdprinting;
     bool echo;
     bool sendingChecksum;
@@ -94,13 +88,10 @@ private slots:
     void checkStatus();
     void updateRecent();
     void injectCommand(QString command);
-    void updateStatus();
     void initSDprinting(QStringList sdFiles);
     void selectSDfile(QString file);
     void checkSDStatus();
     void updateSDStatus(double currentSDbytes);
-    TemperatureReadings parseStatus(QByteArray data);
-    double parseSDStatus(QByteArray data);
     void requestEEPROMSettings();
     void openEEPROMeditor();
     void sendEEPROMsettings(QStringList changes);
