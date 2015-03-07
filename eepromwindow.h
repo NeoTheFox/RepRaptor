@@ -4,6 +4,10 @@
 #include <QDialog>
 #include <QtWidgets>
 
+#include "repraptor.h"
+
+using namespace RepRaptor;
+
 namespace Ui {
 class EEPROMWindow;
 }
@@ -18,11 +22,16 @@ public:
 
 private:
     Ui::EEPROMWindow *ui;
+    QVector <repetierEEPROMline> lines;
+    QVector <bool> changed;
+    QStringList gcode;
 
 signals:
     void changesComplete(QStringList changed);
+
 private slots:
     void on_buttonBox_accepted();
+    void lineChanged(QString s);
 };
 
 #endif // EEPROMWINDOW_H

@@ -1,6 +1,8 @@
 #ifndef REPRAPTOR_H
 #define REPRAPTOR_H
 
+#include <QString>
+
 namespace RepRaptor
 {
     typedef struct
@@ -14,6 +16,12 @@ namespace RepRaptor
         Repetier,
         OtherFirmware
     };
+
+    typedef struct
+    {
+        int T, P;
+        QString S;
+    } repetierEEPROMline;
 }
 
 #endif // REPRAPTOR_H

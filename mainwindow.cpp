@@ -690,7 +690,10 @@ void MainWindow::on_actionAbout_triggered()
 
 void MainWindow::injectCommand(QString command)
 {
-    userCommands.enqueue(command);
+    //if(checkingTemperature && command == "M105" && userCommands.contains("M105")) return;
+    //if(chekingSDStatus && command == "M27" && userCommands.contains("M27")) return;
+
+    if(!userCommands.contains(command)) userCommands.enqueue(command);
 }
 
 void MainWindow::updateRecent()
@@ -934,5 +937,8 @@ void MainWindow::openEEPROMeditor()
 
 void MainWindow::sendEEPROMsettings(QStringList changes)
 {
-
+    userCommands.clear();
+    foreach (QString str, changes) {
+        injectCommand(str);
+    }
 }
