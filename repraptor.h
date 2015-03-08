@@ -8,6 +8,7 @@ namespace RepRaptor
     typedef struct
     {
         double e, b;
+        QString raw;
     } TemperatureReadings;
 
     enum Firmware

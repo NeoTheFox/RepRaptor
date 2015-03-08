@@ -139,6 +139,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::open()
 {
+    sdprinting = false;
     QString filename;
     QDir home;
     filename = QFileDialog::getOpenFileName(this,
@@ -187,7 +188,6 @@ void MainWindow::parseFile(QFile &file)
 
         }
         file.close();
-        sdprinting = false;
         ui->fileBox->setEnabled(true);
         ui->progressBar->setEnabled(true);
         ui->sendBtn->setText("Send");
@@ -780,6 +780,7 @@ void MainWindow::updateTemperature(TemperatureReadings r)
 {
     ui->extruderlcd->display(r.e);
     ui->bedlcd->display(r.b);
+    ui->tempLine->setText(r.raw);
     sinceLastTemp.restart();
 }
 

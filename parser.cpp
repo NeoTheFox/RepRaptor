@@ -76,6 +76,8 @@ void Parser::parse(QByteArray data)
                 r.b = temperatureRegxp.cap(0).toDouble();
             else return;
 
+            r.raw = QString(data);
+
             emit recievedTemperature(r);
         }
         //else if(data.startsWith("wait")) emit recievedOkWait();
