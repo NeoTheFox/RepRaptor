@@ -24,6 +24,7 @@ private:
     Ui::EEPROMWindow *ui;
     QVector <repetierEEPROMline> lines;
     QVector <bool> changed;
+    int firmware;
 
 signals:
     void changesComplete(QStringList changed);

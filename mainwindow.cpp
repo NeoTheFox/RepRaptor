@@ -267,7 +267,7 @@ void MainWindow::serialconnect()
             ui->consoleGroup->setDisabled(false);
             ui->actionPrint_from_SD->setEnabled(true);
             ui->actionSet_SD_printing_mode->setEnabled(true);
-            if(firmware != OtherFirmware) ui->actionEEPROM_editor->setDisabled(false);
+            if(firmware == Repetier) ui->actionEEPROM_editor->setDisabled(false);
             //if(checkingTemperature) injectCommand("M105");
         }
     }
@@ -708,9 +708,6 @@ void MainWindow::on_actionAbout_triggered()
 
 void MainWindow::injectCommand(QString command)
 {
-    //if(checkingTemperature && command == "M105" && userCommands.contains("M105")) return;
-    //if(chekingSDStatus && command == "M27" && userCommands.contains("M27")) return;
-
     if(!userCommands.contains(command)) userCommands.enqueue(command);
 }
 
@@ -872,7 +869,7 @@ void MainWindow::requestEEPROMSettings()
     switch(firmware)
     {
     case Marlin:
-        injectCommand("M501");
+        injectCommand("M503");
         break;
     case Repetier:
         injectCommand("M205");
