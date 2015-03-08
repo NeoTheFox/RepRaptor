@@ -27,6 +27,18 @@
    <layout class="QGridLayout" name="gridLayout_6">
     <item row="0" column="0">
      <widget class="QGroupBox" name="serialGroup">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>200</width>
+        <height>16777215</height>
+       </size>
+      </property>
       <property name="title">
        <string>Serial</string>
       </property>
@@ -78,6 +90,12 @@
       <property name="title">
        <string>Control</string>
       </property>
+      <property name="alignment">
+       <set>Qt::AlignHCenter|Qt::AlignTop</set>
+      </property>
+      <property name="flat">
+       <bool>false</bool>
+      </property>
       <property name="checkable">
        <bool>true</bool>
       </property>
@@ -123,10 +141,10 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
-        <widget class="QPushButton" name="centerbtn">
+       <item row="1" column="4">
+        <widget class="QPushButton" name="ezerobtn">
          <property name="text">
-          <string>C</string>
+          <string>E0</string>
          </property>
         </widget>
        </item>
@@ -137,10 +155,10 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="4">
-        <widget class="QPushButton" name="ezerobtn">
+       <item row="1" column="1">
+        <widget class="QPushButton" name="centerbtn">
          <property name="text">
-          <string>E0</string>
+          <string>C</string>
          </property>
         </widget>
        </item>
@@ -172,6 +190,13 @@
          </property>
         </widget>
        </item>
+       <item row="3" column="3" colspan="4">
+        <widget class="QPushButton" name="releasebtn">
+         <property name="text">
+          <string>Release</string>
+         </property>
+        </widget>
+       </item>
        <item row="2" column="6">
         <widget class="QPushButton" name="homezbtn">
          <property name="text">
@@ -186,17 +211,17 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="4">
-        <widget class="QPushButton" name="etmpset">
-         <property name="text">
-          <string>SET</string>
-         </property>
-        </widget>
-       </item>
        <item row="6" column="6">
         <widget class="QPushButton" name="etmpoff">
          <property name="text">
           <string>OFF</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="4">
+        <widget class="QPushButton" name="etmpset">
+         <property name="text">
+          <string>SET</string>
          </property>
         </widget>
        </item>
@@ -322,10 +347,16 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="3" colspan="4">
-        <widget class="QPushButton" name="releasebtn">
+       <item row="4" column="3" colspan="2">
+        <widget class="QLabel" name="label">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>15</height>
+          </size>
+         </property>
          <property name="text">
-          <string>Release</string>
+          <string>E Step</string>
          </property>
         </widget>
        </item>
@@ -345,6 +376,19 @@
          </property>
         </widget>
        </item>
+       <item row="4" column="0" colspan="2">
+        <widget class="QLabel" name="label_2">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>15</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Step</string>
+         </property>
+        </widget>
+       </item>
        <item row="5" column="0" colspan="3">
         <widget class="QDoubleSpinBox" name="stepspin">
          <property name="locale">
@@ -358,32 +402,6 @@
          </property>
          <property name="value">
           <double>1.000000000000000</double>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="3" colspan="2">
-        <widget class="QLabel" name="label">
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>15</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>E Step</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0" colspan="2">
-        <widget class="QLabel" name="label_2">
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>15</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Step</string>
          </property>
         </widget>
        </item>
@@ -903,9 +921,15 @@ STOP</string>
     </item>
     <item row="1" column="0">
      <widget class="QGroupBox" name="fileBox">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="maximumSize">
        <size>
-        <width>190</width>
+        <width>200</width>
         <height>16777215</height>
        </size>
       </property>
@@ -977,9 +1001,15 @@ STOP</string>
     </item>
     <item row="2" column="0">
      <widget class="QGroupBox" name="statusGroup">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="maximumSize">
        <size>
-        <width>190</width>
+        <width>200</width>
         <height>16777215</height>
        </size>
       </property>
@@ -1568,6 +1598,38 @@ STOP</string>
     <hint type="destinationlabel">
      <x>494</x>
      <y>397</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>speededit</sender>
+   <signal>returnPressed()</signal>
+   <receiver>speedsetbtn</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>315</x>
+     <y>339</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>446</x>
+     <y>340</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>flowedit</sender>
+   <signal>returnPressed()</signal>
+   <receiver>flowbutton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>368</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>421</x>
+     <y>371</y>
     </hint>
    </hints>
   </connection>
