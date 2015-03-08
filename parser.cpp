@@ -117,8 +117,8 @@ void Parser::parse(QByteArray data)
             SDFilesList.clear();
             readingFiles = true; //start reading files from SD
         }
-        else if(data.contains("REPETIER")) emit recievedFirmware(Repetier);
-        else if(data.contains("MARLIN")) emit recievedFirmware(Marlin);
+        //else if(data.contains("REPETIER")) emit recievedFirmware(Repetier);
+        //else if(data.contains("MARLIN")) emit recievedFirmware(Marlin);
     }
 }
 

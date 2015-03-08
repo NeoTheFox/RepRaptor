@@ -467,7 +467,9 @@ void MainWindow::on_haltbtn_clicked()
 
 void MainWindow::readSerial()
 {
-    QByteArray data = printer.readLine();
+    if(printer.canReadLine())
+    {
+        QByteArray data = printer.readLine();
     /*
     if(printer.canReadLine())
     {
@@ -554,10 +556,11 @@ void MainWindow::readSerial()
             readingFiles = true; //start reading files from SD
         }
 */
-    emit recievedData(data);
-    if(data.startsWith("ok")) readyRecieve++;
-    else if(data.startsWith("wa")) readyRecieve=1;
-    printMsg(QString(data)); //echo
+        emit recievedData(data);
+        if(data.startsWith("ok")) readyRecieve++;
+        else if(data.startsWith("wa")) readyRecieve=1;
+        printMsg(QString(data)); //echo
+    }
 }
 
 void MainWindow::printMsg(const char* text)
