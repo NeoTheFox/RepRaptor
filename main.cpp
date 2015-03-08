@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationDomain("https://github.com/NeoTheFox");
     QCoreApplication::setApplicationName("RepRaptor");
 
-    QThread::currentThread()->setPriority(QThread::HighPriority);
+    QThread::currentThread()->setPriority(QThread::HighestPriority);
 
     MainWindow w;
     w.show();
