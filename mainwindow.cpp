@@ -58,7 +58,7 @@ MainWindow::MainWindow(QWidget *parent) :
     sdBytes = 0;
     userCommand = "";
     currentLine = 0;
-    readyRecieve = 0;
+    readyRecieve = 1;
     lastRecieved = 0;
 
     serialupdate();
@@ -555,6 +555,8 @@ void MainWindow::readSerial()
         }
 */
     emit recievedData(data);
+    if(data.startsWith("ok")) readyRecieve++;
+    else if(data.startsWith("wa")) readyRecieve=1;
     printMsg(QString(data)); //echo
 }
 
