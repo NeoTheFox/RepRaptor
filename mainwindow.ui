@@ -861,6 +861,12 @@ STOP</string>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
+      <property name="minimumSize">
+       <size>
+        <width>190</width>
+        <height>0</height>
+       </size>
+      </property>
       <property name="title">
        <string>Console</string>
       </property>

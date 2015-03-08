@@ -261,7 +261,7 @@ void MainWindow::serialconnect()
         {
             ui->connectBtn->setText("Disconnect");
             ui->sendBtn->setDisabled(false);
-            ui->pauseBtn->setDisabled(false);
+            //ui->pauseBtn->setDisabled(false);
             ui->progressBar->setValue(0);
             ui->controlBox->setDisabled(false);
             ui->consoleGroup->setDisabled(false);
@@ -612,6 +612,7 @@ void MainWindow::on_sendBtn_clicked()
         injectCommand("M27");
         ui->sendBtn->setText("Start");
         ui->pauseBtn->setText("Pause");
+        ui->pauseBtn->setEnabled(true);
         if(autolock) ui->controlBox->setChecked(true);
         paused = false;
     }
