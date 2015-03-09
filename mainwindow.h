@@ -72,7 +72,6 @@ private:
     unsigned long int lastRecieved;
     int readyRecieve;
     unsigned long int sdBytes;
-    QString userCommand;
 
 private slots:
     void open();

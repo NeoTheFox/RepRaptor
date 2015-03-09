@@ -7,6 +7,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    //Setup the UI
     ui->fileBox->setDisabled(true);
     ui->sendBtn->setDisabled(true);
     ui->pauseBtn->setDisabled(true);
@@ -17,7 +18,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->actionPrint_from_SD->setDisabled(true);
     ui->actionSet_SD_printing_mode->setDisabled(true);
     ui->actionEEPROM_editor->setDisabled(true);
+    ui->extruderlcd->setPalette(Qt::red);
+    ui->bedlcd->setPalette(Qt::red);
 
+    //Init baudrate combobox
     ui->baudbox->addItem(QString::number(4800));
     ui->baudbox->addItem(QString::number(9600));
     ui->baudbox->addItem(QString::number(115200));
@@ -30,37 +34,34 @@ MainWindow::MainWindow(QWidget *parent) :
         ui->baudbox->setCurrentIndex(settings.value("printer/baudrateindex").toInt());
     else ui->baudbox->setCurrentIndex(2);
 
-    ui->extruderlcd->setPalette(Qt::red);
-    ui->bedlcd->setPalette(Qt::red);
-
+    //Restore settings
     firstrun = !settings.value("core/firstrun").toBool(); //firstrun is inverted!
-
     checkingTemperature = settings.value("core/checktemperature").toBool();
     ui->checktemp->setChecked(checkingTemperature);
-
     ui->etmpspin->setValue(settings.value("user/extrudertemp").toInt());
     ui->btmpspin->setValue(settings.value("user/bedtemp").toInt());
-
     echo = settings.value("core/echo", 0).toBool();
-
     autolock = settings.value("core/lockcontrols").toBool();
     sendingChecksum = settings.value("core/checksums").toBool();
     chekingSDStatus = settings.value("core/checksdstatus").toBool();
-
     firmware = settings.value("printer/firmware", OtherFirmware).toInt();
+    statusTimer.setInterval(settings.value("core/statusinterval", 3000).toInt());
+    sendTimer.setInterval(settings.value("core/senderinterval", 2).toInt());
 
+    //Init values
     sending = false;
     paused = false;
     readingFiles = false;
     sdprinting = false;
     sdBytes = 0;
-    userCommand = "";
     currentLine = 0;
     readyRecieve = 1;
     lastRecieved = 0;
 
+    //Update serial ports
     serialupdate();
 
+    //Internal signal-slots
     connect(&printer, SIGNAL(error(QSerialPort::SerialPortError)), this, SLOT(serialError(QSerialPort::SerialPortError)));
     connect(&printer, SIGNAL(readyRead()), this, SLOT(readSerial()));
     connect(&statusTimer, SIGNAL(timeout()), this, SLOT(checkStatus()));
@@ -68,6 +69,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&progressSDTimer, SIGNAL(timeout()), this, SLOT(checkSDStatus()));
     connect(this, SIGNAL(eepromReady()), this, SLOT(openEEPROMeditor()));
 
+    //Parser thread signal-slots and init
     qRegisterMetaType<TemperatureReadings>("TemperatureReadings");
     qRegisterMetaType<SDProgress>("SDProgress");
     parser = new Parser();
@@ -88,34 +90,19 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(parser, &Parser::recievedSDUpdate, this, &MainWindow::updateSDStatus);
     parserThread->start();
 
-    statusTimer.setInterval(settings.value("core/statusinterval", 3000).toInt());
+    //Timers init
     statusTimer.start();
-
-    sendTimer.setInterval(settings.value("core/senderinterval", 2).toInt());
     sendTimer.start();
-
     progressSDTimer.setInterval(2100);
-
     if(chekingSDStatus) progressSDTimer.start();
-
     sinceLastTemp.start();
 
-    #ifdef QT_DEBUG
-    ui->actionEEPROM_editor->setEnabled(true);
-    #else
-    ui->actionEEPROM_editor->setDisabled(true);
-    #endif
 }
 
 MainWindow::~MainWindow()
 {
-    if(gfile.isOpen()) gfile.close();
-    if(printer.isOpen()) printer.close();
-    parserThread->quit();
-    parserThread->wait();
-
+    //Save settings
     if(firstrun) settings.setValue("core/firstrun", true); //firstrun is inverted!
-
     settings.setValue("printer/baudrateindex", ui->baudbox->currentIndex());
     settings.setValue("core/checktemperature", ui->checktemp->isChecked());
     settings.setValue("user/extrudertemp", ui->etmpspin->value());
@@ -128,6 +115,12 @@ MainWindow::~MainWindow()
         settings.setValue("user/recentfile", recentFiles.at(i));
     }
     settings.endArray();
+
+    //Cleanup what is left
+    if(gfile.isOpen()) gfile.close();
+    if(printer.isOpen()) printer.close();
+    parserThread->quit();
+    parserThread->wait();
 
     delete ui;
 }
@@ -231,29 +224,30 @@ void MainWindow::serialconnect()
         }
 
         printer.setPort(printerinfo);
-        printer.setFlowControl(QSerialPort::NoFlowControl);
-
-        switch(ui->baudbox->currentText().toInt())
-        {
-            case 4800:
-            printer.setBaudRate(QSerialPort::Baud4800);
-            break;
-
-            case 9600:
-            printer.setBaudRate(QSerialPort::Baud9600);
-            break;
-
-            case 115200:
-            printer.setBaudRate(QSerialPort::Baud115200);
-            break;
-
-            default:
-            printer.setBaudRate(ui->baudbox->currentText().toInt());
-            break;
-        }
 
         if(printer.open(QIODevice::ReadWrite))
         {
+
+            //Moved here to be compatible with Qt 5.2.1
+            switch(ui->baudbox->currentText().toInt())
+            {
+                case 4800:
+                printer.setBaudRate(QSerialPort::Baud4800);
+                break;
+
+                case 9600:
+                printer.setBaudRate(QSerialPort::Baud9600);
+                break;
+
+                case 115200:
+                printer.setBaudRate(QSerialPort::Baud115200);
+                break;
+
+                default:
+                printer.setBaudRate(ui->baudbox->currentText().toInt());
+                break;
+            }
+
             ui->connectBtn->setText("Disconnect");
             ui->sendBtn->setDisabled(false);
             //ui->pauseBtn->setDisabled(false);
@@ -263,7 +257,6 @@ void MainWindow::serialconnect()
             ui->actionPrint_from_SD->setEnabled(true);
             ui->actionSet_SD_printing_mode->setEnabled(true);
             if(firmware == Repetier) ui->actionEEPROM_editor->setDisabled(false);
-            //if(checkingTemperature) injectCommand("M105");
         }
     }
 
@@ -712,7 +705,7 @@ void MainWindow::updateRecent()
 void MainWindow::serialError(QSerialPort::SerialPortError error)
 {
     if(error == QSerialPort::NoError) return;
-    if(error == QSerialPort::NotOpenError) return;
+    if(error == QSerialPort::NotOpenError) return; //this error is internal
 
     if(printer.isOpen()) printer.close();
 
