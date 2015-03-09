@@ -8,7 +8,7 @@ Right now the project is in early stage. This means some features are still abse
 ![Screenshot](http://reprap.org/mediawiki/images/6/6c/RepRaptor-v0.2.png)
 
 ## Install via PPA
-Since 0.3 release PPA is available for Ubuntu 14.04 and Linux Mint 17.
+Since 0.3 release PPA is available for Ubuntu 14.04 and Linux Mint 17 (and later).
 ```
 sudo add-apt-repository ppa:soniczerops/repraptor-dev
 sudo apt-get update
