@@ -7,33 +7,22 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    bool firstrun = !settings.value("core/firstrun").toBool(); //firstrun is inverted!
+    //bool firstrun = !settings.value("core/firstrun").toBool(); //firstrun is inverted!
 
-    if(firstrun) ui->senderbox->setValue(4);
-    else ui->senderbox->setValue(settings.value("core/senderinterval").toFloat());
+    ui->senderbox->setValue(settings.value("core/senderinterval", 2).toFloat());
+    ui->echobox->setChecked(settings.value("core/echo", 0).toBool());
+    ui->statusbox->setValue(settings.value("core/statusinterval", 2000).toInt());
+    ui->bedxbox->setValue(settings.value("printer/bedx", 200).toInt());
+    ui->bedybox->setValue(settings.value("printer/bedy", 200).toInt());
+    ui->lockbox->setChecked(settings.value("core/lockcontrols", 0).toBool());
+    ui->checksumbox->setChecked(settings.value("core/checksums", 0).toBool());
+    ui->sdbox->setChecked(settings.value("core/checksdstatus", 1).toBool());
 
-    if(firstrun) ui->echobox->setChecked(false);
-    else ui->echobox->setChecked(settings.value("core/echo").toBool());
+    ui->firmwarecombo->addItem("Marlin"); //0
+    ui->firmwarecombo->addItem("Repetier"); //1
+    ui->firmwarecombo->addItem("Other"); //2
 
-    if(settings.value("core/statusinterval").toInt()) ui->statusbox->setValue(settings.value("core/statusinterval").toInt());
-    else ui->statusbox->setValue(1500);
-
-    if(settings.value("printer/bedx").toInt()) ui->bedxbox->setValue(settings.value("printer/bedx").toInt());
-    else ui->bedxbox->setValue(200);
-
-    if(settings.value("printer/bedy").toInt()) ui->bedybox->setValue(settings.value("printer/bedy").toInt());
-    else ui->bedybox->setValue(200);
-
-    ui->lockbox->setChecked(settings.value("core/lockcontrols").toBool());
-    ui->checksumbox->setChecked(settings.value("core/checksums").toBool());
-    ui->sdbox->setChecked(settings.value("core/checksdstatus").toBool());
-
-    ui->firmwarecombo->addItem("Marlin");
-    ui->firmwarecombo->addItem("Repetier");
-    ui->firmwarecombo->addItem("Other");
-
-    if(firstrun) ui->firmwarecombo->setCurrentIndex(OtherFirmware);
-    else ui->firmwarecombo->setCurrentIndex(settings.value("printer/firmware").toInt());
+    ui->firmwarecombo->setCurrentIndex(settings.value("printer/firmware", OtherFirmware).toInt());
 
     #ifdef QT_DEBUG
     ui->checksumbox->setEnabled(true);

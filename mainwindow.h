@@ -46,7 +46,6 @@ protected:
     QTimer sendTimer;
     QTimer progressSDTimer;
     QTimer statusTimer;
-    QTimer tempWarning;
     QElapsedTimer sinceLastTemp;
     QSettings settings;
     QStringList recentFiles;

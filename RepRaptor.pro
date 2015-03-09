@@ -13,7 +13,6 @@ TARGET = RepRaptor
 TEMPLATE = app
 CONFIG += static
 
-
 SOURCES += main.cpp\
         mainwindow.cpp \
     settingswindow.cpp \

@@ -41,15 +41,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->etmpspin->setValue(settings.value("user/extrudertemp").toInt());
     ui->btmpspin->setValue(settings.value("user/bedtemp").toInt());
 
-    if(!firstrun) echo = settings.value("core/echo").toBool();
-    else echo = false;
+    echo = settings.value("core/echo", 0).toBool();
 
     autolock = settings.value("core/lockcontrols").toBool();
     sendingChecksum = settings.value("core/checksums").toBool();
     chekingSDStatus = settings.value("core/checksdstatus").toBool();
 
-    if(firstrun) firmware = OtherFirmware;
-    else firmware = settings.value("printer/firmware").toInt();
+    firmware = settings.value("printer/firmware", OtherFirmware).toInt();
 
     sending = false;
     paused = false;
@@ -90,18 +88,15 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(parser, &Parser::recievedSDUpdate, this, &MainWindow::updateSDStatus);
     parserThread->start();
 
-    if(settings.value("core/statusinterval").toInt()) statusTimer.setInterval(settings.value("core/statusinterval").toInt());
-    else statusTimer.setInterval(3000);
+    statusTimer.setInterval(settings.value("core/statusinterval", 3000).toInt());
     statusTimer.start();
 
-    if(settings.value("core/senderinterval").toInt()) sendTimer.setInterval(settings.value("core/senderinterval").toInt());
-    else sendTimer.setInterval(5);
+    sendTimer.setInterval(settings.value("core/senderinterval", 2).toInt());
     sendTimer.start();
 
-    progressSDTimer.setInterval(2000);
-    if(chekingSDStatus)progressSDTimer.start();
+    progressSDTimer.setInterval(2100);
 
-    tempWarning.setInterval(10000);
+    if(chekingSDStatus) progressSDTimer.start();
 
     sinceLastTemp.start();
 
