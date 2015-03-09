@@ -408,11 +408,8 @@ void MainWindow::bedcenter()
 {
     int x, y;
 
-    if(settings.value("printer/bedx").toInt()) x = settings.value("printer/bedx").toInt();
-    else x = 200;
-
-    if(settings.value("printer/bedy").toInt()) y = settings.value("printer/bedy").toInt();
-    else y = 200;
+    x = settings.value("printer/bedx", 200).toInt();
+    y = settings.value("printer/bedy", 200).toInt();
 
     QString command = "G1 X" + QString::number(x/2) + "Y" + QString::number(y/2);
     injectCommand(command);
