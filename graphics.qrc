@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/">
-        <file>icons/icon.png</file>
+        <file>icons/repraptor.png</file>
         <file>icons/logo.png</file>
         <file>icons/error_a.png</file>
         <file>icons/error_b.png</file>

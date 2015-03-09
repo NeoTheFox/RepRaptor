@@ -35,7 +35,7 @@ unix
     desktop.files += $${TARGET}.desktop
 
     icon.path = $$DATADIR/icons
-    icon.files += icons/icon.png
+    icon.files += icons/repraptor.png
 }
 
 SOURCES += main.cpp\
