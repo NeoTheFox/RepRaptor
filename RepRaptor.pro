@@ -15,16 +15,27 @@ CONFIG += static
 
 unix
 {
+    #VARIABLES
+    isEmpty(PREFIX)
+    {
+        PREFIX = /usr/local
+    }
+    BINDIR = $$PREFIX/bin
+    DATADIR =$$PREFIX/share
+
+    DEFINES += DATADIR=\\\"$$DATADIR\\\" PKGDATADIR=\\\"$$PKGDATADIR\\\"
+
+    #MAKE INSTALL
+
+    INSTALLS += target desktop service iconxpm icon26 icon48 icon64
+
+    target.path =$$BINDIR
+
+    desktop.path = $$DATADIR/applications
+    desktop.files += $${TARGET}.desktop
+
+    icon.path = $$DATADIR/icons
     icon.files += icons/icon.png
-    icon.path = /usr/share/icons
-
-    desktop.files += RepRaptor.desktop
-    desktop.path = /usr/share/applications
-
-    repraptor.files += RepRaptor
-    repraptor.path = /usr/bin
-
-    INSTALLS+= icon desktop repraptor
 }
 
 SOURCES += main.cpp\
