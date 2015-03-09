@@ -78,7 +78,6 @@ private slots:
     void serialconnect();
     void serialupdate();
     bool sendLine(QString line);
-
     void readSerial();
     void printMsg(QString text);
     void printMsg(const char* text);
@@ -142,9 +141,7 @@ private slots:
     void on_actionAbout_triggered();
     void serialError(QSerialPort::SerialPortError error);
     void on_actionPrint_from_SD_triggered();
-
     void on_actionSet_SD_printing_mode_triggered();
-
     void on_actionEEPROM_editor_triggered();
 
 signals:

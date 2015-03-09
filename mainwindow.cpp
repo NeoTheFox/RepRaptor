@@ -30,20 +30,18 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->baudbox->addItem(QString::number(250000));
     ui->baudbox->addItem(QString::number(460800));
     ui->baudbox->addItem(QString::number(500000));
-    if(settings.value("printer/baudrateindex").toInt())
-        ui->baudbox->setCurrentIndex(settings.value("printer/baudrateindex").toInt());
-    else ui->baudbox->setCurrentIndex(2);
 
     //Restore settings
     firstrun = !settings.value("core/firstrun").toBool(); //firstrun is inverted!
-    checkingTemperature = settings.value("core/checktemperature").toBool();
+    ui->baudbox->setCurrentIndex(settings.value("printer/baudrateindex", 2).toInt());
+    checkingTemperature = settings.value("core/checktemperature", 0).toBool();
     ui->checktemp->setChecked(checkingTemperature);
-    ui->etmpspin->setValue(settings.value("user/extrudertemp").toInt());
-    ui->btmpspin->setValue(settings.value("user/bedtemp").toInt());
+    ui->etmpspin->setValue(settings.value("user/extrudertemp", 210).toInt());
+    ui->btmpspin->setValue(settings.value("user/bedtemp", 60).toInt());
     echo = settings.value("core/echo", 0).toBool();
-    autolock = settings.value("core/lockcontrols").toBool();
-    sendingChecksum = settings.value("core/checksums").toBool();
-    chekingSDStatus = settings.value("core/checksdstatus").toBool();
+    autolock = settings.value("core/lockcontrols", 0).toBool();
+    sendingChecksum = settings.value("core/checksums", 0).toBool();
+    chekingSDStatus = settings.value("core/checksdstatus", 1).toBool();
     firmware = settings.value("printer/firmware", OtherFirmware).toInt();
     statusTimer.setInterval(settings.value("core/statusinterval", 3000).toInt());
     sendTimer.setInterval(settings.value("core/senderinterval", 2).toInt());
@@ -452,96 +450,11 @@ void MainWindow::on_haltbtn_clicked()
 
 void MainWindow::readSerial()
 {
-    if(printer.canReadLine())
+    if(printer.canReadLine()) //Check if full line in buffer
     {
-        QByteArray data = printer.readLine();
-    /*
-    if(printer.canReadLine())
-    {
-        QByteArray data = printer.readLine();
+        QByteArray data = printer.readLine(); //Read the line
 
-        if(readingFiles)
-        {
-            if(!data.contains("End file list")) sdFiles.append(data);
-            else
-            {
-                readingFiles = false;
-                emit sdReady();
-            }
-            printMsg(QString(data)); //echo
-            return;
-        }
-
-        if(readingEEPROM)
-        {
-            if(firmware == Repetier)
-            {
-                if(data.startsWith("EPR"))
-                {
-                    EEPROMSettings.append(data);
-                    EEPROMReadingStarted = true;
-                }
-                else if(EEPROMReadingStarted)
-                {
-                    readingEEPROM = false;
-                    EEPROMReadingStarted = false;
-                    emit eepromReady();
-                }
-
-                printMsg(QString(data)); //echo
-                return;
-            }
-        }
-
-        if(data.startsWith("ok")) readyRecieve++;
-        else if(checkingTemperature && data.startsWith("T:"))
-        {
-            QFuture<TemperatureReadings> parseThread = QtConcurrent::run(this, &MainWindow::parseStatus, data);
-            statusWatcher.setFuture(parseThread); //parseThread is very costly operation
-            ui->tempLine->setText(data);
-        }
-        else if(data.startsWith("wait")) readyRecieve = 1;
-        else if(data.startsWith("Resend"))  //Handle resend if requested
-        {
-            if(gcode.isEmpty())
-            {
-                injectCommand("M110 N0"); //This means we rebooted, file is gone, so we need to reset counter
-                return;
-            }
-            int err = data.split(':')[1].toInt();
-            if(!sendingChecksum)
-            {
-                if(currentLine > 0) currentLine -= err;
-                if(currentLine < 0) currentLine = 0;
-            }
-            else  injectCommand(gcode.at(err));
-        }
-        else if(data.startsWith("!!"))
-        {
-            ErrorWindow errorwindow(this,"Hardware failure");
-            errorwindow.exec();
-        }
-        else if(data.startsWith("Done"))
-        {
-            sdprinting=false;
-            ui->progressBar->setValue(0);
-            ui->filename->setText("");
-            ui->fileBox->setDisabled(true);
-        }
-        else if(data.startsWith("start") && checkingTemperature) injectCommand("M105");
-        else if(data.startsWith("SD pr"))
-        {
-            QFuture<double> parseSDThread = QtConcurrent::run(this, &MainWindow::parseSDStatus, data);
-            sdWatcher.setFuture(parseSDThread);
-        }
-        else if(sdprinting && data.startsWith("Not SD ")) sdprinting = false;
-        else if(data.contains("Begin file list"))
-        {
-            sdFiles.clear();
-            readingFiles = true; //start reading files from SD
-        }
-*/
-        emit recievedData(data);
+        emit recievedData(data); //Send data to parser thread
         if(data.startsWith("ok")) readyRecieve++;
         else if(data.startsWith("wa")) readyRecieve=1;
         printMsg(QString(data)); //echo
@@ -608,13 +521,13 @@ void MainWindow::on_sendBtn_clicked()
 
 void MainWindow::sendNext()
 {
-    if(!userCommands.isEmpty() && printer.isWritable() && readyRecieve > 0)
+    if(!userCommands.isEmpty() && printer.isWritable() && readyRecieve > 0) //Inject user command
     {
         sendLine(userCommands.dequeue());
         readyRecieve--;
         return;
     }
-    else if(sending && !paused && readyRecieve > 0 && !sdprinting && printer.isWritable())
+    else if(sending && !paused && readyRecieve > 0 && !sdprinting && printer.isWritable()) //Send line of gcode
     {
         if(currentLine >= gcode.size()) //check if we are at the end of array
         {
