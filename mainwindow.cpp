@@ -274,7 +274,9 @@ void MainWindow::serialconnect()
      }
 }
 
-//Buttons start
+/////////////////
+//Buttons start//
+/////////////////
 void MainWindow::xplus()
 {
     QString command = "G91\nG1 X" + ui->stepspin->text() + "\nG90";
@@ -446,40 +448,10 @@ void MainWindow::on_haltbtn_clicked()
     userCommands.clear();
     injectCommand("M112");
 }
-//Buttons end
 
-void MainWindow::readSerial()
+void MainWindow::on_actionPrint_from_SD_triggered()
 {
-    if(printer.canReadLine()) //Check if full line in buffer
-    {
-        QByteArray data = printer.readLine(); //Read the line
-
-        emit recievedData(data); //Send data to parser thread
-        if(data.startsWith("ok")) readyRecieve++;
-        else if(data.startsWith("wa")) readyRecieve=1;
-        printMsg(QString(data)); //echo
-    }
-}
-
-void MainWindow::printMsg(const char* text)
-{
-    QTextCursor cursor = ui->terminal->textCursor();
-    cursor.movePosition(QTextCursor::End);
-
-    cursor.insertText(text);
-
-    ui->terminal->setTextCursor(cursor);
-;
-}
-
-void MainWindow::printMsg(QString text)
-{
-    QTextCursor cursor = ui->terminal->textCursor();
-    cursor.movePosition(QTextCursor::End);
-
-    cursor.insertText(text);
-
-    ui->terminal->setTextCursor(cursor);
+    injectCommand("M20");
 }
 
 void MainWindow::on_sendBtn_clicked()
@@ -519,6 +491,70 @@ void MainWindow::on_sendBtn_clicked()
     currentLine = 0;
 }
 
+void MainWindow::on_pauseBtn_clicked()
+{
+    if(paused && !sdprinting)
+    {
+        paused = false;
+        if(autolock) ui->controlBox->setChecked(false);
+        ui->pauseBtn->setText("Pause");
+    }
+    else if(!paused && !sdprinting)
+    {
+        paused = true;
+        if(autolock) ui->controlBox->setChecked(true);
+        ui->pauseBtn->setText("Resume");
+    }
+    else if(sdprinting)
+    {
+        injectCommand("M25");
+    }
+}
+
+void MainWindow::on_releasebtn_clicked()
+{
+    injectCommand("M84");
+}
+/////////////////
+//Buttons end  //
+/////////////////
+
+void MainWindow::readSerial()
+{
+    if(printer.canReadLine()) //Check if full line in buffer
+    {
+        QByteArray data = printer.readLine(); //Read the line
+
+        emit recievedData(data); //Send data to parser thread
+        if(data.startsWith("ok")) readyRecieve++;
+        else if(data.startsWith("wa")) readyRecieve=1;
+        printMsg(QString(data)); //echo
+    }
+}
+
+void MainWindow::printMsg(const char* text)
+{
+    QTextCursor cursor = ui->terminal->textCursor();
+    cursor.movePosition(QTextCursor::End);
+
+    cursor.insertText(text);
+
+    ui->terminal->setTextCursor(cursor);
+;
+}
+
+void MainWindow::printMsg(QString text)
+{
+    QTextCursor cursor = ui->terminal->textCursor();
+    cursor.movePosition(QTextCursor::End);
+
+    cursor.insertText(text);
+
+    ui->terminal->setTextCursor(cursor);
+}
+
+
+
 void MainWindow::sendNext()
 {
     if(!userCommands.isEmpty() && printer.isWritable() && readyRecieve > 0) //Inject user command
@@ -554,26 +590,6 @@ void MainWindow::sendNext()
     }
 }
 
-void MainWindow::on_pauseBtn_clicked()
-{
-    if(paused && !sdprinting)
-    {
-        paused = false;
-        if(autolock) ui->controlBox->setChecked(false);
-        ui->pauseBtn->setText("Pause");
-    }
-    else if(!paused && !sdprinting)
-    {
-        paused = true;
-        if(autolock) ui->controlBox->setChecked(true);
-        ui->pauseBtn->setText("Resume");
-    }
-    else if(sdprinting)
-    {
-        injectCommand("M25");
-    }
-}
-
 void MainWindow::checkStatus()
 {
     if(checkingTemperature
@@ -591,11 +607,6 @@ void MainWindow::on_actionSettings_triggered()
     SettingsWindow settingswindow(this);
 
     settingswindow.exec();
-}
-
-void MainWindow::on_releasebtn_clicked()
-{
-    injectCommand("M84");
 }
 
 void MainWindow::on_actionAbout_triggered()
@@ -680,11 +691,6 @@ void MainWindow::updateTemperature(TemperatureReadings r)
     ui->bedlcd->display(r.b);
     ui->tempLine->setText(r.raw);
     sinceLastTemp.restart();
-}
-
-void MainWindow::on_actionPrint_from_SD_triggered()
-{
-    injectCommand("M20");
 }
 
 void MainWindow::on_actionAbout_Qt_triggered()
