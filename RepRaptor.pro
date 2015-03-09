@@ -16,14 +16,13 @@ CONFIG += static
 unix
 {
     icon.files += icons/icon.png
-    icon.path = /usr/local/share/icons
+    icon.path = /usr/share/icons
 
     desktop.files += RepRaptor.desktop
-    desktop.path = /usr/local/share/applications
+    desktop.path = /usr/share/applications
 
     repraptor.files += RepRaptor
-    repraptor.extra = cp RepRaptor repraptor
-    repraptor.path = /usr/local/bin
+    repraptor.path = /usr/bin
 
     INSTALLS+= icon desktop repraptor
 }
