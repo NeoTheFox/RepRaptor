@@ -27,7 +27,7 @@ unix
 
     #MAKE INSTALL
 
-    INSTALLS += target desktop service iconxpm icon26 icon48 icon64
+    INSTALLS += target desktop service icon
 
     target.path =$$BINDIR
 
