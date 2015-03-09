@@ -47,6 +47,7 @@ protected:
     QTimer progressSDTimer;
     QTimer statusTimer;
     QElapsedTimer sinceLastTemp;
+    QElapsedTimer sinceLastSDStatus;
     QSettings settings;
     QStringList recentFiles;
     QStringList EEPROMSettings;

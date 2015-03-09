@@ -745,7 +745,7 @@ void MainWindow::updateSDStatus(SDProgress p)
 
 void MainWindow::checkSDStatus()
 {
-    if(sdprinting && chekingSDStatus && sinceLastSDStatus > progressSDTimer.interval())
+    if(sdprinting && chekingSDStatus && sinceLastSDStatus.elapsed() > progressSDTimer.interval())
         injectCommand("M27");
 }
 
@@ -807,9 +807,9 @@ void MainWindow::openEEPROMeditor()
 void MainWindow::sendEEPROMsettings(QStringList changes)
 {
     userCommands.clear();
-    foreach (QString str, changes) {
+    foreach (QString str, changes)
+    {
         injectCommand(str);
-        //printMsg(str);
     }
 }
 
