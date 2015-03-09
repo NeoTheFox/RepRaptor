@@ -7,7 +7,15 @@ Right now the project is in early stage. This means some features are still abse
 ## Screenshots
 ![Screenshot](http://reprap.org/mediawiki/images/6/6c/RepRaptor-v0.2.png)
 
-## Building on Ubuntu 14.04.2
+## Install via PPA
+Since 0.3 release PPA is available for Ubuntu 14.04 and Linux Mint 17.
+```
+sudo add-apt-repository ppa:soniczerops/repraptor-dev
+sudo apt-get update
+sudo apt-get install repraptor
+```
+
+## Building on Ubuntu 14.04
 
 ```
 sudo apt-get install libqt5serialport5-dev git build-essential 
