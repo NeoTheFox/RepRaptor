@@ -13,6 +13,21 @@ TARGET = RepRaptor
 TEMPLATE = app
 CONFIG += static
 
+unix
+{
+    icon.files += icons/icon.png
+    icon.path = /usr/local/share/icons
+
+    desktop.files += RepRaptor.desktop
+    desktop.path = /usr/local/share/applications
+
+    repraptor.files += RepRaptor
+    repraptor.extra = cp RepRaptor repraptor
+    repraptir.path = /usr/local/bin
+
+    INSTALLS+= icon desktop repraptor
+}
+
 SOURCES += main.cpp\
         mainwindow.cpp \
     settingswindow.cpp \
@@ -45,4 +60,5 @@ RESOURCES += \
 
 DISTFILES += \
     LICENCE \
-    README.md
+    README.md \
+    RepRaptor.desktop
