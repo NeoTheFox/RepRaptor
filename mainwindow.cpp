@@ -91,10 +91,10 @@ MainWindow::MainWindow(QWidget *parent) :
     //Timers init
     statusTimer.start();
     sendTimer.start();
-    progressSDTimer.setInterval(2100);
+    progressSDTimer.setInterval(2500);
     if(chekingSDStatus) progressSDTimer.start();
     sinceLastTemp.start();
-
+    sinceLastSDStatus.start();
 }
 
 MainWindow::~MainWindow()
@@ -734,11 +734,13 @@ void MainWindow::updateSDStatus(SDProgress p)
     if(p.progress != 0) ui->progressBar->setValue(((double)p.progress/p.total) * 100);
     else ui->progressBar->setValue(0);
     if(p.total == p.progress) sdprinting = false;
+    sinceLastSDStatus.restart();
 }
 
 void MainWindow::checkSDStatus()
 {
-    if(sdprinting && chekingSDStatus) injectCommand("M27");
+    if(sdprinting && chekingSDStatus && sinceLastSDStatus > progressSDTimer.interval())
+        injectCommand("M27");
 }
 
 void MainWindow::on_stepspin_valueChanged(const QString &arg1)

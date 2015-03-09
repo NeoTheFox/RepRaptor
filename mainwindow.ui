@@ -21,7 +21,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="graphics.qrc">
-    <normaloff>:/icons/icon.png</normaloff>:/icons/icon.png</iconset>
+    <normaloff>:/icons/repraptor.png</normaloff>:/icons/repraptor.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout_6">
