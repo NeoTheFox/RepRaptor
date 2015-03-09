@@ -23,7 +23,7 @@ unix
 
     repraptor.files += RepRaptor
     repraptor.extra = cp RepRaptor repraptor
-    repraptir.path = /usr/local/bin
+    repraptor.path = /usr/local/bin
 
     INSTALLS+= icon desktop repraptor
 }
