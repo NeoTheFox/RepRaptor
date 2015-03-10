@@ -13,11 +13,9 @@ TARGET = RepRaptor
 TEMPLATE = app
 CONFIG += static
 
-unix
-{
+unix {
     #VARIABLES
-    isEmpty(PREFIX)
-    {
+    isEmpty(PREFIX) {
         PREFIX = /usr
     }
     BINDIR = $$PREFIX/bin
