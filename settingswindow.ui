@@ -154,7 +154,7 @@
          <number>-1</number>
         </property>
         <property name="minimum">
-         <number>500</number>
+         <number>1500</number>
         </property>
         <property name="maximum">
          <number>99999</number>
