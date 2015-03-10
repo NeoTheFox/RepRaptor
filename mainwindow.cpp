@@ -152,7 +152,7 @@ void MainWindow::open()
     if(!recentFiles.contains(filename))
     {
         recentFiles.prepend(filename);
-        if(recentFiles.size() == 5) recentFiles.removeAt(5);
+        if(recentFiles.size() >= 10) recentFiles.removeLast();
     }
 
     updateRecent();
@@ -638,17 +638,17 @@ void MainWindow::injectCommand(QString command)
 
 void MainWindow::updateRecent()
 {
-    if(!recentFiles.isEmpty())
+    if(!recentFiles.isEmpty()) //If array is empty we should not be bothered
     {
-        recentMenu->clear();
+        recentMenu->clear(); //Clear menu from previos actions
         foreach (QString str, recentFiles)
         {
-            if (!str.isEmpty())
+            if (!str.isEmpty()) //Empty strings are not needed
             {
                 QAction *action = new QAction(this);
-                action->setText(str);
-                action->setObjectName(str);
-                recentMenu->addAction(action);
+                action->setText(str); //Set filepath as a title
+                action->setObjectName(str); //Also set name to the path so we can get it later
+                recentMenu->addAction(action); //Add action to the menu
                 connect(action, SIGNAL(triggered()), this, SLOT(recentClicked()));
             }
         }
