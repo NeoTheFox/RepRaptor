@@ -20,6 +20,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->actionEEPROM_editor->setDisabled(true);
     ui->extruderlcd->setPalette(Qt::red);
     ui->bedlcd->setPalette(Qt::red);
+    ui->sendtext->installEventFilter(this);
 
     //Init baudrate combobox
     ui->baudbox->addItem(QString::number(4800));
@@ -55,6 +56,8 @@ MainWindow::MainWindow(QWidget *parent) :
     currentLine = 0;
     readyRecieve = 1;
     lastRecieved = 0;
+    userHistoryPos = 0;
+    userHistory.append("");
 
     //Update serial ports
     serialupdate();
@@ -353,6 +356,8 @@ void MainWindow::homeall()
 void MainWindow::on_sendbtn_clicked()
 {
     injectCommand(ui->sendtext->text());
+    userHistory.append(ui->sendtext->text());
+    userHistoryPos = 0;
 }
 
 void MainWindow::on_fanonbtn_clicked()
@@ -846,4 +851,32 @@ void MainWindow::recievedSDDone()
 void MainWindow::recievedResend(int num)
 {
     if(!sendingChecksum) currentLine--;
+}
+
+bool MainWindow::eventFilter(QObject *obj, QEvent *event)
+{
+    if(obj == ui->sendtext && !userHistory.isEmpty())
+    {
+        if(event->type() == QEvent::KeyPress)
+        {
+            QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+
+            if (keyEvent->key() == Qt::Key_Up)
+            {
+                if(++userHistoryPos <= userHistory.size()-1)
+                    ui->sendtext->setText(userHistory.at(userHistoryPos));
+                else userHistoryPos--;
+                return true;
+            }
+            else if(keyEvent->key() == Qt::Key_Down)
+            {
+                if(--userHistoryPos >= 0)
+                    ui->sendtext->setText(userHistory.at(userHistoryPos));
+                else userHistoryPos++;
+                return true;
+            }
+        }
+        return false;
+    }
+    return QMainWindow::eventFilter(obj, event);
 }

@@ -51,6 +51,8 @@ protected:
     QSettings settings;
     QStringList recentFiles;
     QStringList EEPROMSettings;
+    QStringList userHistory;
+    bool eventFilter(QObject *target, QEvent *event);
 
 private:
     Ui::MainWindow *ui;
@@ -72,6 +74,7 @@ private:
     long int currentLine;
     unsigned long int lastRecieved;
     int readyRecieve;
+    int userHistoryPos;
     unsigned long int sdBytes;
 
 private slots:
