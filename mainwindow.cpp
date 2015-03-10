@@ -21,6 +21,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->extruderlcd->setPalette(Qt::red);
     ui->bedlcd->setPalette(Qt::red);
     ui->sendtext->installEventFilter(this);
+    recentMenu = new QMenu(this);
+    recentMenu->setTitle("Recent files");
+    ui->menuFile->insertMenu(ui->actionSettings, recentMenu);
+    ui->menuFile->insertSeparator(ui->actionSettings);
 
     //Init baudrate combobox
     ui->baudbox->addItem(QString::number(4800));
@@ -46,6 +50,13 @@ MainWindow::MainWindow(QWidget *parent) :
     firmware = settings.value("printer/firmware", OtherFirmware).toInt();
     statusTimer.setInterval(settings.value("core/statusinterval", 3000).toInt());
     sendTimer.setInterval(settings.value("core/senderinterval", 2).toInt());
+    int size = settings.beginReadArray("user/recentfiles");
+    for(int i = 0; i < size; ++i)
+    {
+        settings.setArrayIndex(i);
+        recentFiles.append(settings.value("user/file").toString());
+    }
+    settings.endArray();
 
     //Init values
     sending = false;
@@ -98,6 +109,8 @@ MainWindow::MainWindow(QWidget *parent) :
     if(chekingSDStatus) progressSDTimer.start();
     sinceLastTemp.start();
     sinceLastSDStatus.start();
+
+    updateRecent();
 }
 
 MainWindow::~MainWindow()
@@ -110,10 +123,10 @@ MainWindow::~MainWindow()
     settings.setValue("user/bedtemp", ui->btmpspin->value());
 
     settings.beginWriteArray("user/recentfiles");
-    for(int i = 0; i < recentFiles.size(); i++)
+    for(int i = 0; i < recentFiles.size(); ++i)
     {
         settings.setArrayIndex(i);
-        settings.setValue("user/recentfile", recentFiles.at(i));
+        settings.setValue("user/file", recentFiles.at(i));
     }
     settings.endArray();
 
@@ -135,27 +148,24 @@ void MainWindow::open()
                                             tr("Open GCODE"),
                                             home.home().absolutePath(),
                                             tr("GCODE (*.g *.gcode *.nc)"));
-
     gfile.setFileName(filename);
     if(!recentFiles.contains(filename))
     {
-        if(recentFiles.size() < 5) recentFiles.append(filename);
-        else
-        {
-            recentFiles.push_front(filename);
-            recentFiles.removeAt(5);
-        }
+        recentFiles.prepend(filename);
+        if(recentFiles.size() == 5) recentFiles.removeAt(5);
     }
 
-    parseFile(gfile);
+    updateRecent();
+    parseFile(filename);
 }
 
-void MainWindow::parseFile(QFile &file)
+void MainWindow::parseFile(QString filename)
 {
+    gfile.setFileName(filename);
     gcode.clear();
-    if (file.open(QIODevice::ReadOnly))
+    if (gfile.open(QIODevice::ReadOnly))
     {
-        QTextStream in(&file);
+        QTextStream in(&gfile);
         int n = 0;
         while (!in.atEnd())
         {
@@ -176,11 +186,11 @@ void MainWindow::parseFile(QFile &file)
             }
 
         }
-        file.close();
+        gfile.close();
         ui->fileBox->setEnabled(true);
         ui->progressBar->setEnabled(true);
         ui->sendBtn->setText("Send");
-        ui->filename->setText(file.fileName().split("/").last());
+        ui->filename->setText(gfile.fileName().split("/").last());
         ui->filelines->setText(QString::number(gcode.size()) + QString("/0 lines"));
     }
 }
@@ -628,7 +638,21 @@ void MainWindow::injectCommand(QString command)
 
 void MainWindow::updateRecent()
 {
-    //TODO
+    if(!recentFiles.isEmpty())
+    {
+        recentMenu->clear();
+        foreach (QString str, recentFiles)
+        {
+            if (!str.isEmpty())
+            {
+                QAction *action = new QAction(this);
+                action->setText(str);
+                action->setObjectName(str);
+                recentMenu->addAction(action);
+                connect(action, SIGNAL(triggered()), this, SLOT(recentClicked()));
+            }
+        }
+    }
 }
 
 void MainWindow::serialError(QSerialPort::SerialPortError error)
@@ -879,4 +903,9 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         return false;
     }
     return QMainWindow::eventFilter(obj, event);
+}
+
+void MainWindow::recentClicked()
+{
+    parseFile(sender()->objectName());
 }

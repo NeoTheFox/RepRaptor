@@ -52,12 +52,13 @@ protected:
     QStringList recentFiles;
     QStringList EEPROMSettings;
     QStringList userHistory;
+    QMenu *recentMenu;
+
     bool eventFilter(QObject *target, QEvent *event);
 
 private:
     Ui::MainWindow *ui;
 
-    void parseFile(QFile &file);
     QSerialPort printer;
     QSerialPortInfo printerinfo;
     bool firstrun;
@@ -103,6 +104,8 @@ private slots:
     void recievedError();
     void recievedSDDone();
     void recievedResend(int num);
+    void parseFile(QString filename);
+    void recentClicked();
 
     void xplus();
     void yplus();
