@@ -144,7 +144,7 @@ void MainWindow::open()
     sdprinting = false;
     QString filename;
     QDir home;
-    filename = QFileDialog::getOpenFileName(0,
+    filename = QFileDialog::getOpenFileName(this,
                                             "Open GCODE",
                                             home.home().absolutePath(),
                                             "GCODE (*.g *.gcode *.nc)");
