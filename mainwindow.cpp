@@ -144,11 +144,10 @@ void MainWindow::open()
     sdprinting = false;
     QString filename;
     QDir home;
-    QFileDialog dialog(this);
-    filename = dialog.getOpenFileName(this,
-                                      "Open GCODE",
-                                      home.home().absolutePath(),
-                                      "GCODE (*.g *.gcode *.nc)");
+    filename = QFileDialog::getOpenFileName(0,
+                                            "Open GCODE",
+                                            home.home().absolutePath(),
+                                            "GCODE (*.g *.gcode *.nc)");
     gfile.setFileName(filename);
     if(!recentFiles.contains(filename))
     {
