@@ -190,7 +190,7 @@ void MainWindow::parseFile(QString filename)
         ui->fileBox->setEnabled(true);
         ui->progressBar->setEnabled(true);
         ui->sendBtn->setText("Send");
-        ui->filename->setText(gfile.fileName().split("/").last());
+        ui->filename->setText(gfile.fileName().split(QDir::separator()).last());
         ui->filelines->setText(QString::number(gcode.size()) + QString("/0 lines"));
     }
 }
