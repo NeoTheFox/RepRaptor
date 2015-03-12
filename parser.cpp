@@ -71,10 +71,10 @@ void Parser::parse(QByteArray data)
 
             if(temperatureRegxp.indexIn(QString(data)) != -1)
                 r.e = temperatureRegxp.cap(0).toDouble();
-            else return;
+            else r.e = 0;
             if(temperatureRegxp.indexIn(QString(data), temperatureRegxp.matchedLength()) != -1)
                 r.b = temperatureRegxp.cap(0).toDouble();
-            else return;
+            else r.b = 0;
 
             r.raw = QString(data);
 
