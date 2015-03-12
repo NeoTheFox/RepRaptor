@@ -541,8 +541,12 @@ void MainWindow::readSerial()
         QByteArray data = printer.readLine(); //Read the line
 
         emit recievedData(data); //Send data to parser thread
-        if(data.startsWith("ok")) readyRecieve++;
-        else if(data.startsWith("wa")) readyRecieve=1;
+        if(firmware == Marlin || firmware == OtherFirmware) readyRecieve++;
+        else if(firmware == Repetier)
+        {
+            if(data.startsWith("ok")) readyRecieve++;
+            else if(data.startsWith("wa")) readyRecieve=1;
+        }
         printMsg(QString(data)); //echo
     }
 }
