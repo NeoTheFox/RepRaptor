@@ -65,7 +65,7 @@ void Parser::parse(QByteArray data)
             else emit recievedOkNum(0);
         }
         */
-        else if(data.startsWith("T:"))
+        else if(data.startsWith("T:") || data.startsWith("ok T:"))
         {
             TemperatureReadings r;
 
