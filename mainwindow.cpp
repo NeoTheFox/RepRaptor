@@ -259,6 +259,8 @@ void MainWindow::serialconnect()
                 break;
             }
 
+            printer.setFlowControl(QSerialPort::HardwareControl);
+
             ui->connectBtn->setText("Disconnect");
             ui->sendBtn->setDisabled(false);
             //ui->pauseBtn->setDisabled(false);

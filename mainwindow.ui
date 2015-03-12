@@ -193,7 +193,7 @@
        <item row="3" column="3" colspan="4">
         <widget class="QPushButton" name="releasebtn">
          <property name="text">
-          <string>Release</string>
+          <string>Motors off</string>
          </property>
         </widget>
        </item>
