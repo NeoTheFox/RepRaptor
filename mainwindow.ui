@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>761</width>
-    <height>456</height>
+    <width>791</width>
+    <height>514</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -1087,8 +1087,8 @@ STOP</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>761</width>
-     <height>20</height>
+     <width>791</width>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -1177,6 +1177,9 @@ STOP</string>
    </property>
    <property name="text">
     <string>Open...</string>
+   </property>
+   <property name="iconText">
+    <string>Open File</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
