@@ -1014,7 +1014,7 @@ STOP</string>
        </size>
       </property>
       <property name="title">
-       <string>Status</string>
+       <string>Temperature</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_5">
        <item row="0" column="0">
