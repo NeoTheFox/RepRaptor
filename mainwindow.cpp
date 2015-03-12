@@ -147,7 +147,7 @@ void MainWindow::open()
     filename = QFileDialog::getOpenFileName(this,
                                             "Open GCODE",
                                             home.home().absolutePath(),
-                                            "GCODE (*.g *.gcode *.nc)");
+                                            "GCODE (*.g *.gco *.gcode *.nc)");
     gfile.setFileName(filename);
     if(!recentFiles.contains(filename))
     {
