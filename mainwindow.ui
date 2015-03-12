@@ -164,6 +164,9 @@
        </item>
        <item row="1" column="6">
         <widget class="QPushButton" name="homeybtn">
+         <property name="whatsThis">
+          <string/>
+         </property>
          <property name="text">
           <string>H Y</string>
          </property>
@@ -214,14 +217,14 @@
        <item row="6" column="6">
         <widget class="QPushButton" name="etmpoff">
          <property name="text">
-          <string>OFF</string>
+          <string>Off</string>
          </property>
         </widget>
        </item>
        <item row="6" column="4">
         <widget class="QPushButton" name="etmpset">
          <property name="text">
-          <string>SET</string>
+          <string>Set</string>
          </property>
         </widget>
        </item>
@@ -235,14 +238,14 @@
        <item row="7" column="4">
         <widget class="QPushButton" name="btmpset">
          <property name="text">
-          <string>SET</string>
+          <string>Set</string>
          </property>
         </widget>
        </item>
        <item row="7" column="6">
         <widget class="QPushButton" name="btmpoff">
          <property name="text">
-          <string>OFF</string>
+          <string>Off</string>
          </property>
         </widget>
        </item>
@@ -275,7 +278,7 @@
        <item row="8" column="5" colspan="2">
         <widget class="QPushButton" name="speedsetbtn">
          <property name="text">
-          <string>SET</string>
+          <string>Set</string>
          </property>
         </widget>
        </item>
@@ -308,35 +311,35 @@
        <item row="9" column="5" colspan="2">
         <widget class="QPushButton" name="flowbutton">
          <property name="text">
-          <string>SET</string>
+          <string>Set</string>
          </property>
         </widget>
        </item>
        <item row="10" column="2" colspan="2">
         <widget class="QPushButton" name="fanonbtn">
          <property name="text">
-          <string>FAN ON</string>
+          <string>Fan On</string>
          </property>
         </widget>
        </item>
        <item row="10" column="4" colspan="3">
         <widget class="QPushButton" name="fanoffbtn">
          <property name="text">
-          <string>FAN OFF</string>
+          <string>Fan Off</string>
          </property>
         </widget>
        </item>
        <item row="11" column="2" colspan="2">
         <widget class="QPushButton" name="atxonbtn">
          <property name="text">
-          <string>ATX ON</string>
+          <string>ATX On</string>
          </property>
         </widget>
        </item>
        <item row="11" column="4" colspan="3">
         <widget class="QPushButton" name="atxoffbtn">
          <property name="text">
-          <string>ATX OFF</string>
+          <string>ATX Off</string>
          </property>
         </widget>
        </item>
