@@ -143,6 +143,15 @@
        </item>
        <item row="1" column="4">
         <widget class="QPushButton" name="ezerobtn">
+         <property name="toolTip">
+          <string>this is tool tip e0</string>
+         </property>
+         <property name="statusTip">
+          <string>this is status e0</string>
+         </property>
+         <property name="whatsThis">
+          <string>this is e0</string>
+         </property>
          <property name="text">
           <string>E0</string>
          </property>
@@ -209,6 +218,9 @@
        </item>
        <item row="6" column="2" colspan="2">
         <widget class="QSpinBox" name="etmpspin">
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
          <property name="maximum">
           <number>500</number>
          </property>
@@ -230,6 +242,9 @@
        </item>
        <item row="7" column="2" colspan="2">
         <widget class="QSpinBox" name="btmpspin">
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
          <property name="maximum">
           <number>500</number>
          </property>
