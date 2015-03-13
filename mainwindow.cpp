@@ -129,7 +129,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //Timers init
     statusTimer.start();
-    //sendTimer.start();
     progressSDTimer.setInterval(2500);
     if(chekingSDStatus) progressSDTimer.start();
     sinceLastTemp.start();

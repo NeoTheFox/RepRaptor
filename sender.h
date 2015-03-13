@@ -23,13 +23,15 @@ public:
 protected:
     QSerialPort *printer;
     QTimer *sendTimer;
-    int currentLine;
-    int totalLineNum;
-    int baudrate;
+    unsigned int currentLine;
+    unsigned int totalLineNum;
+    unsigned int resendNum;
+    unsigned int baudrate;
     bool paused;
     bool sending;
     bool readyRecieve;
     bool sendingChecksum;
+    bool resending;
     QQueue <QString> userCommands;
     QStringList sentCommands;
     QVector <QString> gcode;
@@ -55,7 +57,7 @@ public slots:
     void recievedOkWait();
     void recievedOkNum(int);
     void recievedStart();
-    void recievedResend(int);
+    void recievedResend(int r);
 
     void sendNext();
 

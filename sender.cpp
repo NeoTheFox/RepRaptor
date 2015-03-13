@@ -6,6 +6,8 @@ Sender::Sender(QObject *parent) : QObject(parent)
     currentLine=0;
     totalLineNum=0;
     baudrate=115200;
+    resendNum = 0;
+    resending = false;
     sendingChecksum=false;
     paused=false;
     sending=false;
@@ -34,15 +36,36 @@ Sender::~Sender()
 //Mainloop of sending
 void Sender::sendNext()
 {
-    if(printer->isWritable())
+    if(printer->isWritable() && readyRecieve)
     {
-        if(!userCommands.isEmpty() && readyRecieve) //Inject user command
+        if(sendingChecksum && resending)
+        {
+            if(resendNum < sentCommands.size())
+            {
+                sendLine(sentCommands.at(resendNum));
+                resendNum++;
+            }
+            else if(resendNum == sentCommands.size())
+            {
+                resending = false;
+                resendNum = 0;
+            }
+            else if(resendNum > sentCommands.size())
+            {
+                sendLine("M110 N0");
+                totalLineNum = 0;
+                resendNum = 0;
+                sentCommands.clear();
+            }
+            return;
+        }
+        if(!userCommands.isEmpty()) //Inject user command
         {
             sendLine(userCommands.dequeue());
             readyRecieve = false;
             return;
         }
-        else if(sending && !paused && readyRecieve) //Send line of gcode
+        else if(sending && !paused) //Send line of gcode
         {
             FileProgress p;
             if(currentLine >= gcode.size()) //check if we are at the end of array
@@ -70,9 +93,10 @@ void Sender::sendNext()
 
 bool Sender::sendLine(QString line)
 {
+    sentCommands.clear();
     if(printer->isOpen())
     {
-        if(sendingChecksum)
+        if(sendingChecksum && !resending)
         {
             if(line.contains("M110")) totalLineNum = 0;
 
@@ -83,6 +107,7 @@ bool Sender::sendLine(QString line)
             cs &= 0xff;
             line += QString::number(cs);
             totalLineNum++;
+            sentCommands.append(line);
         }
         if(printer->write(line.toUtf8()+'\n')) return true;
         else return false;
@@ -157,7 +182,7 @@ void Sender::setFile(QVector <QString> f)
 
 void Sender::injectCommand(QString command)
 {
-    if(userCommands.contains(command)) userCommands.enqueue(command);
+    if(!userCommands.contains(command)) userCommands.enqueue(command);
 }
 
 void Sender::recievedOkWait()
@@ -180,9 +205,14 @@ void Sender::flushInjectionBuffer()
     userCommands.clear();
 }
 
-void Sender::recievedResend(int)
+void Sender::recievedResend(int r)
 {
-
+    if(sendingChecksum)
+    {
+        resending = true;
+        resendNum = r;
+    }
+    else currentLine--;
 }
 
 void Sender::recievedData()
@@ -192,6 +222,7 @@ void Sender::recievedData()
         QByteArray data = printer->readLine();
         if(data == "") return;
         emit dataRecieved(data);
+        //Yeah, yeah, I know. This class is called "Sender", but checking this here is faster.
         if(data.startsWith("ok") || data.startsWith("wa")) readyRecieve=true;
     }
 }
