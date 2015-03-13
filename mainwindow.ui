@@ -43,13 +43,6 @@
        <string>Serial</string>
       </property>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="0">
-        <widget class="QPushButton" name="portsBtn">
-         <property name="text">
-          <string>Ports</string>
-         </property>
-        </widget>
-       </item>
        <item row="0" column="1">
         <widget class="QComboBox" name="serialBox">
          <property name="maximumSize">
@@ -60,15 +53,22 @@
          </property>
         </widget>
        </item>
+       <item row="1" column="1">
+        <widget class="QComboBox" name="baudbox"/>
+       </item>
+       <item row="0" column="0">
+        <widget class="QPushButton" name="portsBtn">
+         <property name="text">
+          <string>Ports</string>
+         </property>
+        </widget>
+       </item>
        <item row="1" column="0">
         <widget class="QPushButton" name="connectBtn">
          <property name="text">
           <string>Connect</string>
          </property>
         </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QComboBox" name="baudbox"/>
        </item>
       </layout>
      </widget>
@@ -143,6 +143,15 @@
        </item>
        <item row="1" column="4">
         <widget class="QPushButton" name="ezerobtn">
+         <property name="toolTip">
+          <string>this is tool tip e0</string>
+         </property>
+         <property name="statusTip">
+          <string>this is status e0</string>
+         </property>
+         <property name="whatsThis">
+          <string>this is e0</string>
+         </property>
          <property name="text">
           <string>E0</string>
          </property>
@@ -164,6 +173,9 @@
        </item>
        <item row="1" column="6">
         <widget class="QPushButton" name="homeybtn">
+         <property name="whatsThis">
+          <string/>
+         </property>
          <property name="text">
           <string>H Y</string>
          </property>
@@ -206,6 +218,9 @@
        </item>
        <item row="6" column="2" colspan="2">
         <widget class="QSpinBox" name="etmpspin">
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
          <property name="maximum">
           <number>500</number>
          </property>
@@ -214,19 +229,22 @@
        <item row="6" column="6">
         <widget class="QPushButton" name="etmpoff">
          <property name="text">
-          <string>OFF</string>
+          <string>Off</string>
          </property>
         </widget>
        </item>
        <item row="6" column="4">
         <widget class="QPushButton" name="etmpset">
          <property name="text">
-          <string>SET</string>
+          <string>Set</string>
          </property>
         </widget>
        </item>
        <item row="7" column="2" colspan="2">
         <widget class="QSpinBox" name="btmpspin">
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
          <property name="maximum">
           <number>500</number>
          </property>
@@ -235,14 +253,14 @@
        <item row="7" column="4">
         <widget class="QPushButton" name="btmpset">
          <property name="text">
-          <string>SET</string>
+          <string>Set</string>
          </property>
         </widget>
        </item>
        <item row="7" column="6">
         <widget class="QPushButton" name="btmpoff">
          <property name="text">
-          <string>OFF</string>
+          <string>Off</string>
          </property>
         </widget>
        </item>
@@ -250,6 +268,9 @@
         <widget class="QLineEdit" name="speededit">
          <property name="text">
           <string>100</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
          </property>
          <property name="clearButtonEnabled">
           <bool>false</bool>
@@ -275,14 +296,22 @@
        <item row="8" column="5" colspan="2">
         <widget class="QPushButton" name="speedsetbtn">
          <property name="text">
-          <string>SET</string>
+          <string>Set</string>
          </property>
         </widget>
        </item>
        <item row="9" column="2">
         <widget class="QLineEdit" name="flowedit">
+         <property name="font">
+          <font>
+           <pointsize>13</pointsize>
+          </font>
+         </property>
          <property name="text">
           <string>100</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
          </property>
          <property name="clearButtonEnabled">
           <bool>false</bool>
@@ -308,35 +337,35 @@
        <item row="9" column="5" colspan="2">
         <widget class="QPushButton" name="flowbutton">
          <property name="text">
-          <string>SET</string>
+          <string>Set</string>
          </property>
         </widget>
        </item>
        <item row="10" column="2" colspan="2">
         <widget class="QPushButton" name="fanonbtn">
          <property name="text">
-          <string>FAN ON</string>
+          <string>Fan On</string>
          </property>
         </widget>
        </item>
        <item row="10" column="4" colspan="3">
         <widget class="QPushButton" name="fanoffbtn">
          <property name="text">
-          <string>FAN OFF</string>
+          <string>Fan Off</string>
          </property>
         </widget>
        </item>
        <item row="11" column="2" colspan="2">
         <widget class="QPushButton" name="atxonbtn">
          <property name="text">
-          <string>ATX ON</string>
+          <string>ATX On</string>
          </property>
         </widget>
        </item>
        <item row="11" column="4" colspan="3">
         <widget class="QPushButton" name="atxoffbtn">
          <property name="text">
-          <string>ATX OFF</string>
+          <string>ATX Off</string>
          </property>
         </widget>
        </item>
@@ -376,19 +405,6 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="0" colspan="2">
-        <widget class="QLabel" name="label_2">
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>15</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Step</string>
-         </property>
-        </widget>
-       </item>
        <item row="5" column="0" colspan="3">
         <widget class="QDoubleSpinBox" name="stepspin">
          <property name="locale">
@@ -415,7 +431,7 @@
        <item row="7" column="0" colspan="2">
         <widget class="QLabel" name="label_4">
          <property name="text">
-          <string>B tmp</string>
+          <string>Bed tmp</string>
          </property>
         </widget>
        </item>
@@ -868,6 +884,19 @@ STOP</string>
          </property>
         </widget>
        </item>
+       <item row="4" column="0" colspan="3">
+        <widget class="QLabel" name="label_2">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>15</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Step Increment</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </item>
@@ -889,6 +918,13 @@ STOP</string>
        <string>Console</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_3">
+       <item row="3" column="0">
+        <widget class="QPushButton" name="sendbtn">
+         <property name="text">
+          <string>Send</string>
+         </property>
+        </widget>
+       </item>
        <item row="0" column="0">
         <widget class="QTextBrowser" name="terminal">
          <property name="acceptDrops">
@@ -908,13 +944,6 @@ STOP</string>
        </item>
        <item row="2" column="0">
         <widget class="QLineEdit" name="sendtext"/>
-       </item>
-       <item row="3" column="0">
-        <widget class="QPushButton" name="sendbtn">
-         <property name="text">
-          <string>Send</string>
-         </property>
-        </widget>
        </item>
       </layout>
      </widget>
@@ -1014,7 +1043,7 @@ STOP</string>
        </size>
       </property>
       <property name="title">
-       <string>Status</string>
+       <string>Temperature</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_5">
        <item row="0" column="0">

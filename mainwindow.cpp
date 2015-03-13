@@ -18,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->actionPrint_from_SD->setDisabled(true);
     ui->actionSet_SD_printing_mode->setDisabled(true);
     ui->actionEEPROM_editor->setDisabled(true);
+    ui->statusGroup->setDisabled(true);
     ui->extruderlcd->setPalette(Qt::red);
     ui->bedlcd->setPalette(Qt::red);
     ui->sendtext->installEventFilter(this);
@@ -267,6 +268,7 @@ void MainWindow::serialconnect()
             ui->progressBar->setValue(0);
             ui->controlBox->setDisabled(false);
             ui->consoleGroup->setDisabled(false);
+            ui->statusGroup->setDisabled(false);
             ui->actionPrint_from_SD->setEnabled(true);
             ui->actionSet_SD_printing_mode->setEnabled(true);
             if(firmware == Repetier) ui->actionEEPROM_editor->setDisabled(false);
@@ -285,6 +287,7 @@ void MainWindow::serialconnect()
         ui->consoleGroup->setDisabled(true);
         ui->actionPrint_from_SD->setDisabled(true);
         ui->actionSet_SD_printing_mode->setDisabled(true);
+        ui->statusGroup->setDisabled(true);
         ui->actionEEPROM_editor->setDisabled(false);
      }
 }
