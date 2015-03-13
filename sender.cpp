@@ -189,6 +189,7 @@ void Sender::recievedData()
     if(printer->canReadLine())
     {
         QByteArray data = printer->readLine();
+        if(data == "") return;
         emit dataRecieved(data);
         if(data.startsWith("ok") || data.startsWith("wa")) readyRecieve=true;
     }

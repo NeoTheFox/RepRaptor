@@ -46,7 +46,6 @@ protected:
     QFile gfile;
     QVector<QString> gcode;
     QQueue <QString> userCommands;
-    QTimer sendTimer;
     QTimer progressSDTimer;
     QTimer statusTimer;
     QElapsedTimer sinceLastTemp;
@@ -62,7 +61,6 @@ protected:
 private:
     Ui::MainWindow *ui;
 
-    QSerialPort printer;
     QSerialPortInfo printerinfo;
     bool opened;
     bool firstrun;
@@ -89,11 +87,9 @@ private slots:
     void open();
     void serialconnect();
     void serialupdate();
-    bool sendLine(QString line);
     void readSerial(QByteArray data);
     void printMsg(QString text);
     void printMsg(const char* text);
-    void sendNext();
     void checkStatus();
     void updateRecent();
     void initSDprinting(QStringList sdFiles);

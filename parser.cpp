@@ -82,7 +82,7 @@ void Parser::parse(QByteArray data)
         }
         //else if(data.startsWith("wait")) emit recievedOkWait();
         else if(data.startsWith("rs") || data.toLower().startsWith("resend"))
-            emit recievedResend(data.split(' ').at(1).toInt());
+            emit recievedResend(data.split(':').at(1).toInt());
         else if(data.startsWith("!!")) emit recievedError();
         else if(data.startsWith("Done")) emit recievedSDDone();
         else if(data.startsWith("start")) emit recievedStart();

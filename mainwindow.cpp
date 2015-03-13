@@ -50,7 +50,6 @@ MainWindow::MainWindow(QWidget *parent) :
     chekingSDStatus = settings.value("core/checksdstatus", 1).toBool();
     firmware = settings.value("printer/firmware", OtherFirmware).toInt();
     statusTimer.setInterval(settings.value("core/statusinterval", 3000).toInt());
-    sendTimer.setInterval(settings.value("core/senderinterval", 2).toInt());
     int size = settings.beginReadArray("user/recentfiles");
     for(int i = 0; i < size; ++i)
     {
@@ -78,10 +77,7 @@ MainWindow::MainWindow(QWidget *parent) :
     serialupdate();
 
     //Internal signal-slots
-    //connect(&printer, SIGNAL(error(QSerialPort::SerialPortError)), this, SLOT(serialError(QSerialPort::SerialPortError)));
-    //connect(&printer, SIGNAL(readyRead()), this, SLOT(readSerial()));
     connect(&statusTimer, SIGNAL(timeout()), this, SLOT(checkStatus()));
-    connect(&sendTimer, SIGNAL(timeout()), this, SLOT(sendNext()));
     connect(&progressSDTimer, SIGNAL(timeout()), this, SLOT(checkSDStatus()));
     connect(this, SIGNAL(eepromReady()), this, SLOT(openEEPROMeditor()));
 
@@ -89,22 +85,18 @@ MainWindow::MainWindow(QWidget *parent) :
     qRegisterMetaType<TemperatureReadings>("TemperatureReadings");
     qRegisterMetaType<SDProgress>("SDProgress");
     parserWorker = new Parser();
-    parserThread = new QThread();
+    parserThread = new QThread(this);
     parserWorker->moveToThread(parserThread);
     connect(parserThread, &QThread::finished, parserWorker, &QObject::deleteLater);
     connect(this, &MainWindow::recievedData, parserWorker, &Parser::parse);
     connect(this, &MainWindow::startedReadingEEPROM, parserWorker, &Parser::setEEPROMReadingMode);
     connect(parserWorker, &Parser::recievedTemperature, this, &MainWindow::updateTemperature);
-    //connect(parserWorker, &Parser::recievedOkNum, this, &MainWindow::recievedOkNum);
-    //connect(parserWorker, &Parser::recievedOkWait, this, &MainWindow::recievedWait);
     connect(parserWorker, &Parser::recievedSDFilesList, this, &MainWindow::initSDprinting);
     connect(parserWorker, &Parser::recievedEEPROMLine, this, &MainWindow::EEPROMSettingRecieved);
     connect(parserWorker, &Parser::recievingEEPROMDone, this, &MainWindow::openEEPROMeditor);
     connect(parserWorker, &Parser::recievedError, this, &MainWindow::recievedError);
     connect(parserWorker, &Parser::recievedSDDone, this, &MainWindow::recievedSDDone);
-    //connect(parser, &Parser::recievedResend, this, &MainWindow::recievedResend);
     connect(parserWorker, &Parser::recievedSDUpdate, this, &MainWindow::updateSDStatus);
-    //connect(parser, &Parser::recievedStart, this, &MainWindow::recievedStart);
     parserThread->start();
 
     //Sender thread signal-slots and init
@@ -113,7 +105,7 @@ MainWindow::MainWindow(QWidget *parent) :
     qRegisterMetaType<FileProgress>("FileProgress");
     qRegisterMetaType<QSerialPort::SerialPortError>("QSerialPort::SerialPortError");
     senderWorker = new Sender();
-    senderThread = new QThread();
+    senderThread = new QThread(this);
     senderWorker->moveToThread(senderThread);
     connect(senderThread, &QThread::finished, senderWorker, &QObject::deleteLater);
     connect(parserWorker, &Parser::recievedOkNum, senderWorker, &Sender::recievedOkNum);
@@ -165,7 +157,6 @@ MainWindow::~MainWindow()
 
     //Cleanup what is left
     if(gfile.isOpen()) gfile.close();
-    if(printer.isOpen()) printer.close();
     parserThread->quit();
     parserThread->wait();
     senderThread->quit();
@@ -214,33 +205,6 @@ void MainWindow::parseFile(QString filename)
         ui->filename->setText(gfile.fileName().split(QDir::separator()).last());
         ui->filelines->setText(QString::number(gcode.size()) + QString("/0 lines"));
     }
-}
-
-bool MainWindow::sendLine(QString line)
-{
-    if(printer.isOpen())
-    {
-        if(sendingChecksum)
-        {
-            if(line.contains("M110")) totalLineNum = 0;
-
-            //Checksum algorithm from RepRap wiki
-            line = "N"+QString::number(totalLineNum)+line+"*";
-            int cs = 0;
-            for(int i = 0; line.at(i) != '*'; i++) cs = cs ^ line.at(i).toLatin1();
-            cs &= 0xff;
-            line += QString::number(cs);
-            totalLineNum++;
-        }
-        if(printer.write(line.toUtf8()+'\n'))
-        {
-            if(echo) printMsg(line + '\n');
-            return true;
-        }
-        else return false;
-    }
-    else return false;
-
 }
 
 void MainWindow::serialupdate()
@@ -580,52 +544,6 @@ void MainWindow::printMsg(QString text)
     ui->terminal->setTextCursor(cursor);
 }
 
-void MainWindow::sendNext()
-{
-    if(printer.isWritable())
-    {
-        if(resendLineNum != -1)
-        {
-            if(gcode.isEmpty()) sendLine("M110 N0");
-            else sendLine(gcode.at(resendLineNum));
-            resendLineNum = -1;
-
-            return;
-        }
-        if(!userCommands.isEmpty() && readyRecieve) //Inject user command
-        {
-            sendLine(userCommands.dequeue());
-            readyRecieve = false;
-            return;
-        }
-        else if(sending && !paused && readyRecieve && !sdprinting) //Send line of gcode
-        {
-            if(currentLine >= gcode.size()) //check if we are at the end of array
-            {
-                sending = false;
-                currentLine = 0;
-                ui->sendBtn->setText("Send");
-                ui->pauseBtn->setDisabled(true);
-                ui->filelines->setText(QString::number(gcode.size())
-                                       + QString("/")
-                                       + QString::number(currentLine)
-                                       + QString(" Lines"));
-                if(sendingChecksum) emit injectCommand("M110 N0");
-                return;
-            }
-            sendLine(gcode.at(currentLine));
-            currentLine++;
-            readyRecieve=false;
-
-            ui->filelines->setText(QString::number(gcode.size())
-                                + QString("/")
-                                + QString::number(currentLine)
-                                + QString(" Lines"));
-            ui->progressBar->setValue(((float)currentLine/gcode.size()) * 100);
-        }
-    }
-}
-
 void MainWindow::checkStatus()
 {
     if(checkingTemperature
@@ -676,7 +594,7 @@ void MainWindow::serialError(QSerialPort::SerialPortError error)
     if(error == QSerialPort::NoError) return;
     if(error == QSerialPort::NotOpenError) return; //this error is internal
 
-    if(printer.isOpen()) printer.close();
+    emit closePort();
 
     if(sending) paused = true;
     emit pause(paused);
