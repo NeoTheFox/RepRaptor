@@ -96,10 +96,10 @@ bool Sender::sendLine(QString line)
     sentCommands.clear();
     if(printer->isOpen())
     {
-        if(sendingChecksum && !resending)
+        if(sendingChecksum)
         {
             if(line.contains("M110")) totalLineNum = 0;
-
+            sentCommands.append(line);
             //Checksum algorithm from RepRap wiki
             line = "N"+QString::number(totalLineNum)+line+"*";
             int cs = 0;
@@ -107,7 +107,6 @@ bool Sender::sendLine(QString line)
             cs &= 0xff;
             line += QString::number(cs);
             totalLineNum++;
-            sentCommands.append(line);
         }
         if(printer->write(line.toUtf8()+'\n')) return true;
         else return false;
