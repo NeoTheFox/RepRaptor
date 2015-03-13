@@ -22,6 +22,7 @@ public:
 
 protected:
     QSerialPort *printer;
+    QTimer *sendTimer;
     int currentLine;
     int totalLineNum;
     int baudrate;
@@ -29,7 +30,6 @@ protected:
     bool sending;
     bool readyRecieve;
     bool sendingChecksum;
-    QTimer sendTimer;
     QQueue <QString> userCommands;
     QStringList sentCommands;
     QVector <QString> gcode;

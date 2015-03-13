@@ -11,23 +11,24 @@ Sender::Sender(QObject *parent) : QObject(parent)
     sending=false;
     readyRecieve = false;
     printer = new QSerialPort(this);
+    sendTimer = new QTimer(this);
 
     //Fetch settings
     QSettings settings;
-    sendTimer.setInterval(settings.value("core/senderinterval", 2).toInt());
+    sendTimer->setInterval(settings.value("core/senderinterval", 2).toInt());
     sendingChecksum = settings.value("core/checksums", 0).toBool();
 
-    sendTimer.start();
+    sendTimer->start();
 
     connect(printer, SIGNAL(error(QSerialPort::SerialPortError)), this, SLOT(recievedError(QSerialPort::SerialPortError)));
     connect(printer, &QSerialPort::readyRead, this, &Sender::recievedData);
-    connect(&sendTimer, &QTimer::timeout, this, &Sender::sendNext);
+    connect(sendTimer, &QTimer::timeout, this, &Sender::sendNext);
 }
 
 Sender::~Sender()
 {
     closePort();
-    sendTimer.stop();
+    sendTimer->stop();
 }
 
 //Mainloop of sending
