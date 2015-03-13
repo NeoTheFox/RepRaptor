@@ -75,6 +75,8 @@ private:
     long int currentLine;
     unsigned long int lastRecieved;
     int readyRecieve;
+    unsigned long int totalLineNum;
+    long int resendLineNum;
     int userHistoryPos;
     unsigned long int sdBytes;
 

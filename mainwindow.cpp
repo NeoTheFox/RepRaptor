@@ -69,6 +69,8 @@ MainWindow::MainWindow(QWidget *parent) :
     readyRecieve = 1;
     lastRecieved = 0;
     userHistoryPos = 0;
+    totalLineNum = 0;
+    resendLineNum = -1;
     userHistory.append("");
 
     //Update serial ports
@@ -171,21 +173,7 @@ void MainWindow::parseFile(QString filename)
         while (!in.atEnd())
         {
             QString line = in.readLine();
-            if(!line.startsWith(";"))
-            {
-                if(sendingChecksum)
-                {
-                    //Checksum algorithm from RepRap wiki
-                    line = "N"+QString::number(n)+line+"*";
-                    int cs = 0;
-                    for(int i = 0; line.at(i) != '*'; i++) cs = cs ^ line.at(i).toLatin1();
-                    cs &= 0xff;
-                    line += QString::number(cs);
-                    n++;
-                }
-                gcode.append(line);
-            }
-
+            if(!line.startsWith(";")) gcode.append(line);
         }
         gfile.close();
         ui->fileBox->setEnabled(true);
@@ -198,9 +186,20 @@ void MainWindow::parseFile(QString filename)
 
 bool MainWindow::sendLine(QString line)
 {
-
     if(printer.isOpen())
     {
+        if(sendingChecksum)
+        {
+            if(line.contains("M110")) totalLineNum = 0;
+
+            //Checksum algorithm from RepRap wiki
+            line = "N"+QString::number(totalLineNum)+line+"*";
+            int cs = 0;
+            for(int i = 0; line.at(i) != '*'; i++) cs = cs ^ line.at(i).toLatin1();
+            cs &= 0xff;
+            line += QString::number(cs);
+            totalLineNum++;
+        }
         if(printer.write(line.toUtf8()+'\n'))
         {
             if(echo) printMsg(line + '\n');
@@ -208,6 +207,7 @@ bool MainWindow::sendLine(QString line)
         }
         else return false;
     }
+
     else return false;
 
 }
@@ -579,36 +579,47 @@ void MainWindow::printMsg(QString text)
 
 void MainWindow::sendNext()
 {
-    if(!userCommands.isEmpty() && printer.isWritable() && readyRecieve > 0) //Inject user command
+    if(printer.isWritable())
     {
-        sendLine(userCommands.dequeue());
-        readyRecieve--;
-        return;
-    }
-    else if(sending && !paused && readyRecieve > 0 && !sdprinting && printer.isWritable()) //Send line of gcode
-    {
-        if(currentLine >= gcode.size()) //check if we are at the end of array
+        if(resendLineNum != -1)
         {
-            sending = false;
-            currentLine = 0;
-            ui->sendBtn->setText("Send");
-            ui->pauseBtn->setDisabled(true);
-            ui->filelines->setText(QString::number(gcode.size())
-                                   + QString("/")
-                                   + QString::number(currentLine)
-                                   + QString(" Lines"));
-            if(sendingChecksum) injectCommand("M110 N0");
+            if(gcode.isEmpty()) sendLine("M110 N0");
+            else sendLine(gcode.at(resendLineNum));
+            resendLineNum = -1;
+
             return;
         }
-        sendLine(gcode.at(currentLine));
-        currentLine++;
-        readyRecieve--;
+        if(!userCommands.isEmpty() && readyRecieve > 0) //Inject user command
+        {
+            sendLine(userCommands.dequeue());
+            readyRecieve--;
+            return;
+        }
+        else if(sending && !paused && readyRecieve > 0 && !sdprinting) //Send line of gcode
+        {
+            if(currentLine >= gcode.size()) //check if we are at the end of array
+            {
+                sending = false;
+                currentLine = 0;
+                ui->sendBtn->setText("Send");
+                ui->pauseBtn->setDisabled(true);
+                ui->filelines->setText(QString::number(gcode.size())
+                                       + QString("/")
+                                       + QString::number(currentLine)
+                                       + QString(" Lines"));
+                if(sendingChecksum) injectCommand("M110 N0");
+                return;
+            }
+            sendLine(gcode.at(currentLine));
+            currentLine++;
+            readyRecieve--;
 
-        ui->filelines->setText(QString::number(gcode.size())
-                               + QString("/")
-                               + QString::number(currentLine)
-                               + QString(" Lines"));
-        ui->progressBar->setValue(((float)currentLine/gcode.size()) * 100);
+            ui->filelines->setText(QString::number(gcode.size())
+                                + QString("/")
+                                + QString::number(currentLine)
+                                + QString(" Lines"));
+            ui->progressBar->setValue(((float)currentLine/gcode.size()) * 100);
+        }
     }
 }
 
@@ -882,6 +893,7 @@ void MainWindow::recievedSDDone()
 void MainWindow::recievedResend(int num)
 {
     if(!sendingChecksum) currentLine--;
+    else resendLineNum = num;
 }
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
