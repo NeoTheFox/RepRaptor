@@ -304,7 +304,7 @@
         <widget class="QLineEdit" name="flowedit">
          <property name="font">
           <font>
-           <pointsize>13</pointsize>
+           <pointsize>9</pointsize>
           </font>
          </property>
          <property name="text">
@@ -1117,7 +1117,7 @@ STOP</string>
      <x>0</x>
      <y>0</y>
      <width>791</width>
-     <height>22</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

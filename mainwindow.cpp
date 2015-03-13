@@ -66,7 +66,7 @@ MainWindow::MainWindow(QWidget *parent) :
     sdprinting = false;
     sdBytes = 0;
     currentLine = 0;
-    readyRecieve = 1;
+    readyRecieve = false;
     lastRecieved = 0;
     userHistoryPos = 0;
     totalLineNum = 0;
@@ -77,8 +77,8 @@ MainWindow::MainWindow(QWidget *parent) :
     serialupdate();
 
     //Internal signal-slots
-    connect(&printer, SIGNAL(error(QSerialPort::SerialPortError)), this, SLOT(serialError(QSerialPort::SerialPortError)));
-    connect(&printer, SIGNAL(readyRead()), this, SLOT(readSerial()));
+    //connect(&printer, SIGNAL(error(QSerialPort::SerialPortError)), this, SLOT(serialError(QSerialPort::SerialPortError)));
+    //connect(&printer, SIGNAL(readyRead()), this, SLOT(readSerial()));
     connect(&statusTimer, SIGNAL(timeout()), this, SLOT(checkStatus()));
     connect(&sendTimer, SIGNAL(timeout()), this, SLOT(sendNext()));
     connect(&progressSDTimer, SIGNAL(timeout()), this, SLOT(checkSDStatus()));
@@ -87,23 +87,37 @@ MainWindow::MainWindow(QWidget *parent) :
     //Parser thread signal-slots and init
     qRegisterMetaType<TemperatureReadings>("TemperatureReadings");
     qRegisterMetaType<SDProgress>("SDProgress");
-    parser = new Parser();
+    parserWorker = new Parser();
     parserThread = new QThread();
-    parser->moveToThread(parserThread);
-    connect(parserThread, &QThread::finished, parser, &QObject::deleteLater);
-    connect(this, &MainWindow::recievedData, parser, &Parser::parse);
-    connect(this, &MainWindow::startedReadingEEPROM, parser, &Parser::setEEPROMReadingMode);
-    connect(parser, &Parser::recievedTemperature, this, &MainWindow::updateTemperature);
-    connect(parser, &Parser::recievedOkNum, this, &MainWindow::recievedOkNum);
-    connect(parser, &Parser::recievedOkWait, this, &MainWindow::recievedWait);
-    connect(parser, &Parser::recievedSDFilesList, this, &MainWindow::initSDprinting);
-    connect(parser, &Parser::recievedEEPROMLine, this, &MainWindow::EEPROMSettingRecieved);
-    connect(parser, &Parser::recievingEEPROMDone, this, &MainWindow::openEEPROMeditor);
-    connect(parser, &Parser::recievedError, this, &MainWindow::recievedError);
-    connect(parser, &Parser::recievedSDDone, this, &MainWindow::recievedSDDone);
-    connect(parser, &Parser::recievedResend, this, &MainWindow::recievedResend);
-    connect(parser, &Parser::recievedSDUpdate, this, &MainWindow::updateSDStatus);
+    parserWorker->moveToThread(parserThread);
+    connect(parserThread, &QThread::finished, parserWorker, &QObject::deleteLater);
+    connect(this, &MainWindow::recievedData, parserWorker, &Parser::parse);
+    connect(this, &MainWindow::startedReadingEEPROM, parserWorker, &Parser::setEEPROMReadingMode);
+    connect(parserWorker, &Parser::recievedTemperature, this, &MainWindow::updateTemperature);
+    //connect(parserWorker, &Parser::recievedOkNum, this, &MainWindow::recievedOkNum);
+    //connect(parserWorker, &Parser::recievedOkWait, this, &MainWindow::recievedWait);
+    connect(parserWorker, &Parser::recievedSDFilesList, this, &MainWindow::initSDprinting);
+    connect(parserWorker, &Parser::recievedEEPROMLine, this, &MainWindow::EEPROMSettingRecieved);
+    connect(parserWorker, &Parser::recievingEEPROMDone, this, &MainWindow::openEEPROMeditor);
+    connect(parserWorker, &Parser::recievedError, this, &MainWindow::recievedError);
+    connect(parserWorker, &Parser::recievedSDDone, this, &MainWindow::recievedSDDone);
+    //connect(parser, &Parser::recievedResend, this, &MainWindow::recievedResend);
+    connect(parserWorker, &Parser::recievedSDUpdate, this, &MainWindow::updateSDStatus);
+    //connect(parser, &Parser::recievedStart, this, &MainWindow::recievedStart);
     parserThread->start();
+
+    //Sender thread signal-slots and init
+    senderWorker = new Sender();
+    senderThread = new QThread();
+    senderWorker->moveToThread(senderThread);
+    connect(senderThread, &QThread::finished, senderWorker, &QObject::deleteLater);
+    connect(parserWorker, &Parser::recievedOkNum, senderWorker, &Sender::recievedOkNum);
+    connect(parserWorker, &Parser::recievedOkWait, senderWorker, &Sender::recievedOkWait);
+    connect(parserWorker, &Parser::recievedResend, senderWorker, &Sender::recievedResend);
+    connect(parserWorker, &Parser::recievedStart, senderWorker, &Sender::recievedStart);
+    connect(senderWorker, &Sender::errorRecieved, this, &MainWindow::serialError);
+    connect(senderWorker, &Sender::dataRecieved, parserWorker, &Parser::parse);
+    senderThread->start();
 
     //Timers init
     statusTimer.start();
@@ -138,6 +152,8 @@ MainWindow::~MainWindow()
     if(printer.isOpen()) printer.close();
     parserThread->quit();
     parserThread->wait();
+    senderThread->quit();
+    senderThread->wait();
 
     delete ui;
 }
@@ -176,6 +192,7 @@ void MainWindow::parseFile(QString filename)
             if(!line.startsWith(";")) gcode.append(line);
         }
         gfile.close();
+        emit setFile(gcode);
         ui->fileBox->setEnabled(true);
         ui->progressBar->setEnabled(true);
         ui->sendBtn->setText("Send");
@@ -207,7 +224,6 @@ bool MainWindow::sendLine(QString line)
         }
         else return false;
     }
-
     else return false;
 
 }
@@ -235,8 +251,12 @@ void MainWindow::serialconnect()
             }
         }
 
-        printer.setPort(printerinfo);
+        emit setBaudrate(ui->baudbox->currentText().toInt());
+        emit openPort(printerinfo);
+    }
+        //printer.setPort(printerinfo);
 
+        /*
         if(printer.open(QIODevice::ReadWrite))
         {
 
@@ -290,6 +310,7 @@ void MainWindow::serialconnect()
         ui->statusGroup->setDisabled(true);
         ui->actionEEPROM_editor->setDisabled(false);
      }
+     */
 }
 
 /////////////////
@@ -476,6 +497,7 @@ void MainWindow::on_actionPrint_from_SD_triggered()
 
 void MainWindow::on_sendBtn_clicked()
 {
+    /*
     userCommands.clear();
     if(sending && !sdprinting)
     {
@@ -509,6 +531,8 @@ void MainWindow::on_sendBtn_clicked()
 
     ui->progressBar->setValue(0);
     currentLine = 0;
+    */
+    emit startPrinting();
 }
 
 void MainWindow::on_pauseBtn_clicked()
@@ -547,8 +571,7 @@ void MainWindow::readSerial()
 
         emit recievedData(data); //Send data to parser thread
 
-        if(data.startsWith("ok")) readyRecieve++;
-        else if(data.startsWith("wa")) readyRecieve=1;
+        if(data.startsWith("ok") || data.startsWith("wa")) readyRecieve = true;
 
         printMsg(QString(data)); //echo
     }
@@ -575,8 +598,6 @@ void MainWindow::printMsg(QString text)
     ui->terminal->setTextCursor(cursor);
 }
 
-
-
 void MainWindow::sendNext()
 {
     if(printer.isWritable())
@@ -589,13 +610,13 @@ void MainWindow::sendNext()
 
             return;
         }
-        if(!userCommands.isEmpty() && readyRecieve > 0) //Inject user command
+        if(!userCommands.isEmpty() && readyRecieve) //Inject user command
         {
             sendLine(userCommands.dequeue());
-            readyRecieve--;
+            readyRecieve = false;
             return;
         }
-        else if(sending && !paused && readyRecieve > 0 && !sdprinting) //Send line of gcode
+        else if(sending && !paused && readyRecieve && !sdprinting) //Send line of gcode
         {
             if(currentLine >= gcode.size()) //check if we are at the end of array
             {
@@ -612,7 +633,7 @@ void MainWindow::sendNext()
             }
             sendLine(gcode.at(currentLine));
             currentLine++;
-            readyRecieve--;
+            readyRecieve=false;
 
             ui->filelines->setText(QString::number(gcode.size())
                                 + QString("/")
@@ -862,13 +883,13 @@ void MainWindow::sendEEPROMsettings(QStringList changes)
 
 void MainWindow::recievedOkNum(int num)
 {
-    readyRecieve++;
+    readyRecieve=true;
     lastRecieved = num;
 }
 
 void MainWindow::recievedWait()
 {
-    readyRecieve = 1;
+    readyRecieve = true;
 }
 
 void MainWindow::EEPROMSettingRecieved(QString esetting)
@@ -892,8 +913,13 @@ void MainWindow::recievedSDDone()
 
 void MainWindow::recievedResend(int num)
 {
-    if(!sendingChecksum) currentLine--;
+    if(!sendingChecksum) injectCommand("M110 N0");
     else resendLineNum = num;
+}
+
+void MainWindow::recievedStart()
+{
+    readyRecieve = true;
 }
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)

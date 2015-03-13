@@ -21,6 +21,7 @@
 #include "repraptor.h"
 #include "eepromwindow.h"
 #include "parser.h"
+#include "sender.h"
 
 using namespace RepRaptor;
 
@@ -36,8 +37,10 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    Parser *parser;
+    Parser *parserWorker;
+    Sender *senderWorker;
     QThread *parserThread;
+    QThread *senderThread;
 
 protected:
     QFile gfile;
@@ -74,7 +77,7 @@ private:
     int firmware;
     long int currentLine;
     unsigned long int lastRecieved;
-    int readyRecieve;
+    bool readyRecieve;
     unsigned long int totalLineNum;
     long int resendLineNum;
     int userHistoryPos;
@@ -106,6 +109,7 @@ private slots:
     void recievedError();
     void recievedSDDone();
     void recievedResend(int num);
+    void recievedStart();
     void parseFile(QString filename);
     void recentClicked();
 
@@ -158,6 +162,14 @@ signals:
     void eepromReady();
     void recievedData(QByteArray);
     void startedReadingEEPROM();
+
+    void openPort(QSerialPortInfo i);
+    void closePort();
+    void startPrinting();
+    void stopPrinting();
+    void pause(bool p);
+    void setBaudrate(int b);
+    void setFile(QVector <QString> f);
 };
 
 #endif // MAINWINDOW_H
