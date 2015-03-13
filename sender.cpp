@@ -156,7 +156,7 @@ void Sender::setFile(QVector <QString> f)
 
 void Sender::injectCommand(QString command)
 {
-    userCommands.enqueue(command);
+    if(userCommands.contains(command)) userCommands.enqueue(command);
 }
 
 void Sender::recievedOkWait()

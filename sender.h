@@ -20,9 +20,8 @@ public:
     explicit Sender(QObject *parent = 0);
     ~Sender();
 
-    QSerialPort *printer;
-
 protected:
+    QSerialPort *printer;
     int currentLine;
     int totalLineNum;
     int baudrate;

@@ -531,7 +531,7 @@ void MainWindow::printMsg(const char* text)
     cursor.insertText(text);
 
     ui->terminal->setTextCursor(cursor);
-;
+
 }
 
 void MainWindow::printMsg(QString text)
@@ -835,9 +835,9 @@ void MainWindow::updateFileProgress(FileProgress p)
         ui->pauseBtn->setEnabled(true);
         sending = true;
     }
-    ui->filelines->setText(QString::number(p.P)
+    ui->filelines->setText(QString::number(p.T)
                         + QString("/")
-                        + QString::number(p.T)
+                        + QString::number(p.P)
                         + QString(" Lines"));
     ui->progressBar->setValue(((float)p.P/p.T) * 100);
 }
