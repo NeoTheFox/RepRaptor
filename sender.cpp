@@ -17,6 +17,8 @@ Sender::Sender(QObject *parent) : QObject(parent)
     sendTimer.setInterval(settings.value("core/senderinterval", 2).toInt());
     sendingChecksum = settings.value("core/checksums", 0).toBool();
 
+    sendTimer.start();
+
     connect(printer, SIGNAL(error(QSerialPort::SerialPortError)), this, SLOT(recievedError(QSerialPort::SerialPortError)));
     connect(printer, &QSerialPort::readyRead, this, &Sender::recievedData);
     connect(&sendTimer, &QTimer::timeout, this, &Sender::sendNext);
@@ -41,17 +43,26 @@ void Sender::sendNext()
         }
         else if(sending && !paused && readyRecieve) //Send line of gcode
         {
+            FileProgress p;
             if(currentLine >= gcode.size()) //check if we are at the end of array
             {
                 sending = false;
                 currentLine = 0;
                 if(sendingChecksum) sendLine("M110 N0");
 
+                p.P = gcode.size();
+                p.T = gcode.size();
+                emit reportProgress(p);
+
                 return;
             }
             sendLine(gcode.at(currentLine));
             currentLine++;
             readyRecieve=false;
+
+            p.P = currentLine;
+            p.T = gcode.size();
+            emit reportProgress(p);
         }
     }
 }
@@ -82,7 +93,7 @@ void Sender::openPort(QSerialPortInfo i)
 {
     printer->setPort(i);
 
-    if(printer->open(QIODevice::ReadWrite))
+    if(!printer->isOpen() && printer->open(QIODevice::ReadWrite))
     {
 
         //Moved here to be compatible with Qt 5.2.1
@@ -106,15 +117,12 @@ void Sender::openPort(QSerialPortInfo i)
         }
 
         printer->setFlowControl(QSerialPort::HardwareControl);
-
-        sendTimer.start();
     }
 }
 
 void Sender::closePort()
 {
     if(printer->isOpen()) printer->close();
-    sendTimer.stop();
 }
 
 void Sender::startPrinting()
@@ -164,6 +172,11 @@ void Sender::recievedOkNum(int)
 void Sender::recievedStart()
 {
     readyRecieve = true;
+}
+
+void Sender::flushInjectionBuffer()
+{
+    userCommands.clear();
 }
 
 void Sender::recievedResend(int)

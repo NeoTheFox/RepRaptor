@@ -64,8 +64,10 @@ private:
 
     QSerialPort printer;
     QSerialPortInfo printerinfo;
+    bool opened;
     bool firstrun;
     bool autolock;
+    bool printing;
     bool sending;
     bool paused;
     bool checkingTemperature;
@@ -88,13 +90,12 @@ private slots:
     void serialconnect();
     void serialupdate();
     bool sendLine(QString line);
-    void readSerial();
+    void readSerial(QByteArray data);
     void printMsg(QString text);
     void printMsg(const char* text);
     void sendNext();
     void checkStatus();
     void updateRecent();
-    void injectCommand(QString command);
     void initSDprinting(QStringList sdFiles);
     void selectSDfile(QString file);
     void checkSDStatus();
@@ -112,6 +113,7 @@ private slots:
     void recievedStart();
     void parseFile(QString filename);
     void recentClicked();
+    void updateFileProgress(FileProgress);
 
     void xplus();
     void yplus();
@@ -170,6 +172,8 @@ signals:
     void pause(bool p);
     void setBaudrate(int b);
     void setFile(QVector <QString> f);
+    void injectCommand(QString command);
+    void flushInjectionBuffer();
 };
 
 #endif // MAINWINDOW_H

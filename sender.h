@@ -40,7 +40,7 @@ protected:
 signals:
     void errorRecieved(QSerialPort::SerialPortError error);
     void dataRecieved(QByteArray data);
-    void reportPeogress(SDProgress p);
+    void reportProgress(FileProgress p);
 
 public slots:
     void openPort(QSerialPortInfo i);
@@ -51,6 +51,7 @@ public slots:
     void setBaudrate(int b);
     void setFile(QVector <QString> f);
     void injectCommand(QString);
+    void flushInjectionBuffer();
 
     void recievedOkWait();
     void recievedOkNum(int);

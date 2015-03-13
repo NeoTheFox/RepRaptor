@@ -28,6 +28,11 @@ namespace RepRaptor
     {
         unsigned long int progress, total;
     } SDProgress;
+
+    typedef struct
+    {
+        unsigned int T, P;
+    } FileProgress;
 }
 
 #endif // REPRAPTOR_H
