@@ -65,7 +65,7 @@ void Parser::parse(QByteArray data)
             else emit recievedOkNum(0);
         }
         */
-        else if(data.startsWith("T:") || data.startsWith("ok T:"))
+        else if(data.contains("T:"))
         {
             TemperatureReadings r;
 
@@ -81,8 +81,8 @@ void Parser::parse(QByteArray data)
             emit recievedTemperature(r);
         }
         //else if(data.startsWith("wait")) emit recievedOkWait();
-        else if(data.startsWith("rs") || data.startsWith("Resend"))
-            emit recievedResend(data.split(' ').at(0).toInt());
+        else if(data.startsWith("rs") || data.toLower().startsWith("resend"))
+            emit recievedResend(data.split(':').at(1).toInt());
         else if(data.startsWith("!!")) emit recievedError();
         else if(data.startsWith("Done")) emit recievedSDDone();
         else if(data.startsWith("start")) emit recievedStart();

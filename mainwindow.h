@@ -21,6 +21,7 @@
 #include "repraptor.h"
 #include "eepromwindow.h"
 #include "parser.h"
+#include "sender.h"
 
 using namespace RepRaptor;
 
@@ -36,14 +37,15 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    Parser *parser;
+    Parser *parserWorker;
+    Sender *senderWorker;
     QThread *parserThread;
+    QThread *senderThread;
 
 protected:
     QFile gfile;
     QVector<QString> gcode;
     QQueue <QString> userCommands;
-    QTimer sendTimer;
     QTimer progressSDTimer;
     QTimer statusTimer;
     QElapsedTimer sinceLastTemp;
@@ -59,10 +61,11 @@ protected:
 private:
     Ui::MainWindow *ui;
 
-    QSerialPort printer;
     QSerialPortInfo printerinfo;
+    bool opened;
     bool firstrun;
     bool autolock;
+    bool printing;
     bool sending;
     bool paused;
     bool checkingTemperature;
@@ -74,7 +77,7 @@ private:
     int firmware;
     long int currentLine;
     unsigned long int lastRecieved;
-    int readyRecieve;
+    bool readyRecieve;
     unsigned long int totalLineNum;
     long int resendLineNum;
     int userHistoryPos;
@@ -84,14 +87,11 @@ private slots:
     void open();
     void serialconnect();
     void serialupdate();
-    bool sendLine(QString line);
-    void readSerial();
+    void readSerial(QByteArray data);
     void printMsg(QString text);
     void printMsg(const char* text);
-    void sendNext();
     void checkStatus();
     void updateRecent();
-    void injectCommand(QString command);
     void initSDprinting(QStringList sdFiles);
     void selectSDfile(QString file);
     void checkSDStatus();
@@ -106,8 +106,10 @@ private slots:
     void recievedError();
     void recievedSDDone();
     void recievedResend(int num);
+    void recievedStart();
     void parseFile(QString filename);
     void recentClicked();
+    void updateFileProgress(FileProgress);
 
     void xplus();
     void yplus();
@@ -158,6 +160,16 @@ signals:
     void eepromReady();
     void recievedData(QByteArray);
     void startedReadingEEPROM();
+
+    void openPort(QSerialPortInfo i);
+    void closePort();
+    void startPrinting();
+    void stopPrinting();
+    void pause(bool p);
+    void setBaudrate(int b);
+    void setFile(QVector <QString> f);
+    void injectCommand(QString command);
+    void flushInjectionBuffer();
 };
 
 #endif // MAINWINDOW_H

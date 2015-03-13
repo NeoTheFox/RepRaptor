@@ -50,7 +50,6 @@ MainWindow::MainWindow(QWidget *parent) :
     chekingSDStatus = settings.value("core/checksdstatus", 1).toBool();
     firmware = settings.value("printer/firmware", OtherFirmware).toInt();
     statusTimer.setInterval(settings.value("core/statusinterval", 3000).toInt());
-    sendTimer.setInterval(settings.value("core/senderinterval", 2).toInt());
     int size = settings.beginReadArray("user/recentfiles");
     for(int i = 0; i < size; ++i)
     {
@@ -64,9 +63,10 @@ MainWindow::MainWindow(QWidget *parent) :
     paused = false;
     readingFiles = false;
     sdprinting = false;
+    opened = false;
     sdBytes = 0;
     currentLine = 0;
-    readyRecieve = 1;
+    readyRecieve = false;
     lastRecieved = 0;
     userHistoryPos = 0;
     totalLineNum = 0;
@@ -77,37 +77,59 @@ MainWindow::MainWindow(QWidget *parent) :
     serialupdate();
 
     //Internal signal-slots
-    connect(&printer, SIGNAL(error(QSerialPort::SerialPortError)), this, SLOT(serialError(QSerialPort::SerialPortError)));
-    connect(&printer, SIGNAL(readyRead()), this, SLOT(readSerial()));
     connect(&statusTimer, SIGNAL(timeout()), this, SLOT(checkStatus()));
-    connect(&sendTimer, SIGNAL(timeout()), this, SLOT(sendNext()));
     connect(&progressSDTimer, SIGNAL(timeout()), this, SLOT(checkSDStatus()));
     connect(this, SIGNAL(eepromReady()), this, SLOT(openEEPROMeditor()));
 
     //Parser thread signal-slots and init
     qRegisterMetaType<TemperatureReadings>("TemperatureReadings");
     qRegisterMetaType<SDProgress>("SDProgress");
-    parser = new Parser();
-    parserThread = new QThread();
-    parser->moveToThread(parserThread);
-    connect(parserThread, &QThread::finished, parser, &QObject::deleteLater);
-    connect(this, &MainWindow::recievedData, parser, &Parser::parse);
-    connect(this, &MainWindow::startedReadingEEPROM, parser, &Parser::setEEPROMReadingMode);
-    connect(parser, &Parser::recievedTemperature, this, &MainWindow::updateTemperature);
-    connect(parser, &Parser::recievedOkNum, this, &MainWindow::recievedOkNum);
-    connect(parser, &Parser::recievedOkWait, this, &MainWindow::recievedWait);
-    connect(parser, &Parser::recievedSDFilesList, this, &MainWindow::initSDprinting);
-    connect(parser, &Parser::recievedEEPROMLine, this, &MainWindow::EEPROMSettingRecieved);
-    connect(parser, &Parser::recievingEEPROMDone, this, &MainWindow::openEEPROMeditor);
-    connect(parser, &Parser::recievedError, this, &MainWindow::recievedError);
-    connect(parser, &Parser::recievedSDDone, this, &MainWindow::recievedSDDone);
-    connect(parser, &Parser::recievedResend, this, &MainWindow::recievedResend);
-    connect(parser, &Parser::recievedSDUpdate, this, &MainWindow::updateSDStatus);
+    parserWorker = new Parser();
+    parserThread = new QThread(this);
+    parserWorker->moveToThread(parserThread);
+    connect(parserThread, &QThread::finished, parserWorker, &QObject::deleteLater);
+    connect(this, &MainWindow::recievedData, parserWorker, &Parser::parse);
+    connect(this, &MainWindow::startedReadingEEPROM, parserWorker, &Parser::setEEPROMReadingMode);
+    connect(parserWorker, &Parser::recievedTemperature, this, &MainWindow::updateTemperature);
+    connect(parserWorker, &Parser::recievedSDFilesList, this, &MainWindow::initSDprinting);
+    connect(parserWorker, &Parser::recievedEEPROMLine, this, &MainWindow::EEPROMSettingRecieved);
+    connect(parserWorker, &Parser::recievingEEPROMDone, this, &MainWindow::openEEPROMeditor);
+    connect(parserWorker, &Parser::recievedError, this, &MainWindow::recievedError);
+    connect(parserWorker, &Parser::recievedSDDone, this, &MainWindow::recievedSDDone);
+    connect(parserWorker, &Parser::recievedSDUpdate, this, &MainWindow::updateSDStatus);
     parserThread->start();
+
+    //Sender thread signal-slots and init
+    qRegisterMetaType<QSerialPortInfo>("QSerialPortInfo");
+    qRegisterMetaType< QVector<QString> >("QVector<QString>");
+    qRegisterMetaType<FileProgress>("FileProgress");
+    qRegisterMetaType<QSerialPort::SerialPortError>("QSerialPort::SerialPortError");
+    senderWorker = new Sender();
+    senderThread = new QThread(this);
+    senderWorker->moveToThread(senderThread);
+    connect(senderThread, &QThread::finished, senderWorker, &QObject::deleteLater);
+    connect(parserWorker, &Parser::recievedOkNum, senderWorker, &Sender::recievedOkNum);
+    connect(parserWorker, &Parser::recievedOkWait, senderWorker, &Sender::recievedOkWait);
+    connect(parserWorker, &Parser::recievedResend, senderWorker, &Sender::recievedResend);
+    connect(parserWorker, &Parser::recievedStart, senderWorker, &Sender::recievedStart);
+    connect(senderWorker, &Sender::errorRecieved, this, &MainWindow::serialError);
+    connect(senderWorker, &Sender::dataRecieved, parserWorker, &Parser::parse, Qt::QueuedConnection);
+    connect(senderWorker, &Sender::dataRecieved, this, &MainWindow::readSerial, Qt::QueuedConnection);
+    connect(senderWorker, &Sender::reportProgress, this, &MainWindow::updateFileProgress);
+    connect(this, &MainWindow::setFile, senderWorker, &Sender::setFile);
+    connect(this, &MainWindow::startPrinting, senderWorker, &Sender::startPrinting);
+    connect(this, &MainWindow::stopPrinting, senderWorker, &Sender::stopPrinting);
+    connect(this, &MainWindow::pause, senderWorker, &Sender::pause);
+    connect(this, &MainWindow::setBaudrate, senderWorker, &Sender::setBaudrate);
+    connect(this, &MainWindow::openPort, senderWorker, &Sender::openPort);
+    connect(this, &MainWindow::closePort, senderWorker, &Sender::closePort);
+    connect(this, &MainWindow::injectCommand, senderWorker, &Sender::injectCommand);
+    connect(this, &MainWindow::flushInjectionBuffer, senderWorker, &Sender::flushInjectionBuffer);
+    senderThread->start();
 
     //Timers init
     statusTimer.start();
-    sendTimer.start();
+    //sendTimer.start();
     progressSDTimer.setInterval(2500);
     if(chekingSDStatus) progressSDTimer.start();
     sinceLastTemp.start();
@@ -135,9 +157,10 @@ MainWindow::~MainWindow()
 
     //Cleanup what is left
     if(gfile.isOpen()) gfile.close();
-    if(printer.isOpen()) printer.close();
     parserThread->quit();
     parserThread->wait();
+    senderThread->quit();
+    senderThread->wait();
 
     delete ui;
 }
@@ -169,47 +192,19 @@ void MainWindow::parseFile(QString filename)
     if (gfile.open(QIODevice::ReadOnly))
     {
         QTextStream in(&gfile);
-        int n = 0;
         while (!in.atEnd())
         {
             QString line = in.readLine();
             if(!line.startsWith(";")) gcode.append(line);
         }
         gfile.close();
+        emit setFile(gcode);
         ui->fileBox->setEnabled(true);
         ui->progressBar->setEnabled(true);
         ui->sendBtn->setText("Send");
         ui->filename->setText(gfile.fileName().split(QDir::separator()).last());
         ui->filelines->setText(QString::number(gcode.size()) + QString("/0 lines"));
     }
-}
-
-bool MainWindow::sendLine(QString line)
-{
-    if(printer.isOpen())
-    {
-        if(sendingChecksum)
-        {
-            if(line.contains("M110")) totalLineNum = 0;
-
-            //Checksum algorithm from RepRap wiki
-            line = "N"+QString::number(totalLineNum)+line+"*";
-            int cs = 0;
-            for(int i = 0; line.at(i) != '*'; i++) cs = cs ^ line.at(i).toLatin1();
-            cs &= 0xff;
-            line += QString::number(cs);
-            totalLineNum++;
-        }
-        if(printer.write(line.toUtf8()+'\n'))
-        {
-            if(echo) printMsg(line + '\n');
-            return true;
-        }
-        else return false;
-    }
-
-    else return false;
-
 }
 
 void MainWindow::serialupdate()
@@ -222,9 +217,9 @@ void MainWindow::serialupdate()
 
 void MainWindow::serialconnect()
 {
-    userCommands.clear();
+    emit flushInjectionBuffer();
 
-    if(!printer.isOpen())
+    if(!opened)
     {
         foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts())
         {
@@ -235,49 +230,24 @@ void MainWindow::serialconnect()
             }
         }
 
-        printer.setPort(printerinfo);
-
-        if(printer.open(QIODevice::ReadWrite))
-        {
-
-            //Moved here to be compatible with Qt 5.2.1
-            switch(ui->baudbox->currentText().toInt())
-            {
-                case 4800:
-                printer.setBaudRate(QSerialPort::Baud4800);
-                break;
-
-                case 9600:
-                printer.setBaudRate(QSerialPort::Baud9600);
-                break;
-
-                case 115200:
-                printer.setBaudRate(QSerialPort::Baud115200);
-                break;
-
-                default:
-                printer.setBaudRate(ui->baudbox->currentText().toInt());
-                break;
-            }
-
-            printer.setFlowControl(QSerialPort::HardwareControl);
-
-            ui->connectBtn->setText("Disconnect");
-            ui->sendBtn->setDisabled(false);
-            //ui->pauseBtn->setDisabled(false);
-            ui->progressBar->setValue(0);
-            ui->controlBox->setDisabled(false);
-            ui->consoleGroup->setDisabled(false);
-            ui->statusGroup->setDisabled(false);
-            ui->actionPrint_from_SD->setEnabled(true);
-            ui->actionSet_SD_printing_mode->setEnabled(true);
-            if(firmware == Repetier) ui->actionEEPROM_editor->setDisabled(false);
-        }
+        emit setBaudrate(ui->baudbox->currentText().toInt());
+        emit openPort(printerinfo);
+        opened=true;
+        ui->connectBtn->setText("Disconnect");
+        ui->sendBtn->setDisabled(false);
+        //ui->pauseBtn->setDisabled(false);
+        ui->progressBar->setValue(0);
+        ui->controlBox->setDisabled(false);
+        ui->consoleGroup->setDisabled(false);
+        ui->statusGroup->setDisabled(false);
+        ui->actionPrint_from_SD->setEnabled(true);
+        ui->actionSet_SD_printing_mode->setEnabled(true);
+        if(firmware == Repetier) ui->actionEEPROM_editor->setDisabled(false);
     }
 
-    else if(printer.isOpen())
+    else if(opened)
     {
-        printer.close();
+        emit closePort();
 
         ui->connectBtn->setText("Connect");
         ui->sendBtn->setDisabled(true);
@@ -289,7 +259,9 @@ void MainWindow::serialconnect()
         ui->actionSet_SD_printing_mode->setDisabled(true);
         ui->statusGroup->setDisabled(true);
         ui->actionEEPROM_editor->setDisabled(false);
+        opened = false;
      }
+
 }
 
 /////////////////
@@ -298,123 +270,123 @@ void MainWindow::serialconnect()
 void MainWindow::xplus()
 {
     QString command = "G91\nG1 X" + ui->stepspin->text() + "\nG90";
-    injectCommand(command);
+    emit injectCommand(command);
 }
 
 void MainWindow::xminus()
 {
     QString command = "G91\nG1 X-" + ui->stepspin->text() + "\nG90";
-    injectCommand(command);
+    emit injectCommand(command);
 }
 
 void MainWindow::xhome()
 {
-    injectCommand("G28 X0");
+    emit injectCommand("G28 X0");
 }
 
 void MainWindow::yplus()
 {
     QString command = "G91\nG1 Y" + ui->stepspin->text() + "\nG90";
-    injectCommand(command);
+    emit injectCommand(command);
 }
 
 void MainWindow::yminus()
 {
     QString command = "G91\nG1 Y-" + ui->stepspin->text() + "\nG90";
-    injectCommand(command);
+    emit injectCommand(command);
 }
 
 void MainWindow::yhome()
 {
-    injectCommand("G28 Y0");
+    emit injectCommand("G28 Y0");
 }
 
 void MainWindow::zplus()
 {
     QString command = "G91\nG1 Z" + ui->stepspin->text() + "\nG90";
-    injectCommand(command);
+    emit injectCommand(command);
 }
 
 void MainWindow::zminus()
 {
     QString command = "G91\nG1 Z-" + ui->stepspin->text() + "\nG90";
-    injectCommand(command);
+    emit injectCommand(command);
 }
 
 void MainWindow::zhome()
 {
-    injectCommand("G28 Z0");
+    emit injectCommand("G28 Z0");
 }
 
 void MainWindow::eplus()
 {
     QString command = "G91\nG1 E" + ui->estepspin->text() + "\nG90";
-    injectCommand(command);
+    emit injectCommand(command);
 }
 
 void MainWindow::eminus()
 {
     QString command = "G91\nG1 E-" + ui->estepspin->text() + "\nG90";
-    injectCommand(command);
+    emit injectCommand(command);
 }
 
 void MainWindow::ezero()
 {
-    injectCommand("G92 E0");
+    emit injectCommand("G92 E0");
 }
 
 void MainWindow::homeall()
 {
-    injectCommand("G28");
+    emit injectCommand("G28");
 }
 
 void MainWindow::on_sendbtn_clicked()
 {
-    injectCommand(ui->sendtext->text());
+    emit injectCommand(ui->sendtext->text());
     userHistory.append(ui->sendtext->text());
     userHistoryPos = 0;
 }
 
 void MainWindow::on_fanonbtn_clicked()
 {
-    injectCommand("M106");
+    emit injectCommand("M106");
 }
 
 void MainWindow::on_fanoffbtn_clicked()
 {
-    injectCommand("M107");
+    emit injectCommand("M107");
 }
 
 void MainWindow::on_atxonbtn_clicked()
 {
-    injectCommand("M80");
+    emit injectCommand("M80");
 }
 
 void MainWindow::on_atxoffbtn_clicked()
 {
-    injectCommand("M81");
+    emit injectCommand("M81");
 }
 
 void MainWindow::on_etmpset_clicked()
 {
     QString command = "M80\nM104 S" + ui->etmpspin->text();
-    injectCommand(command);
+    emit injectCommand(command);
 }
 
 void MainWindow::on_etmpoff_clicked()
 {
-    injectCommand("M104 S0");
+    emit injectCommand("M104 S0");
 }
 
 void MainWindow::on_btmpset_clicked()
 {
     QString command = "M80\nM140 S" + ui->btmpspin->text();
-    injectCommand(command);
+    emit injectCommand(command);
 }
 
 void MainWindow::on_btmpoff_clicked()
 {
-    injectCommand("M140 S0");
+    emit injectCommand("M140 S0");
 }
 
 void MainWindow::bedcenter()
@@ -425,7 +397,7 @@ void MainWindow::bedcenter()
     y = settings.value("printer/bedy", 200).toInt();
 
     QString command = "G1 X" + QString::number(x/2) + "Y" + QString::number(y/2);
-    injectCommand(command);
+    emit injectCommand(command);
 }
 
 void MainWindow::on_speedslider_valueChanged(int value)
@@ -442,7 +414,7 @@ void MainWindow::on_speededit_textChanged(const QString &arg1)
 void MainWindow::on_speedsetbtn_clicked()
 {
     QString command = "M220 S" + QString::number(ui->speedslider->value());
-    injectCommand(command);
+    emit injectCommand(command);
 }
 
 void MainWindow::on_flowedit_textChanged(const QString &arg1)
@@ -459,24 +431,24 @@ void MainWindow::on_flowslider_valueChanged(int value)
 void MainWindow::on_flowbutton_clicked()
 {
     QString command = "M221 S" + QString::number(ui->flowslider->value());
-    injectCommand(command);
+    emit injectCommand(command);
 }
 
 void MainWindow::on_haltbtn_clicked()
 {
     if(sending && !paused)ui->pauseBtn->click();
-    userCommands.clear();
-    injectCommand("M112");
+    emit flushInjectionBuffer();
+    emit injectCommand("M112");
 }
 
 void MainWindow::on_actionPrint_from_SD_triggered()
 {
-    injectCommand("M20");
+    emit injectCommand("M20");
 }
 
 void MainWindow::on_sendBtn_clicked()
 {
-    userCommands.clear();
+    emit flushInjectionBuffer();
     if(sending && !sdprinting)
     {
         sending = false;
@@ -485,6 +457,8 @@ void MainWindow::on_sendBtn_clicked()
         ui->pauseBtn->setDisabled(true);
         if(autolock) ui->controlBox->setChecked(true);
         paused = false;
+        emit pause(paused);
+        emit stopPrinting();
     }
     else if(!sending && !sdprinting)
     {
@@ -494,17 +468,20 @@ void MainWindow::on_sendBtn_clicked()
         ui->pauseBtn->setEnabled(true);
         if(autolock) ui->controlBox->setChecked(false);
         paused = false;
+        emit pause(paused);
+        emit startPrinting();
     }
     else if(sdprinting)
     {
         sending = false;
-        injectCommand("M24");
-        injectCommand("M27");
+        emit injectCommand("M24");
+        emit injectCommand("M27");
         ui->sendBtn->setText("Start");
         ui->pauseBtn->setText("Pause");
         ui->pauseBtn->setEnabled(true);
         if(autolock) ui->controlBox->setChecked(true);
         paused = false;
+        emit pause(paused);
     }
 
     ui->progressBar->setValue(0);
@@ -516,42 +493,34 @@ void MainWindow::on_pauseBtn_clicked()
     if(paused && !sdprinting)
     {
         paused = false;
+        emit pause(paused);
         if(autolock) ui->controlBox->setChecked(false);
         ui->pauseBtn->setText("Pause");
     }
     else if(!paused && !sdprinting)
     {
         paused = true;
+        emit pause(paused);
         if(autolock) ui->controlBox->setChecked(true);
         ui->pauseBtn->setText("Resume");
     }
     else if(sdprinting)
     {
-        injectCommand("M25");
+        emit injectCommand("M25");
     }
 }
 
 void MainWindow::on_releasebtn_clicked()
 {
-    injectCommand("M84");
+    emit injectCommand("M84");
 }
 /////////////////
 //Buttons end  //
 /////////////////
 
-void MainWindow::readSerial()
+void MainWindow::readSerial(QByteArray data)
 {
-    if(printer.canReadLine()) //Check if full line in buffer
-    {
-        QByteArray data = printer.readLine(); //Read the line
-
-        emit recievedData(data); //Send data to parser thread
-
-        if(data.startsWith("ok")) readyRecieve++;
-        else if(data.startsWith("wa")) readyRecieve=1;
-
-        printMsg(QString(data)); //echo
-    }
+    printMsg(QString(data)); //echo
 }
 
 void MainWindow::printMsg(const char* text)
@@ -575,58 +544,10 @@ void MainWindow::printMsg(QString text)
     ui->terminal->setTextCursor(cursor);
 }
 
-
-
-void MainWindow::sendNext()
-{
-    if(printer.isWritable())
-    {
-        if(resendLineNum != -1)
-        {
-            if(gcode.isEmpty()) sendLine("M110 N0");
-            else sendLine(gcode.at(resendLineNum));
-            resendLineNum = -1;
-
-            return;
-        }
-        if(!userCommands.isEmpty() && readyRecieve > 0) //Inject user command
-        {
-            sendLine(userCommands.dequeue());
-            readyRecieve--;
-            return;
-        }
-        else if(sending && !paused && readyRecieve > 0 && !sdprinting) //Send line of gcode
-        {
-            if(currentLine >= gcode.size()) //check if we are at the end of array
-            {
-                sending = false;
-                currentLine = 0;
-                ui->sendBtn->setText("Send");
-                ui->pauseBtn->setDisabled(true);
-                ui->filelines->setText(QString::number(gcode.size())
-                                       + QString("/")
-                                       + QString::number(currentLine)
-                                       + QString(" Lines"));
-                if(sendingChecksum) injectCommand("M110 N0");
-                return;
-            }
-            sendLine(gcode.at(currentLine));
-            currentLine++;
-            readyRecieve--;
-
-            ui->filelines->setText(QString::number(gcode.size())
-                                + QString("/")
-                                + QString::number(currentLine)
-                                + QString(" Lines"));
-            ui->progressBar->setValue(((float)currentLine/gcode.size()) * 100);
-        }
-    }
-}
-
 void MainWindow::checkStatus()
 {
     if(checkingTemperature
-            &&(sinceLastTemp.elapsed() > statusTimer.interval())) injectCommand("M105");
+            &&(sinceLastTemp.elapsed() > statusTimer.interval())) emit injectCommand("M105");
 }
 
 void MainWindow::on_checktemp_stateChanged(int arg1)
@@ -647,11 +568,6 @@ void MainWindow::on_actionAbout_triggered()
     AboutWindow aboutwindow(this);
 
     aboutwindow.exec();
-}
-
-void MainWindow::injectCommand(QString command)
-{
-    if(!userCommands.contains(command)) userCommands.enqueue(command);
 }
 
 void MainWindow::updateRecent()
@@ -678,11 +594,12 @@ void MainWindow::serialError(QSerialPort::SerialPortError error)
     if(error == QSerialPort::NoError) return;
     if(error == QSerialPort::NotOpenError) return; //this error is internal
 
-    if(printer.isOpen()) printer.close();
+    emit closePort();
 
     if(sending) paused = true;
+    emit pause(paused);
 
-    userCommands.clear();
+    emit flushInjectionBuffer();
 
     ui->connectBtn->setText("Connect");
     ui->sendBtn->setDisabled(true);
@@ -692,6 +609,7 @@ void MainWindow::serialError(QSerialPort::SerialPortError error)
     ui->actionPrint_from_SD->setDisabled(true);
     ui->actionSet_SD_printing_mode->setDisabled(true);
     ui->actionEEPROM_editor->setDisabled(true);
+    opened = false;
 
     qDebug() << error;
 
@@ -772,8 +690,8 @@ void MainWindow::selectSDfile(QString file)
     ui->sendBtn->setText("Start");
     sdBytes = bytes.toDouble();
 
-    userCommands.clear();
-    injectCommand("M23 " + filename);
+    emit flushInjectionBuffer();
+    emit injectCommand("M23 " + filename);
     sdprinting = true;
     ui->fileBox->setDisabled(false);
 }
@@ -793,7 +711,7 @@ void MainWindow::updateSDStatus(SDProgress p)
 void MainWindow::checkSDStatus()
 {
     if(sdprinting && chekingSDStatus && sinceLastSDStatus.elapsed() > progressSDTimer.interval())
-        injectCommand("M27");
+        emit injectCommand("M27");
 }
 
 void MainWindow::on_stepspin_valueChanged(const QString &arg1)
@@ -818,16 +736,16 @@ void MainWindow::on_actionSet_SD_printing_mode_triggered()
 
 void MainWindow::requestEEPROMSettings()
 {
-    userCommands.clear();
+    emit flushInjectionBuffer();
     EEPROMSettings.clear();
 
     switch(firmware)
     {
     case Marlin:
-        injectCommand("M503");
+        emit injectCommand("M503");
         break;
     case Repetier:
-        injectCommand("M205");
+        emit injectCommand("M205");
         break;
     case OtherFirmware:
         return;
@@ -853,22 +771,22 @@ void MainWindow::openEEPROMeditor()
 
 void MainWindow::sendEEPROMsettings(QStringList changes)
 {
-    userCommands.clear();
+    emit flushInjectionBuffer();
     foreach (QString str, changes)
     {
-        injectCommand(str);
+        emit injectCommand(str);
     }
 }
 
 void MainWindow::recievedOkNum(int num)
 {
-    readyRecieve++;
+    readyRecieve=true;
     lastRecieved = num;
 }
 
 void MainWindow::recievedWait()
 {
-    readyRecieve = 1;
+    readyRecieve = true;
 }
 
 void MainWindow::EEPROMSettingRecieved(QString esetting)
@@ -892,8 +810,36 @@ void MainWindow::recievedSDDone()
 
 void MainWindow::recievedResend(int num)
 {
-    if(!sendingChecksum) currentLine--;
+    if(!sendingChecksum) emit injectCommand("M110 N0");
     else resendLineNum = num;
+}
+
+void MainWindow::recievedStart()
+{
+    readyRecieve = true;
+}
+
+void MainWindow::updateFileProgress(FileProgress p)
+{
+    if(p.P >= p.T)
+    {
+        ui->sendBtn->setText("Send");
+        ui->pauseBtn->setDisabled(true);
+        sending = false;
+        paused = false;
+        emit pause(paused);
+    }
+    else
+    {
+        ui->sendBtn->setText("Stop");
+        ui->pauseBtn->setEnabled(true);
+        sending = true;
+    }
+    ui->filelines->setText(QString::number(p.P)
+                        + QString("/")
+                        + QString::number(p.T)
+                        + QString(" Lines"));
+    ui->progressBar->setValue(((float)p.P/p.T) * 100);
 }
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
