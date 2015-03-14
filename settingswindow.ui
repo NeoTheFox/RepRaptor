@@ -98,6 +98,9 @@
      <layout class="QGridLayout" name="gridLayout">
       <item row="3" column="0" colspan="3">
        <widget class="QCheckBox" name="echobox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="toolTip">
          <string>Show every sent command in console</string>
         </property>

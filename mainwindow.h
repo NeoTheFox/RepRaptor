@@ -46,15 +46,15 @@ protected:
     QFile gfile;
     QVector<QString> gcode;
     QQueue <QString> userCommands;
-    QTimer progressSDTimer;
-    QTimer statusTimer;
-    QElapsedTimer sinceLastTemp;
-    QElapsedTimer sinceLastSDStatus;
+    QTimer *progressSDTimer;
+    QTimer *statusTimer;
+    QMenu *recentMenu;
+    QElapsedTimer *sinceLastTemp;
+    QElapsedTimer *sinceLastSDStatus;
     QSettings settings;
     QStringList recentFiles;
     QStringList EEPROMSettings;
     QStringList userHistory;
-    QMenu *recentMenu;
 
     bool eventFilter(QObject *target, QEvent *event);
 
@@ -69,13 +69,10 @@ private:
     bool sending;
     bool paused;
     bool checkingTemperature;
-    bool readingFiles;
     bool sdprinting;
     bool echo;
-    bool sendingChecksum;
     bool chekingSDStatus;
     int firmware;
-    //unsigned long int lastRecieved;
     int userHistoryPos;
     unsigned long int sdBytes;
 

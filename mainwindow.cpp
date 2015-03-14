@@ -37,6 +37,16 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->baudbox->addItem(QString::number(460800));
     ui->baudbox->addItem(QString::number(500000));
 
+    //Create objects
+    statusTimer = new QTimer(this);
+    progressSDTimer = new QTimer(this);
+    sinceLastTemp = new QElapsedTimer();
+    sinceLastSDStatus = new QElapsedTimer();
+    parserWorker = new Parser();
+    parserThread = new QThread(this);
+    senderWorker = new Sender();
+    senderThread = new QThread(this);
+
     //Restore settings
     firstrun = !settings.value("core/firstrun").toBool(); //firstrun is inverted!
     ui->baudbox->setCurrentIndex(settings.value("printer/baudrateindex", 2).toInt());
@@ -46,10 +56,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->btmpspin->setValue(settings.value("user/bedtemp", 60).toInt());
     echo = settings.value("core/echo", 0).toBool();
     autolock = settings.value("core/lockcontrols", 0).toBool();
-    sendingChecksum = settings.value("core/checksums", 0).toBool();
     chekingSDStatus = settings.value("core/checksdstatus", 1).toBool();
     firmware = settings.value("printer/firmware", OtherFirmware).toInt();
-    statusTimer.setInterval(settings.value("core/statusinterval", 3000).toInt());
+    statusTimer->setInterval(settings.value("core/statusinterval", 3000).toInt());
     int size = settings.beginReadArray("user/recentfiles");
     for(int i = 0; i < size; ++i)
     {
@@ -61,7 +70,6 @@ MainWindow::MainWindow(QWidget *parent) :
     //Init values
     sending = false;
     paused = false;
-    readingFiles = false;
     sdprinting = false;
     opened = false;
     sdBytes = 0;
@@ -72,15 +80,13 @@ MainWindow::MainWindow(QWidget *parent) :
     serialupdate();
 
     //Internal signal-slots
-    connect(&statusTimer, SIGNAL(timeout()), this, SLOT(checkStatus()));
-    connect(&progressSDTimer, SIGNAL(timeout()), this, SLOT(checkSDStatus()));
+    connect(statusTimer, SIGNAL(timeout()), this, SLOT(checkStatus()));
+    connect(progressSDTimer, SIGNAL(timeout()), this, SLOT(checkSDStatus()));
     connect(this, SIGNAL(eepromReady()), this, SLOT(openEEPROMeditor()));
 
     //Parser thread signal-slots and init
     qRegisterMetaType<TemperatureReadings>("TemperatureReadings");
     qRegisterMetaType<SDProgress>("SDProgress");
-    parserWorker = new Parser();
-    parserThread = new QThread(this);
     parserWorker->moveToThread(parserThread);
     connect(parserThread, &QThread::finished, parserWorker, &QObject::deleteLater);
     connect(this, &MainWindow::recievedData, parserWorker, &Parser::parse);
@@ -99,8 +105,6 @@ MainWindow::MainWindow(QWidget *parent) :
     qRegisterMetaType< QVector<QString> >("QVector<QString>");
     qRegisterMetaType<FileProgress>("FileProgress");
     qRegisterMetaType<QSerialPort::SerialPortError>("QSerialPort::SerialPortError");
-    senderWorker = new Sender();
-    senderThread = new QThread(this);
     senderWorker->moveToThread(senderThread);
     connect(senderThread, &QThread::finished, senderWorker, &QObject::deleteLater);
     connect(parserWorker, &Parser::recievedOkNum, senderWorker, &Sender::recievedOkNum);
@@ -123,11 +127,11 @@ MainWindow::MainWindow(QWidget *parent) :
     senderThread->start();
 
     //Timers init
-    statusTimer.start();
-    progressSDTimer.setInterval(2500);
-    if(chekingSDStatus) progressSDTimer.start();
-    sinceLastTemp.start();
-    sinceLastSDStatus.start();
+    statusTimer->start();
+    progressSDTimer->setInterval(2500);
+    if(chekingSDStatus) progressSDTimer->start();
+    sinceLastTemp->start();
+    sinceLastSDStatus->start();
 
     updateRecent();
 }
@@ -507,6 +511,25 @@ void MainWindow::on_releasebtn_clicked()
 {
     emit injectCommand("M84");
 }
+
+void MainWindow::on_actionSettings_triggered()
+{
+    SettingsWindow settingswindow(this);
+
+    settingswindow.exec();
+}
+
+void MainWindow::on_actionAbout_triggered()
+{
+    AboutWindow aboutwindow(this);
+
+    aboutwindow.exec();
+}
+
+void MainWindow::on_actionAbout_Qt_triggered()
+{
+    qApp->aboutQt();
+}
 /////////////////
 //Buttons end  //
 /////////////////
@@ -540,27 +563,13 @@ void MainWindow::printMsg(QString text)
 void MainWindow::checkStatus()
 {
     if(checkingTemperature
-            &&(sinceLastTemp.elapsed() > statusTimer.interval())) emit injectCommand("M105");
+            &&(sinceLastTemp->elapsed() > statusTimer->interval())) emit injectCommand("M105");
 }
 
 void MainWindow::on_checktemp_stateChanged(int arg1)
 {
     if(arg1) checkingTemperature = true;
     else checkingTemperature = false;
-}
-
-void MainWindow::on_actionSettings_triggered()
-{
-    SettingsWindow settingswindow(this);
-
-    settingswindow.exec();
-}
-
-void MainWindow::on_actionAbout_triggered()
-{
-    AboutWindow aboutwindow(this);
-
-    aboutwindow.exec();
 }
 
 void MainWindow::updateRecent()
@@ -648,12 +657,7 @@ void MainWindow::updateTemperature(TemperatureReadings r)
     ui->extruderlcd->display(r.e);
     ui->bedlcd->display(r.b);
     ui->tempLine->setText(r.raw);
-    sinceLastTemp.restart();
-}
-
-void MainWindow::on_actionAbout_Qt_triggered()
-{
-    qApp->aboutQt();
+    sinceLastTemp->restart();
 }
 
 void MainWindow::initSDprinting(QStringList sdFiles)
@@ -698,12 +702,12 @@ void MainWindow::updateSDStatus(SDProgress p)
     if(p.progress != 0) ui->progressBar->setValue(((double)p.progress/p.total) * 100);
     else ui->progressBar->setValue(0);
     if(p.total == p.progress) sdprinting = false;
-    sinceLastSDStatus.restart();
+    sinceLastSDStatus->restart();
 }
 
 void MainWindow::checkSDStatus()
 {
-    if(sdprinting && chekingSDStatus && sinceLastSDStatus.elapsed() > progressSDTimer.interval())
+    if(sdprinting && chekingSDStatus && sinceLastSDStatus->elapsed() > progressSDTimer->interval())
         emit injectCommand("M27");
 }
 
