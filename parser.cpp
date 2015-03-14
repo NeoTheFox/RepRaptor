@@ -88,15 +88,6 @@ void Parser::parse(QByteArray data)
         else if(data.startsWith("start")) emit recievedStart();
         else if(data.startsWith("SD pr"))
         {
-            /*
-            QString tmp;
-            QString fragment = data.split(' ').at(3);
-            for(int i = 0; fragment.at(i) != '/'; ++i)
-            {
-                tmp += fragment.at(i);
-            }
-            emit recievedSDUpdate(tmp.toDouble());
-            */
             SDProgress p;
             QRegExp rxp("\\d+/\\d+");
             QStringList tmp;

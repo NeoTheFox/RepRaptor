@@ -65,12 +65,7 @@ MainWindow::MainWindow(QWidget *parent) :
     sdprinting = false;
     opened = false;
     sdBytes = 0;
-    currentLine = 0;
-    readyRecieve = false;
-    lastRecieved = 0;
     userHistoryPos = 0;
-    totalLineNum = 0;
-    resendLineNum = -1;
     userHistory.append("");
 
     //Update serial ports
@@ -484,7 +479,6 @@ void MainWindow::on_sendBtn_clicked()
     }
 
     ui->progressBar->setValue(0);
-    currentLine = 0;
 }
 
 void MainWindow::on_pauseBtn_clicked()
@@ -777,17 +771,6 @@ void MainWindow::sendEEPROMsettings(QStringList changes)
     }
 }
 
-void MainWindow::recievedOkNum(int num)
-{
-    readyRecieve=true;
-    lastRecieved = num;
-}
-
-void MainWindow::recievedWait()
-{
-    readyRecieve = true;
-}
-
 void MainWindow::EEPROMSettingRecieved(QString esetting)
 {
     EEPROMSettings.append(esetting);
@@ -805,17 +788,6 @@ void MainWindow::recievedSDDone()
     ui->progressBar->setValue(0);
     ui->filename->setText("");
     ui->fileBox->setDisabled(true);
-}
-
-void MainWindow::recievedResend(int num)
-{
-    if(!sendingChecksum) emit injectCommand("M110 N0");
-    else resendLineNum = num;
-}
-
-void MainWindow::recievedStart()
-{
-    readyRecieve = true;
 }
 
 void MainWindow::updateFileProgress(FileProgress p)

@@ -75,11 +75,7 @@ private:
     bool sendingChecksum;
     bool chekingSDStatus;
     int firmware;
-    long int currentLine;
-    unsigned long int lastRecieved;
-    bool readyRecieve;
-    unsigned long int totalLineNum;
-    long int resendLineNum;
+    //unsigned long int lastRecieved;
     int userHistoryPos;
     unsigned long int sdBytes;
 
@@ -101,12 +97,8 @@ private slots:
     void sendEEPROMsettings(QStringList changes);
     void updateTemperature(TemperatureReadings r);
     void EEPROMSettingRecieved(QString esetting);
-    void recievedOkNum(int num);
-    void recievedWait();
     void recievedError();
     void recievedSDDone();
-    void recievedResend(int num);
-    void recievedStart();
     void parseFile(QString filename);
     void recentClicked();
     void updateFileProgress(FileProgress);
