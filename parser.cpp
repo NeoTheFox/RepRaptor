@@ -3,15 +3,17 @@
 Parser::Parser(QObject *parent):
     QObject(parent)
 {
-    this->setParent(parent);
+    //Init regexp
     temperatureRegxp.setCaseSensitivity(Qt::CaseInsensitive);
     temperatureRegxp.setPatternSyntax(QRegExp::RegExp);
     temperatureRegxp.setPattern("\\d+\\.\\d+"); // Find float in string
 
+    //Init values
     readingFiles = false;
     readingEEPROM = false;
     EEPROMReadingStarted = false;
 
+    //Load settings
     QSettings settings;
     firmware = settings.value("printer/firmware").toInt();
 }
@@ -23,9 +25,9 @@ Parser::~Parser()
 
 void Parser::parse(QByteArray data)
 {
-    if(!data.isEmpty())
+    if(!data.isEmpty()) //Dont need to process empty strings
     {
-        if(readingFiles)
+        if(readingFiles) //SD files list reading mode
         {
             if(!data.contains("End file list")) SDFilesList.append(data);
             else
@@ -36,7 +38,7 @@ void Parser::parse(QByteArray data)
             return;
         }
 
-        if(readingEEPROM)
+        if(readingEEPROM) // EEPROM reading mode
         {
             if(firmware == Repetier)
             {
@@ -55,7 +57,6 @@ void Parser::parse(QByteArray data)
                 return;
             }
         }
-
         /*
         if(data.startsWith("ok"))
         {

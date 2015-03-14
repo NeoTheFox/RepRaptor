@@ -19,11 +19,11 @@ public:
 protected:
     QByteArray data;
     QStringList SDFilesList;
+    QRegExp temperatureRegxp;
     int firmware;
     bool readingFiles;
     bool readingEEPROM;
     bool EEPROMReadingStarted;
-    QRegExp temperatureRegxp;
 
 signals:
     void recievedTemperature(TemperatureReadings);
