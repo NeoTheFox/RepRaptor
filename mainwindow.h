@@ -82,7 +82,6 @@ private slots:
     void serialupdate();
     void readSerial(QByteArray data);
     void printMsg(QString text);
-    void printMsg(const char* text);
     void checkStatus();
     void updateRecent();
     void initSDprinting(QStringList sdFiles);

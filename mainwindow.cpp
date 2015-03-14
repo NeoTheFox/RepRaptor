@@ -84,9 +84,15 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(progressSDTimer, SIGNAL(timeout()), this, SLOT(checkSDStatus()));
     connect(this, SIGNAL(eepromReady()), this, SLOT(openEEPROMeditor()));
 
-    //Parser thread signal-slots and init
+    //Register all the types
     qRegisterMetaType<TemperatureReadings>("TemperatureReadings");
     qRegisterMetaType<SDProgress>("SDProgress");
+    qRegisterMetaType<QSerialPortInfo>("QSerialPortInfo");
+    qRegisterMetaType< QVector<QString> >("QVector<QString>");
+    qRegisterMetaType<FileProgress>("FileProgress");
+    qRegisterMetaType<QSerialPort::SerialPortError>("QSerialPort::SerialPortError");
+
+    //Parser thread signal-slots and init
     parserWorker->moveToThread(parserThread);
     connect(parserThread, &QThread::finished, parserWorker, &QObject::deleteLater);
     connect(this, &MainWindow::recievedData, parserWorker, &Parser::parse);
@@ -101,10 +107,6 @@ MainWindow::MainWindow(QWidget *parent) :
     parserThread->start();
 
     //Sender thread signal-slots and init
-    qRegisterMetaType<QSerialPortInfo>("QSerialPortInfo");
-    qRegisterMetaType< QVector<QString> >("QVector<QString>");
-    qRegisterMetaType<FileProgress>("FileProgress");
-    qRegisterMetaType<QSerialPort::SerialPortError>("QSerialPort::SerialPortError");
     senderWorker->moveToThread(senderThread);
     connect(senderThread, &QThread::finished, senderWorker, &QObject::deleteLater);
     connect(parserWorker, &Parser::recievedOkNum, senderWorker, &Sender::recievedOkNum);
@@ -133,6 +135,7 @@ MainWindow::MainWindow(QWidget *parent) :
     sinceLastTemp->start();
     sinceLastSDStatus->start();
 
+    //Update recent files list
     updateRecent();
 }
 
@@ -144,7 +147,6 @@ MainWindow::~MainWindow()
     settings.setValue("core/checktemperature", ui->checktemp->isChecked());
     settings.setValue("user/extrudertemp", ui->etmpspin->value());
     settings.setValue("user/bedtemp", ui->btmpspin->value());
-
     settings.beginWriteArray("user/recentfiles");
     for(int i = 0; i < recentFiles.size(); ++i)
     {
@@ -155,6 +157,8 @@ MainWindow::~MainWindow()
 
     //Cleanup what is left
     if(gfile.isOpen()) gfile.close();
+    statusTimer->stop();
+    progressSDTimer->stop();
     parserThread->quit();
     parserThread->wait();
     senderThread->quit();
@@ -207,18 +211,23 @@ void MainWindow::parseFile(QString filename)
 
 void MainWindow::serialupdate()
 {
+    //Clear old serialports
     ui->serialBox->clear();
+    //Save ports list
     QList<QSerialPortInfo> list = QSerialPortInfo::availablePorts();
+    //Populate the combobox
     for(int i = 0; i < list.size(); i++)
         ui->serialBox->addItem(list.at(i).portName());
 }
 
 void MainWindow::serialconnect()
 {
+    //Hust to be safe - wipe all the user commands
     emit flushInjectionBuffer();
 
     if(!opened)
     {
+        //Find the portinfo we need
         foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts())
         {
             if(info.portName() == ui->serialBox->currentText())
@@ -228,12 +237,14 @@ void MainWindow::serialconnect()
             }
         }
 
+        //Emit signals needed
         emit setBaudrate(ui->baudbox->currentText().toInt());
         emit openPort(printerinfo);
+        //Set the flag right
         opened=true;
+        //Update UI
         ui->connectBtn->setText("Disconnect");
         ui->sendBtn->setDisabled(false);
-        //ui->pauseBtn->setDisabled(false);
         ui->progressBar->setValue(0);
         ui->controlBox->setDisabled(false);
         ui->consoleGroup->setDisabled(false);
@@ -245,8 +256,11 @@ void MainWindow::serialconnect()
 
     else if(opened)
     {
+        //Emit closing signal to Sender
         emit closePort();
-
+        //Set the flag
+        opened = false;
+        //Update UI
         ui->connectBtn->setText("Connect");
         ui->sendBtn->setDisabled(true);
         ui->pauseBtn->setDisabled(true);
@@ -257,7 +271,6 @@ void MainWindow::serialconnect()
         ui->actionSet_SD_printing_mode->setDisabled(true);
         ui->statusGroup->setDisabled(true);
         ui->actionEEPROM_editor->setDisabled(false);
-        opened = false;
      }
 
 }
@@ -539,29 +552,26 @@ void MainWindow::readSerial(QByteArray data)
     printMsg(QString(data)); //echo
 }
 
-void MainWindow::printMsg(const char* text)
-{
-    QTextCursor cursor = ui->terminal->textCursor();
-    cursor.movePosition(QTextCursor::End);
-
-    cursor.insertText(text);
-
-    ui->terminal->setTextCursor(cursor);
-
-}
-
 void MainWindow::printMsg(QString text)
 {
+    //Get the cursor and set it to the end
     QTextCursor cursor = ui->terminal->textCursor();
     cursor.movePosition(QTextCursor::End);
 
+    //Paste the text
     cursor.insertText(text);
 
+    //Apply
     ui->terminal->setTextCursor(cursor);
 }
 
 void MainWindow::checkStatus()
 {
+    //We want to check for few things here:
+    //if we are checking temperature at all and
+    //if the time passed from the time we last
+    //recieved update is more than the check
+    //interval
     if(checkingTemperature
             &&(sinceLastTemp->elapsed() > statusTimer->interval())) emit injectCommand("M105");
 }
@@ -596,13 +606,22 @@ void MainWindow::serialError(QSerialPort::SerialPortError error)
     if(error == QSerialPort::NoError) return;
     if(error == QSerialPort::NotOpenError) return; //this error is internal
 
-    emit closePort();
+    emit closePort(); //If the port is still open we need to close it
 
+    //Set RepRaptor to pause if printing
+    //We dont want to stop the printing,
+    //in order to be able to continue it
+    //after possible connection fail
     if(sending) paused = true;
     emit pause(paused);
 
+    //Flush all the user commands
     emit flushInjectionBuffer();
 
+    //Set the flag
+    opened = false;
+
+    //Update UI
     ui->connectBtn->setText("Connect");
     ui->sendBtn->setDisabled(true);
     ui->pauseBtn->setDisabled(true);
@@ -611,10 +630,11 @@ void MainWindow::serialError(QSerialPort::SerialPortError error)
     ui->actionPrint_from_SD->setDisabled(true);
     ui->actionSet_SD_printing_mode->setDisabled(true);
     ui->actionEEPROM_editor->setDisabled(true);
-    opened = false;
 
+    //Print error to qDebug to see it in terminal
     qDebug() << error;
 
+    //Identify error
     QString errorMsg;
     switch(error)
     {
@@ -634,6 +654,7 @@ void MainWindow::serialError(QSerialPort::SerialPortError error)
         errorMsg = "Serial connection timed out";
         break;
 
+    //These errors are the same really
     case QSerialPort::WriteError:
     case QSerialPort::ReadError:
         errorMsg = "I/O Error";
@@ -648,6 +669,7 @@ void MainWindow::serialError(QSerialPort::SerialPortError error)
         break;
     }
 
+    //Spawn the error message
     ErrorWindow errorwindow(this, errorMsg);
     errorwindow.exec();
 }
@@ -662,7 +684,7 @@ void MainWindow::updateTemperature(TemperatureReadings r)
 
 void MainWindow::initSDprinting(QStringList sdFiles)
 {
-    SDWindow sdwindow(sdFiles, this); //Made it to 666 lines!
+    SDWindow sdwindow(sdFiles, this);
 
     connect(&sdwindow, SIGNAL(fileSelected(QString)), this, SLOT(selectSDfile(QString)));
 
@@ -707,6 +729,7 @@ void MainWindow::updateSDStatus(SDProgress p)
 
 void MainWindow::checkSDStatus()
 {
+    //Same as temperature check
     if(sdprinting && chekingSDStatus && sinceLastSDStatus->elapsed() > progressSDTimer->interval())
         emit injectCommand("M27");
 }
