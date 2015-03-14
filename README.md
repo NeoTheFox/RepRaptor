@@ -26,6 +26,11 @@ qmake RepRaptor.pro
 
 make
 ```
+And if you want to install system-wide
+```
+sudo make install
+```
+
 ## Links
 - [Binary release downloads (Windows, Linux)](https://github.com/NeoTheFox/RepRaptor/releases)
 - [RepRap wiki](http://reprap.org/wiki/RepRaptor)

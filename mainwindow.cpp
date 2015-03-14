@@ -38,13 +38,24 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->baudbox->addItem(QString::number(500000));
 
     //Create objects
+    //Timers need parent to be set up
+    //in order to be tied to its thread
+    //and stop right
     statusTimer = new QTimer(this);
     progressSDTimer = new QTimer(this);
+    //QElapsedTimers have no parents
     sinceLastTemp = new QElapsedTimer();
     sinceLastSDStatus = new QElapsedTimer();
+    //Workers would be moved to ther thread,
+    //so we should not set their parents. Instead,
+    //we should connect QThread's finished() to
+    //worker's deleteLater()
     parserWorker = new Parser();
-    parserThread = new QThread(this);
     senderWorker = new Sender();
+    //Setting the parent of QThread lets
+    //threads to stop right, and also makes
+    //them inherit parent's priority
+    parserThread = new QThread(this);
     senderThread = new QThread(this);
 
     //Restore settings
