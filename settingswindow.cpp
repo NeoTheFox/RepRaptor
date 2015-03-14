@@ -9,7 +9,7 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
 
     //bool firstrun = !settings.value("core/firstrun").toBool(); //firstrun is inverted!
 
-    ui->senderbox->setValue(settings.value("core/senderinterval", 2).toFloat());
+    ui->senderbox->setValue(settings.value("core/senderinterval", 2).toInt());
     ui->echobox->setChecked(settings.value("core/echo", 0).toBool());
     ui->statusbox->setValue(settings.value("core/statusinterval", 2000).toInt());
     ui->bedxbox->setValue(settings.value("printer/bedx", 200).toInt());
