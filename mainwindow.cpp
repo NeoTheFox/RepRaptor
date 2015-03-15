@@ -764,15 +764,18 @@ void MainWindow::on_estepspin_valueChanged(const QString &arg1)
 
 void MainWindow::on_actionSet_SD_printing_mode_triggered()
 {
+    //This is a manual switch to SD printing mode
+    //It can be useful if you have no display, and connected
+    //to a printer already printing something
     sdprinting = true;
     ui->fileBox->setDisabled(false);
 }
 
 void MainWindow::requestEEPROMSettings()
 {
-    emit flushInjectionBuffer();
-    EEPROMSettings.clear();
-
+    emit flushInjectionBuffer(); //Request ASAP
+    EEPROMSettings.clear(); //Clear anything stored before
+    //Find out what to call according to firmware
     switch(firmware)
     {
     case Marlin:
@@ -797,7 +800,7 @@ void MainWindow::openEEPROMeditor()
 {
     EEPROMWindow eepromwindow(EEPROMSettings, this);
 
-    eepromwindow.setWindowModality(Qt::NonModal);
+    eepromwindow.setWindowModality(Qt::NonModal); //Do not bloct the UI when EEPROM editor is shown
     connect(&eepromwindow, SIGNAL(changesComplete(QStringList)), this, SLOT(sendEEPROMsettings(QStringList)));
 
     eepromwindow.exec();
@@ -805,7 +808,7 @@ void MainWindow::openEEPROMeditor()
 
 void MainWindow::sendEEPROMsettings(QStringList changes)
 {
-    emit flushInjectionBuffer();
+    emit flushInjectionBuffer(); //To send EEPROM settings asap
     foreach (QString str, changes)
     {
         emit injectCommand(str);
@@ -819,6 +822,7 @@ void MainWindow::EEPROMSettingRecieved(QString esetting)
 
 void MainWindow::recievedError()
 {
+    //This should be raised if "!!" recieved
     ErrorWindow errorwindow(this,"Hardware failure");
     errorwindow.exec();
 }
@@ -833,6 +837,7 @@ void MainWindow::recievedSDDone()
 
 void MainWindow::updateFileProgress(FileProgress p)
 {
+    //Check if file is at end
     if(p.P >= p.T)
     {
         ui->sendBtn->setText("Send");
@@ -847,6 +852,7 @@ void MainWindow::updateFileProgress(FileProgress p)
         ui->pauseBtn->setEnabled(true);
         sending = true;
     }
+    //Update progressbar and text lines
     ui->filelines->setText(QString::number(p.T)
                         + QString("/")
                         + QString::number(p.P)
@@ -854,22 +860,24 @@ void MainWindow::updateFileProgress(FileProgress p)
     ui->progressBar->setValue(((float)p.P/p.T) * 100);
 }
 
+//Needed for keypress handling
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 {
+    //User history
     if(obj == ui->sendtext && !userHistory.isEmpty())
     {
         if(event->type() == QEvent::KeyPress)
         {
-            QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+            QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event); //Fetch the event
 
-            if (keyEvent->key() == Qt::Key_Up)
+            if (keyEvent->key() == Qt::Key_Up) //Scroll up with up arrow
             {
                 if(++userHistoryPos <= userHistory.size()-1)
                     ui->sendtext->setText(userHistory.at(userHistoryPos));
                 else userHistoryPos--;
                 return true;
             }
-            else if(keyEvent->key() == Qt::Key_Down)
+            else if(keyEvent->key() == Qt::Key_Down) //Scroll down with down arow
             {
                 if(--userHistoryPos >= 0)
                     ui->sendtext->setText(userHistory.at(userHistoryPos));
@@ -879,13 +887,14 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         }
         return false;
     }
+    //Temperature
     else if(obj == ui->etmpspin)
     {
         QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
 
         if(keyEvent->key() == Qt::Key_Return)
         {
-            ui->etmpset->click();
+            ui->etmpset->click(); //Emulate keypress
             return true;
         }
         return false;
@@ -896,7 +905,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 
         if(keyEvent->key() == Qt::Key_Return)
         {
-            ui->btmpset->click();
+            ui->btmpset->click(); //Emulate keypress
             return true;
         }
         return false;
@@ -906,5 +915,8 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 
 void MainWindow::recentClicked()
 {
+    //Actually a dirty hack, but it is fast and simple
+    //So this slot is not for anything to trigger, but
+    //recent files menu
     parseFile(sender()->objectName());
 }
