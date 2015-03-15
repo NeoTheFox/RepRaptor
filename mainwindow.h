@@ -5,14 +5,13 @@
 #include <QFileDialog>
 #include <QtSerialPort/QtSerialPort>
 #include <QFile>
-#include <QFuture>
+#include <QThread>
 #include <QVector>
 #include <QTextStream>
-#include <QtConcurrent/QtConcurrent>
 #include <QSettings>
 #include <QElapsedTimer>
-#include <QMessageBox>
 #include <QRegExp>
+#include <QMap>
 
 #include "settingswindow.h"
 #include "aboutwindow.h"
@@ -43,6 +42,7 @@ public:
     QThread *senderThread;
 
 protected:
+    QMap <QString, QString> macros;
     QFile gfile;
     QVector<QString> gcode;
     QQueue <QString> userCommands;

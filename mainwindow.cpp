@@ -364,8 +364,9 @@ void MainWindow::homeall()
 
 void MainWindow::on_sendbtn_clicked()
 {
-    emit injectCommand(ui->sendtext->text());
-    userHistory.append(ui->sendtext->text());
+    QString command = ui->sendtext->text();
+    emit injectCommand(command);
+    userHistory.append(command);
     userHistoryPos = 0;
 }
 
