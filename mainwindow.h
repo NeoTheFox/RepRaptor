@@ -55,13 +55,13 @@ protected:
     QStringList recentFiles;
     QStringList EEPROMSettings;
     QStringList userHistory;
+    QSerialPortInfo printerinfo;
 
     bool eventFilter(QObject *target, QEvent *event);
 
 private:
     Ui::MainWindow *ui;
 
-    QSerialPortInfo printerinfo;
     bool opened;
     bool firstrun;
     bool autolock;
