@@ -108,27 +108,27 @@ MainWindow::MainWindow(QWidget *parent) :
     //Parser thread signal-slots and init
     parserWorker->moveToThread(parserThread);
     connect(parserThread, &QThread::finished, parserWorker, &QObject::deleteLater);
-    connect(this, &MainWindow::recievedData, parserWorker, &Parser::parse);
+    connect(this, &MainWindow::receivedData, parserWorker, &Parser::parse);
     connect(this, &MainWindow::startedReadingEEPROM, parserWorker, &Parser::setEEPROMReadingMode);
-    connect(parserWorker, &Parser::recievedTemperature, this, &MainWindow::updateTemperature);
-    connect(parserWorker, &Parser::recievedSDFilesList, this, &MainWindow::initSDprinting);
-    connect(parserWorker, &Parser::recievedEEPROMLine, this, &MainWindow::EEPROMSettingRecieved);
+    connect(parserWorker, &Parser::receivedTemperature, this, &MainWindow::updateTemperature);
+    connect(parserWorker, &Parser::receivedSDFilesList, this, &MainWindow::initSDprinting);
+    connect(parserWorker, &Parser::receivedEEPROMLine, this, &MainWindow::EEPROMSettingReceived);
     connect(parserWorker, &Parser::recievingEEPROMDone, this, &MainWindow::openEEPROMeditor);
-    connect(parserWorker, &Parser::recievedError, this, &MainWindow::recievedError);
-    connect(parserWorker, &Parser::recievedSDDone, this, &MainWindow::recievedSDDone);
-    connect(parserWorker, &Parser::recievedSDUpdate, this, &MainWindow::updateSDStatus);
+    connect(parserWorker, &Parser::receivedError, this, &MainWindow::receivedError);
+    connect(parserWorker, &Parser::receivedSDDone, this, &MainWindow::receivedSDDone);
+    connect(parserWorker, &Parser::receivedSDUpdate, this, &MainWindow::updateSDStatus);
     parserThread->start();
 
     //Sender thread signal-slots and init
     senderWorker->moveToThread(senderThread);
     connect(senderThread, &QThread::finished, senderWorker, &QObject::deleteLater);
-    connect(parserWorker, &Parser::recievedOkNum, senderWorker, &Sender::recievedOkNum);
-    connect(parserWorker, &Parser::recievedOkWait, senderWorker, &Sender::recievedOkWait);
-    connect(parserWorker, &Parser::recievedResend, senderWorker, &Sender::recievedResend);
-    connect(parserWorker, &Parser::recievedStart, senderWorker, &Sender::recievedStart);
-    connect(senderWorker, &Sender::errorRecieved, this, &MainWindow::serialError);
-    connect(senderWorker, &Sender::dataRecieved, parserWorker, &Parser::parse, Qt::QueuedConnection);
-    connect(senderWorker, &Sender::dataRecieved, this, &MainWindow::readSerial, Qt::QueuedConnection);
+    connect(parserWorker, &Parser::receivedOkNum, senderWorker, &Sender::receivedOkNum);
+    connect(parserWorker, &Parser::receivedOkWait, senderWorker, &Sender::receivedOkWait);
+    connect(parserWorker, &Parser::receivedResend, senderWorker, &Sender::receivedResend);
+    connect(parserWorker, &Parser::receivedStart, senderWorker, &Sender::receivedStart);
+    connect(senderWorker, &Sender::errorReceived, this, &MainWindow::serialError);
+    connect(senderWorker, &Sender::dataReceived, parserWorker, &Parser::parse, Qt::QueuedConnection);
+    connect(senderWorker, &Sender::dataReceived, this, &MainWindow::readSerial, Qt::QueuedConnection);
     connect(senderWorker, &Sender::reportProgress, this, &MainWindow::updateFileProgress);
     connect(this, &MainWindow::setFile, senderWorker, &Sender::setFile);
     connect(this, &MainWindow::startPrinting, senderWorker, &Sender::startPrinting);
@@ -584,7 +584,7 @@ void MainWindow::checkStatus()
     //We want to check for few things here:
     //if we are checking temperature at all and
     //if the time passed from the time we last
-    //recieved update is more than the check
+    //received update is more than the check
     //interval
     if(checkingTemperature
             &&(sinceLastTemp->elapsed() > statusTimer->interval())) emit injectCommand("M105");
@@ -815,19 +815,19 @@ void MainWindow::sendEEPROMsettings(QStringList changes)
     }
 }
 
-void MainWindow::EEPROMSettingRecieved(QString esetting)
+void MainWindow::EEPROMSettingReceived(QString esetting)
 {
     EEPROMSettings.append(esetting);
 }
 
-void MainWindow::recievedError()
+void MainWindow::receivedError()
 {
-    //This should be raised if "!!" recieved
+    //This should be raised if "!!" received
     ErrorWindow errorwindow(this,"Hardware failure");
     errorwindow.exec();
 }
 
-void MainWindow::recievedSDDone()
+void MainWindow::receivedSDDone()
 {
     sdprinting=false;
     ui->progressBar->setValue(0);

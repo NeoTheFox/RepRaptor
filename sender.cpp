@@ -22,8 +22,8 @@ Sender::Sender(QObject *parent) : QObject(parent)
 
     sendTimer->start();
 
-    connect(printer, SIGNAL(error(QSerialPort::SerialPortError)), this, SLOT(recievedError(QSerialPort::SerialPortError)));
-    connect(printer, &QSerialPort::readyRead, this, &Sender::recievedData);
+    connect(printer, SIGNAL(error(QSerialPort::SerialPortError)), this, SLOT(receivedError(QSerialPort::SerialPortError)));
+    connect(printer, &QSerialPort::readyRead, this, &Sender::receivedData);
     connect(sendTimer, &QTimer::timeout, this, &Sender::sendNext);
 }
 
@@ -184,17 +184,17 @@ void Sender::injectCommand(QString command)
     if(!userCommands.contains(command)) userCommands.enqueue(command);
 }
 
-void Sender::recievedOkWait()
+void Sender::receivedOkWait()
 {
     readyRecieve = true;
 }
 
-void Sender::recievedOkNum(int)
+void Sender::receivedOkNum(int)
 {
     readyRecieve = true;
 }
 
-void Sender::recievedStart()
+void Sender::receivedStart()
 {
     readyRecieve = true;
 }
@@ -204,7 +204,7 @@ void Sender::flushInjectionBuffer()
     userCommands.clear();
 }
 
-void Sender::recievedResend(int r)
+void Sender::receivedResend(int r)
 {
     if(sendingChecksum)
     {
@@ -214,23 +214,23 @@ void Sender::recievedResend(int r)
     else currentLine--;
 }
 
-void Sender::recievedData()
+void Sender::receivedData()
 {
     if(printer->canReadLine())
     {
         QByteArray data = printer->readLine();
         if(data == "") return;
-        emit dataRecieved(data);
+        emit dataReceived(data);
         //Yeah, yeah, I know. This class is called "Sender", but checking this here is faster.
         if(data.startsWith("ok") || data.startsWith("wa")) readyRecieve=true;
     }
 }
 
-void Sender::recievedError(QSerialPort::SerialPortError error)
+void Sender::receivedError(QSerialPort::SerialPortError error)
 {
     if(error > 0)
     {
         closePort();
-        emit errorRecieved(error);
+        emit errorReceived(error);
     }
 }
