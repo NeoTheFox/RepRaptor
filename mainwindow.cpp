@@ -22,6 +22,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->extruderlcd->setPalette(Qt::red);
     ui->bedlcd->setPalette(Qt::red);
     ui->sendtext->installEventFilter(this);
+    ui->etmpspin->installEventFilter(this);
+    ui->btmpspin->installEventFilter(this);
     recentMenu = new QMenu(this);
     recentMenu->setTitle("Recent files");
     ui->menuFile->insertMenu(ui->actionSettings, recentMenu);
@@ -874,6 +876,28 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
                 else userHistoryPos++;
                 return true;
             }
+        }
+        return false;
+    }
+    else if(obj == ui->etmpspin)
+    {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+
+        if(keyEvent->key() == Qt::Key_Return)
+        {
+            ui->etmpset->click();
+            return true;
+        }
+        return false;
+    }
+    else if(obj == ui->btmpspin)
+    {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+
+        if(keyEvent->key() == Qt::Key_Return)
+        {
+            ui->btmpset->click();
+            return true;
         }
         return false;
     }
