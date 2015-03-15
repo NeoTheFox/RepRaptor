@@ -18,7 +18,7 @@ sudo apt-get install repraptor
 ## Building on Ubuntu 14.04
 
 ```
-sudo apt-get install qt5-default libqt5serialport libqt5serialport5-dev git build-essential
+sudo apt-get install qt5-default libqt5serialport libqt5serialport5-dev git build-essential libudev-dev
 
 git clone https://github.com/NeoTheFox/RepRaptor && cd RepRaptor
 
