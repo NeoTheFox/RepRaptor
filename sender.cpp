@@ -122,25 +122,8 @@ void Sender::openPort(QSerialPortInfo i)
     {
 
         //Moved here to be compatible with Qt 5.2.1
-        switch(baudrate)
-        {
-            case 4800:
-            printer->setBaudRate(QSerialPort::Baud4800);
-            break;
-
-            case 9600:
-            printer->setBaudRate(QSerialPort::Baud9600);
-            break;
-
-            case 115200:
-            printer->setBaudRate(QSerialPort::Baud115200);
-            break;
-
-            default:
-            printer->setBaudRate(baudrate);
-            break;
-        }
-
+        if(!printer->setBaudRate(baudrate))
+            emit baudrateSetFailed(baudrate);
         printer->setFlowControl(QSerialPort::HardwareControl);
     }
 }

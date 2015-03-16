@@ -42,6 +42,7 @@ signals:
     void errorRecieved(QSerialPort::SerialPortError error);
     void dataRecieved(QByteArray data);
     void reportProgress(FileProgress p);
+    void baudrateSetFailed(int b);
 
 public slots:
     void openPort(QSerialPortInfo i);

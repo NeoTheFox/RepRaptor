@@ -98,6 +98,7 @@ private slots:
     void parseFile(QString filename);
     void recentClicked();
     void updateFileProgress(FileProgress);
+    void baudrateSetFailed(int b);
 
     void xplus();
     void yplus();
