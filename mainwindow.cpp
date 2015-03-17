@@ -130,6 +130,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(senderWorker, &Sender::dataReceived, parserWorker, &Parser::parse, Qt::QueuedConnection);
     connect(senderWorker, &Sender::dataReceived, this, &MainWindow::readSerial, Qt::QueuedConnection);
     connect(senderWorker, &Sender::reportProgress, this, &MainWindow::updateFileProgress);
+    connect(senderWorker, &Sender::baudrateSetFailed, this, &MainWindow::baudrateSetFailed);
     connect(this, &MainWindow::setFile, senderWorker, &Sender::setFile);
     connect(this, &MainWindow::startPrinting, senderWorker, &Sender::startPrinting);
     connect(this, &MainWindow::stopPrinting, senderWorker, &Sender::stopPrinting);
@@ -858,6 +859,14 @@ void MainWindow::updateFileProgress(FileProgress p)
                         + QString::number(p.P)
                         + QString(" Lines"));
     ui->progressBar->setValue(((float)p.P/p.T) * 100);
+}
+
+void MainWindow::baudrateSetFailed(int b)
+{
+    ErrorWindow errorwindow(this, QString("Baudrate set failed:\n" +
+                                  QString::number(b) +
+                                  " baud"));
+    errorwindow.show();
 }
 
 //Needed for keypress handling

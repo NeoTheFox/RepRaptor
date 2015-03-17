@@ -120,7 +120,6 @@ void Sender::openPort(QSerialPortInfo i)
 
     if(!printer->isOpen() && printer->open(QIODevice::ReadWrite))
     {
-
         //Moved here to be compatible with Qt 5.2.1
         switch(baudrate)
         {
@@ -153,8 +152,12 @@ void Sender::openPort(QSerialPortInfo i)
             break;
         }
 
+        if(!printer->setBaudRate(baudrate))
+            emit baudrateSetFailed(baudrate);
         printer->setFlowControl(QSerialPort::HardwareControl);
     }
+
+    readyRecieve = true;
 }
 
 void Sender::closePort()
