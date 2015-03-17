@@ -72,6 +72,8 @@ MainWindow::MainWindow(QWidget *parent) :
     chekingSDStatus = settings.value("core/checksdstatus", 1).toBool();
     firmware = settings.value("printer/firmware", OtherFirmware).toInt();
     statusTimer->setInterval(settings.value("core/statusinterval", 3000).toInt());
+    feedrate = settings.value("feedrate", 1500).toInt();
+    extruderFeedrate = settings.value("extruderfeedrate", 200).toInt();
     int size = settings.beginReadArray("user/recentfiles");
     for(int i = 0; i < size; ++i)
     {
@@ -294,13 +296,13 @@ void MainWindow::serialconnect()
 /////////////////
 void MainWindow::xplus()
 {
-    QString command = "G91\nG1 X" + ui->stepspin->text() + "\nG90";
+    QString command = "G91\nG1 X" + ui->stepspin->text() + " F" + QString::number(feedrate) + "\nG90";
     emit injectCommand(command);
 }
 
 void MainWindow::xminus()
 {
-    QString command = "G91\nG1 X-" + ui->stepspin->text() + "\nG90";
+    QString command = "G91\nG1 X-" + ui->stepspin->text() + " F" + QString::number(feedrate) + "\nG90";
     emit injectCommand(command);
 }
 
@@ -311,13 +313,13 @@ void MainWindow::xhome()
 
 void MainWindow::yplus()
 {
-    QString command = "G91\nG1 Y" + ui->stepspin->text() + "\nG90";
+    QString command = "G91\nG1 Y" + ui->stepspin->text() + " F" + QString::number(feedrate) + "\nG90";
     emit injectCommand(command);
 }
 
 void MainWindow::yminus()
 {
-    QString command = "G91\nG1 Y-" + ui->stepspin->text() + "\nG90";
+    QString command = "G91\nG1 Y-" + ui->stepspin->text() + " F" + QString::number(feedrate) + "\nG90";
     emit injectCommand(command);
 }
 
@@ -328,13 +330,13 @@ void MainWindow::yhome()
 
 void MainWindow::zplus()
 {
-    QString command = "G91\nG1 Z" + ui->stepspin->text() + "\nG90";
+    QString command = "G91\nG1 Z" + ui->stepspin->text() + " F" + QString::number(feedrate) + "\nG90";
     emit injectCommand(command);
 }
 
 void MainWindow::zminus()
 {
-    QString command = "G91\nG1 Z-" + ui->stepspin->text() + "\nG90";
+    QString command = "G91\nG1 Z-" + ui->stepspin->text() + " F" + QString::number(feedrate) + "\nG90";
     emit injectCommand(command);
 }
 
@@ -345,13 +347,13 @@ void MainWindow::zhome()
 
 void MainWindow::eplus()
 {
-    QString command = "G91\nG1 E" + ui->estepspin->text() + "\nG90";
+    QString command = "G91\nG1 E" + ui->estepspin->text() + " F" + QString::number(extruderFeedrate) + "\nG90";
     emit injectCommand(command);
 }
 
 void MainWindow::eminus()
 {
-    QString command = "G91\nG1 E-" + ui->estepspin->text() + "\nG90";
+    QString command = "G91\nG1 E-" + ui->estepspin->text() + " F" + QString::number(extruderFeedrate) + "\nG90";
     emit injectCommand(command);
 }
 
@@ -422,7 +424,7 @@ void MainWindow::bedcenter()
     x = settings.value("printer/bedx", 200).toInt();
     y = settings.value("printer/bedy", 200).toInt();
 
-    QString command = "G1 X" + QString::number(x/2) + "Y" + QString::number(y/2);
+    QString command = "G1 X" + QString::number(x/2) + "Y" + QString::number(y/2) + " F" + QString::number(feedrate);
     emit injectCommand(command);
 }
 

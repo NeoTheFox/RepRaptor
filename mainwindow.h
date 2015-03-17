@@ -73,6 +73,8 @@ private:
     bool echo;
     bool chekingSDStatus;
     int firmware;
+    int feedrate;
+    int extruderFeedrate;
     int userHistoryPos;
     unsigned long int sdBytes;
 
