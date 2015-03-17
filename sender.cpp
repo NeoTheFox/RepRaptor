@@ -11,7 +11,7 @@ Sender::Sender(QObject *parent) : QObject(parent)
     sendingChecksum=false;
     paused=false;
     sending=false;
-    readyRecieve = false;
+    readyReceive = false;
     printer = new QSerialPort(this);
     sendTimer = new QTimer(this);
 
@@ -36,7 +36,7 @@ Sender::~Sender()
 //Mainloop of sending
 void Sender::sendNext()
 {
-    if(printer->isWritable() && readyRecieve)
+    if(printer->isWritable() && readyReceive)
     {
         if(sendingChecksum && resending)
         {
@@ -62,7 +62,7 @@ void Sender::sendNext()
         if(!userCommands.isEmpty()) //Inject user command
         {
             sendLine(userCommands.dequeue());
-            readyRecieve = false;
+            readyReceive = false;
             return;
         }
         else if(sending && !paused) //Send line of gcode
@@ -82,7 +82,7 @@ void Sender::sendNext()
             }
             sendLine(gcode.at(currentLine));
             currentLine++;
-            readyRecieve=false;
+            readyReceive=false;
 
             p.P = currentLine;
             p.T = gcode.size();
@@ -130,6 +130,18 @@ void Sender::openPort(QSerialPortInfo i)
 
             case 9600:
             printer->setBaudRate(QSerialPort::Baud9600);
+            break;
+
+            case 19200:
+            printer->setBaudRate(QSerialPort::Baud19200);
+            break;
+
+            case 38400:
+            printer->setBaudRate(QSerialPort::Baud38400);
+            break;
+
+            case 57600:
+            printer->setBaudRate(QSerialPort::Baud57600);
             break;
 
             case 115200:
@@ -186,17 +198,17 @@ void Sender::injectCommand(QString command)
 
 void Sender::receivedOkWait()
 {
-    readyRecieve = true;
+    readyReceive = true;
 }
 
 void Sender::receivedOkNum(int)
 {
-    readyRecieve = true;
+    readyReceive = true;
 }
 
 void Sender::receivedStart()
 {
-    readyRecieve = true;
+    readyReceive = true;
 }
 
 void Sender::flushInjectionBuffer()
@@ -222,7 +234,7 @@ void Sender::receivedData()
         if(data == "") return;
         emit dataReceived(data);
         //Yeah, yeah, I know. This class is called "Sender", but checking this here is faster.
-        if(data.startsWith("ok") || data.startsWith("wa")) readyRecieve=true;
+        if(data.startsWith("ok") || data.startsWith("wa")) readyReceive=true;
     }
 }
 

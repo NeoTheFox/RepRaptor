@@ -29,7 +29,7 @@ protected:
     unsigned int baudrate;
     bool paused;
     bool sending;
-    bool readyRecieve;
+    bool readyReceive;
     bool sendingChecksum;
     bool resending;
     QQueue <QString> userCommands;
