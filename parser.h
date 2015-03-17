@@ -26,18 +26,18 @@ protected:
     bool EEPROMReadingStarted;
 
 signals:
-    void recievedTemperature(TemperatureReadings);
-    void recievedSDUpdate(SDProgress);
-    void recievedEEPROMLine(QString);
+    void receivedTemperature(TemperatureReadings);
+    void receivedSDUpdate(SDProgress);
+    void receivedEEPROMLine(QString);
     void recievingEEPROMDone();
-    void recievedSDFilesList(QStringList);
-    void recievedOkWait();
-    void recievedOkNum(int);
-    void recievedStart();
-    void recievedResend(int);
-    void recievedError();
-    void recievedFirmware(int);
-    void recievedSDDone();
+    void receivedSDFilesList(QStringList);
+    void receivedOkWait();
+    void receivedOkNum(int);
+    void receivedStart();
+    void receivedResend(int);
+    void receivedError();
+    void receivedFirmware(int);
+    void receivedSDDone();
 
 public slots:
     void parse(QByteArray data);

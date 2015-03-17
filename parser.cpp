@@ -33,7 +33,7 @@ void Parser::parse(QByteArray data)
             else
             {
                 readingFiles = false;
-                emit recievedSDFilesList(SDFilesList);
+                emit receivedSDFilesList(SDFilesList);
             }
             return;
         }
@@ -44,7 +44,7 @@ void Parser::parse(QByteArray data)
             {
                 if(data.startsWith("EPR"))
                 {
-                    emit recievedEEPROMLine(QString(data));
+                    emit receivedEEPROMLine(QString(data));
                     EEPROMReadingStarted = true;
                 }
                 else if(EEPROMReadingStarted)
@@ -62,8 +62,8 @@ void Parser::parse(QByteArray data)
         {
             QStringList tmp = QString(data).split(' ');
             if(tmp.size() > 1)
-                emit recievedOkNum(tmp.at(1).toInt());
-            else emit recievedOkNum(0);
+                emit receivedOkNum(tmp.at(1).toInt());
+            else emit receivedOkNum(0);
         }
         */
         else if(data.contains("T:"))
@@ -79,14 +79,14 @@ void Parser::parse(QByteArray data)
 
             r.raw = QString(data);
 
-            emit recievedTemperature(r);
+            emit receivedTemperature(r);
         }
-        //else if(data.startsWith("wait")) emit recievedOkWait();
+        //else if(data.startsWith("wait")) emit receivedOkWait();
         else if(data.startsWith("rs") || data.toLower().startsWith("resend"))
-            emit recievedResend(data.split(':').at(1).toInt());
-        else if(data.startsWith("!!")) emit recievedError();
-        else if(data.startsWith("Done")) emit recievedSDDone();
-        else if(data.startsWith("start")) emit recievedStart();
+            emit receivedResend(data.split(':').at(1).toInt());
+        else if(data.startsWith("!!")) emit receivedError();
+        else if(data.startsWith("Done")) emit receivedSDDone();
+        else if(data.startsWith("start")) emit receivedStart();
         else if(data.startsWith("SD pr"))
         {
             SDProgress p;
@@ -102,7 +102,7 @@ void Parser::parse(QByteArray data)
             }
             else return;
 
-            emit recievedSDUpdate(p);
+            emit receivedSDUpdate(p);
 
         }
         else if(data.startsWith("Not SD "));
@@ -111,8 +111,8 @@ void Parser::parse(QByteArray data)
             SDFilesList.clear();
             readingFiles = true; //start reading files from SD
         }
-        //else if(data.contains("REPETIER")) emit recievedFirmware(Repetier);
-        //else if(data.contains("MARLIN")) emit recievedFirmware(Marlin);
+        //else if(data.contains("REPETIER")) emit receivedFirmware(Repetier);
+        //else if(data.contains("MARLIN")) emit receivedFirmware(Marlin);
     }
 }
 

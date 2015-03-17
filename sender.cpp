@@ -11,7 +11,7 @@ Sender::Sender(QObject *parent) : QObject(parent)
     sendingChecksum=false;
     paused=false;
     sending=false;
-    readyRecieve = false;
+    readyReceive = false;
     printer = new QSerialPort(this);
     sendTimer = new QTimer(this);
 
@@ -22,8 +22,8 @@ Sender::Sender(QObject *parent) : QObject(parent)
 
     sendTimer->start();
 
-    connect(printer, SIGNAL(error(QSerialPort::SerialPortError)), this, SLOT(recievedError(QSerialPort::SerialPortError)));
-    connect(printer, &QSerialPort::readyRead, this, &Sender::recievedData);
+    connect(printer, SIGNAL(error(QSerialPort::SerialPortError)), this, SLOT(receivedError(QSerialPort::SerialPortError)));
+    connect(printer, &QSerialPort::readyRead, this, &Sender::receivedData);
     connect(sendTimer, &QTimer::timeout, this, &Sender::sendNext);
 }
 
@@ -36,7 +36,7 @@ Sender::~Sender()
 //Mainloop of sending
 void Sender::sendNext()
 {
-    if(printer->isWritable() && readyRecieve)
+    if(printer->isWritable() && readyReceive)
     {
         if(sendingChecksum && resending)
         {
@@ -62,7 +62,7 @@ void Sender::sendNext()
         if(!userCommands.isEmpty()) //Inject user command
         {
             sendLine(userCommands.dequeue());
-            readyRecieve = false;
+            readyReceive = false;
             return;
         }
         else if(sending && !paused) //Send line of gcode
@@ -82,7 +82,7 @@ void Sender::sendNext()
             }
             sendLine(gcode.at(currentLine));
             currentLine++;
-            readyRecieve=false;
+            readyReceive=false;
 
             p.P = currentLine;
             p.T = gcode.size();
@@ -121,6 +121,37 @@ void Sender::openPort(QSerialPortInfo i)
     if(!printer->isOpen() && printer->open(QIODevice::ReadWrite))
     {
         //Moved here to be compatible with Qt 5.2.1
+        switch(baudrate)
+        {
+            case 4800:
+            printer->setBaudRate(QSerialPort::Baud4800);
+            break;
+
+            case 9600:
+            printer->setBaudRate(QSerialPort::Baud9600);
+            break;
+
+            case 19200:
+            printer->setBaudRate(QSerialPort::Baud19200);
+            break;
+
+            case 38400:
+            printer->setBaudRate(QSerialPort::Baud38400);
+            break;
+
+            case 57600:
+            printer->setBaudRate(QSerialPort::Baud57600);
+            break;
+
+            case 115200:
+            printer->setBaudRate(QSerialPort::Baud115200);
+            break;
+
+            default:
+            printer->setBaudRate(baudrate);
+            break;
+        }
+
         if(!printer->setBaudRate(baudrate))
             emit baudrateSetFailed(baudrate);
         printer->setFlowControl(QSerialPort::HardwareControl);
@@ -168,19 +199,19 @@ void Sender::injectCommand(QString command)
     if(!userCommands.contains(command)) userCommands.enqueue(command);
 }
 
-void Sender::recievedOkWait()
+void Sender::receivedOkWait()
 {
-    readyRecieve = true;
+    readyReceive = true;
 }
 
-void Sender::recievedOkNum(int)
+void Sender::receivedOkNum(int)
 {
-    readyRecieve = true;
+    readyReceive = true;
 }
 
-void Sender::recievedStart()
+void Sender::receivedStart()
 {
-    readyRecieve = true;
+    readyReceive = true;
 }
 
 void Sender::flushInjectionBuffer()
@@ -188,7 +219,7 @@ void Sender::flushInjectionBuffer()
     userCommands.clear();
 }
 
-void Sender::recievedResend(int r)
+void Sender::receivedResend(int r)
 {
     if(sendingChecksum)
     {
@@ -198,23 +229,23 @@ void Sender::recievedResend(int r)
     else currentLine--;
 }
 
-void Sender::recievedData()
+void Sender::receivedData()
 {
     if(printer->canReadLine())
     {
         QByteArray data = printer->readLine();
         if(data == "") return;
-        emit dataRecieved(data);
+        emit dataReceived(data);
         //Yeah, yeah, I know. This class is called "Sender", but checking this here is faster.
-        if(data.startsWith("ok") || data.startsWith("wa")) readyRecieve=true;
+        if(data.startsWith("ok") || data.startsWith("wa")) readyReceive=true;
     }
 }
 
-void Sender::recievedError(QSerialPort::SerialPortError error)
+void Sender::receivedError(QSerialPort::SerialPortError error)
 {
     if(error > 0)
     {
         closePort();
-        emit errorRecieved(error);
+        emit errorReceived(error);
     }
 }

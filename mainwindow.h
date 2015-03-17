@@ -94,9 +94,9 @@ private slots:
     void openEEPROMeditor();
     void sendEEPROMsettings(QStringList changes);
     void updateTemperature(TemperatureReadings r);
-    void EEPROMSettingRecieved(QString esetting);
-    void recievedError();
-    void recievedSDDone();
+    void EEPROMSettingReceived(QString esetting);
+    void receivedError();
+    void receivedSDDone();
     void parseFile(QString filename);
     void recentClicked();
     void updateFileProgress(FileProgress);
@@ -149,7 +149,7 @@ private slots:
 signals:
     void sdReady();
     void eepromReady();
-    void recievedData(QByteArray);
+    void receivedData(QByteArray);
     void startedReadingEEPROM();
 
     void openPort(QSerialPortInfo i);
