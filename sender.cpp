@@ -128,7 +128,7 @@ void Sender::openPort(QSerialPortInfo i)
         printer->setFlowControl(QSerialPort::HardwareControl);
     }
 
-    readyRecieve = true;
+    readyReceive = true;
 }
 
 void Sender::closePort()
