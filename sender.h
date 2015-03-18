@@ -29,6 +29,7 @@ protected:
     unsigned int baudrate;
     bool paused;
     bool sending;
+    bool dtr;
     bool readyRecieve;
     bool sendingChecksum;
     bool resending;

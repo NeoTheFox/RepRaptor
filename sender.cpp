@@ -19,6 +19,7 @@ Sender::Sender(QObject *parent) : QObject(parent)
     QSettings settings;
     sendTimer->setInterval(settings.value("core/senderinterval", 2).toInt());
     sendingChecksum = settings.value("core/checksums", 0).toBool();
+    dtr = settings.value("core/dtr", 1).toBool();
 
     sendTimer->start();
 
@@ -121,6 +122,7 @@ void Sender::openPort(QSerialPortInfo i)
     if(!printer->isOpen() && printer->open(QIODevice::ReadWrite))
     {
         //Moved here to be compatible with Qt 5.2.1
+        printer->setDataTerminalReady(dtr);
         if(!printer->setBaudRate(baudrate))
             emit baudrateSetFailed(baudrate);
         printer->setFlowControl(QSerialPort::HardwareControl);
