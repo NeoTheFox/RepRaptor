@@ -30,7 +30,7 @@ protected:
     bool paused;
     bool sending;
     bool dtr;
-    bool readyRecieve;
+    bool readyReceive;
     bool sendingChecksum;
     bool resending;
     QQueue <QString> userCommands;
@@ -40,8 +40,8 @@ protected:
     bool sendLine(QString s);
 
 signals:
-    void errorRecieved(QSerialPort::SerialPortError error);
-    void dataRecieved(QByteArray data);
+    void errorReceived(QSerialPort::SerialPortError error);
+    void dataReceived(QByteArray data);
     void reportProgress(FileProgress p);
     void baudrateSetFailed(int b);
 
@@ -56,15 +56,15 @@ public slots:
     void injectCommand(QString);
     void flushInjectionBuffer();
 
-    void recievedOkWait();
-    void recievedOkNum(int);
-    void recievedStart();
-    void recievedResend(int r);
+    void receivedOkWait();
+    void receivedOkNum(int);
+    void receivedStart();
+    void receivedResend(int r);
 
     void sendNext();
 
-    void recievedData();
-    void recievedError(QSerialPort::SerialPortError error);
+    void receivedData();
+    void receivedError(QSerialPort::SerialPortError error);
 };
 
 #endif // SENDER_H
