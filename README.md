@@ -34,6 +34,7 @@ sudo make install
 ## Links
 - [Binary release downloads (Windows, Linux)](https://github.com/NeoTheFox/RepRaptor/releases)
 - [RepRap wiki](http://reprap.org/wiki/RepRaptor)
+- [AUR](https://aur.archlinux.org/packages/repraptor-git/)
 
 [![Support via Gratipay](https://cdn.rawgit.com/gratipay/gratipay-badge/2.3.0/dist/gratipay.svg)](https://gratipay.com/NeoTheFox/)
 
