@@ -1,7 +1,9 @@
 #ifndef REPRAPTOR_H
 #define REPRAPTOR_H
 
-#include <QString>
+#ifndef REPRAPTOR_VERSION
+#define REPRAPTOR_VERSION "0.3.6"
+#endif
 
 namespace RepRaptor
 {

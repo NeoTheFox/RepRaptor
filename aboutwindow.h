@@ -3,6 +3,8 @@
 
 #include <QDialog>
 
+#include "repraptor.h"
+
 namespace Ui {
 class AboutWindow;
 }
