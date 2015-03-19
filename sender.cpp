@@ -126,7 +126,7 @@ void Sender::openPort(QSerialPortInfo i)
         printer->setDataTerminalReady(dtr);
         if(!printer->setBaudRate(baudrate))
             emit baudrateSetFailed(baudrate);
-        printer->setFlowControl(flowcontrol);
+        printer->setFlowControl(static_cast<QSerialPort::FlowControl>(flowcontrol));
     }
 
     readyReceive = true;
