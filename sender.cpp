@@ -125,7 +125,7 @@ void Sender::openPort(QSerialPortInfo i)
         printer->setDataTerminalReady(dtr);
         if(!printer->setBaudRate(baudrate))
             emit baudrateSetFailed(baudrate);
-        printer->setFlowControl(QSerialPort::HardwareControl);
+        //printer->setFlowControl(QSerialPort::HardwareControl);
     }
 
     readyReceive = true;
@@ -208,7 +208,7 @@ void Sender::receivedData()
         if(data == "") return;
         emit dataReceived(data);
         //Yeah, yeah, I know. This class is called "Sender", but checking this here is faster.
-        if(data.startsWith("ok") || data.startsWith("wa")) readyReceive=true;
+        if(data.startsWith("ok") || data.startsWith("wait")) readyReceive=true;
     }
 }
 
