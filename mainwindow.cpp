@@ -471,6 +471,7 @@ void MainWindow::on_haltbtn_clicked()
 
 void MainWindow::on_actionPrint_from_SD_triggered()
 {
+    emit flushInjectionBuffer();
     emit injectCommand("M20");
 }
 
