@@ -20,6 +20,7 @@ Sender::Sender(QObject *parent) : QObject(parent)
     sendTimer->setInterval(settings.value("core/senderinterval", 2).toInt());
     sendingChecksum = settings.value("core/checksums", 0).toBool();
     dtr = settings.value("core/dtr", 1).toBool();
+    flowcontrol = settings.value("core/flowcontrol", 0).toInt();
 
     sendTimer->start();
 
@@ -125,7 +126,7 @@ void Sender::openPort(QSerialPortInfo i)
         printer->setDataTerminalReady(dtr);
         if(!printer->setBaudRate(baudrate))
             emit baudrateSetFailed(baudrate);
-        //printer->setFlowControl(QSerialPort::HardwareControl);
+        printer->setFlowControl(flowcontrol);
     }
 
     readyReceive = true;

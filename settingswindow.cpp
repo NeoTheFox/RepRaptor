@@ -6,9 +6,13 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
     ui(new Ui::SettingsWindow)
 {
     ui->setupUi(this);
+    ui->flowcontrolbox->addItem("No control");
+    ui->flowcontrolbox->addItem("Hardware control");
+    ui->flowcontrolbox->addItem("Software control");
 
     //bool firstrun = !settings.value("core/firstrun").toBool(); //firstrun is inverted!
 
+    ui->flowcontrolbox->setCurrentIndex(settings.value("core/flowcontrol", 0).toInt());
     ui->senderbox->setValue(settings.value("core/senderinterval", 2).toInt());
     ui->echobox->setChecked(settings.value("core/echo", 0).toBool());
     ui->statusbox->setValue(settings.value("core/statusinterval", 2000).toInt());
@@ -42,6 +46,7 @@ SettingsWindow::~SettingsWindow()
 
 void SettingsWindow::on_buttonBox_accepted()
 {
+    settings.setValue("core/flowcontrol", ui->flowcontrolbox->currentIndex());
     settings.setValue("core/senderinterval", ui->senderbox->value());
     settings.setValue("core/statusinterval", ui->statusbox->value());
     settings.setValue("printer/bedy", ui->bedybox->value());

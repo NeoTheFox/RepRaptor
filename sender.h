@@ -27,6 +27,7 @@ protected:
     unsigned int totalLineNum;
     unsigned int resendNum;
     unsigned int baudrate;
+    int flowcontrol;
     bool paused;
     bool sending;
     bool dtr;
