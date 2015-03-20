@@ -682,6 +682,10 @@ void MainWindow::serialError(QSerialPort::SerialPortError error)
         errorMsg = "Disconnected";
         break;
 
+    case QSerialPort::UnsupportedOperationError:
+        errorMsg = "Operation not supported.\nUnsupported baudrate?";
+        break;
+
     default:
         errorMsg = "Unknown error\nSomething went wrong";
         break;
