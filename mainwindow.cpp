@@ -94,10 +94,6 @@ MainWindow::MainWindow(QWidget *parent) :
     //Update serial ports
     serialupdate();
 
-    //Internal signal-slots
-    connect(statusTimer, &QTimer::timeout, this, &MainWindow::checkStatus);
-    connect(progressSDTimer, &QTimer::timeout, this, &MainWindow::checkSDStatus);
-
     //Register all the types
     qRegisterMetaType<TemperatureReadings>("TemperatureReadings");
     qRegisterMetaType<SDProgress>("SDProgress");
@@ -105,6 +101,10 @@ MainWindow::MainWindow(QWidget *parent) :
     qRegisterMetaType< QVector<QString> >("QVector<QString>");
     qRegisterMetaType<FileProgress>("FileProgress");
     qRegisterMetaType<QSerialPort::SerialPortError>("QSerialPort::SerialPortError");
+
+    //Internal signal-slots
+    connect(statusTimer, &QTimer::timeout, this, &MainWindow::checkStatus);
+    connect(progressSDTimer, &QTimer::timeout, this, &MainWindow::checkSDStatus);
 
     //Parser thread signal-slots and init
     parserWorker->moveToThread(parserThread);
@@ -612,7 +612,7 @@ void MainWindow::updateRecent()
                 action->setText(str); //Set filepath as a title
                 action->setObjectName(str); //Also set name to the path so we can get it later
                 recentMenu->addAction(action); //Add action to the menu
-                connect(action, SIGNAL(triggered()), this, SLOT(recentClicked()));
+                connect(action, &QAction::trigger, this, &MainWindow::recentClicked);
             }
         }
     }
@@ -807,8 +807,8 @@ void MainWindow::openEEPROMeditor()
 {
     EEPROMWindow eepromwindow(EEPROMSettings, this);
 
-    eepromwindow.setWindowModality(Qt::NonModal); //Do not bloct the UI when EEPROM editor is shown
-    connect(&eepromwindow, SIGNAL(changesComplete(QStringList)), this, SLOT(sendEEPROMsettings(QStringList)));
+    eepromwindow.setWindowModality(Qt::NonModal); //Do not block the UI when EEPROM editor is shown
+    connect(&eepromwindow, &EEPROMWindow::changesComplete, this, &MainWindow::sendEEPROMsettings);
 
     eepromwindow.exec();
 }
