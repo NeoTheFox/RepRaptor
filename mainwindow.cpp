@@ -95,9 +95,8 @@ MainWindow::MainWindow(QWidget *parent) :
     serialupdate();
 
     //Internal signal-slots
-    connect(statusTimer, SIGNAL(timeout()), this, SLOT(checkStatus()));
-    connect(progressSDTimer, SIGNAL(timeout()), this, SLOT(checkSDStatus()));
-    connect(this, SIGNAL(eepromReady()), this, SLOT(openEEPROMeditor()));
+    connect(statusTimer, &QTimer::timeout, this, &MainWindow::checkStatus);
+    connect(progressSDTimer, &QTimer::timeout, this, &MainWindow::checkSDStatus);
 
     //Register all the types
     qRegisterMetaType<TemperatureReadings>("TemperatureReadings");
@@ -708,7 +707,7 @@ void MainWindow::initSDprinting(QStringList sdFiles)
 {
     SDWindow sdwindow(sdFiles, this);
 
-    connect(&sdwindow, SIGNAL(fileSelected(QString)), this, SLOT(selectSDfile(QString)));
+    connect(&sdwindow, &SDWindow::fileSelected, this, &MainWindow::selectSDfile);
 
     sdwindow.exec();
 }

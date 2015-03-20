@@ -148,7 +148,6 @@ private slots:
 
 signals:
     void sdReady();
-    void eepromReady();
     void receivedData(QByteArray);
     void startedReadingEEPROM();
 
