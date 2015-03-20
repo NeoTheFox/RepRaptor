@@ -40,6 +40,7 @@ void Sender::sendNext()
 {
     if(printer->isWritable() && readyReceive)
     {
+        //Checksums
         if(sendingChecksum && resending)
         {
             if(resendNum < sentCommands.size())
