@@ -91,9 +91,6 @@ MainWindow::MainWindow(QWidget *parent) :
     userHistoryPos = 0;
     userHistory.append("");
 
-    //Update serial ports
-    serialupdate();
-
     //Register all the types
     qRegisterMetaType<TemperatureReadings>("TemperatureReadings");
     qRegisterMetaType<SDProgress>("SDProgress");
@@ -149,6 +146,9 @@ MainWindow::MainWindow(QWidget *parent) :
     if(chekingSDStatus) progressSDTimer->start();
     sinceLastTemp->start();
     sinceLastSDStatus->start();
+
+    //Update serial ports
+    serialupdate();
 
     //Update recent files list
     updateRecent();
@@ -612,7 +612,7 @@ void MainWindow::updateRecent()
                 action->setText(str); //Set filepath as a title
                 action->setObjectName(str); //Also set name to the path so we can get it later
                 recentMenu->addAction(action); //Add action to the menu
-                connect(action, &QAction::trigger, this, &MainWindow::recentClicked);
+                connect(action, &QAction::triggered, this, &MainWindow::recentClicked);
             }
         }
     }
