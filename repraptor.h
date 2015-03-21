@@ -24,6 +24,12 @@ namespace RepRaptor
         OtherFirmware
     };
 
+    enum ErrorType
+    {
+        SerialPortError,
+        OpenFileError
+    };
+
     typedef struct
     {
         int T, P;

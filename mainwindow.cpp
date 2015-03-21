@@ -222,6 +222,13 @@ void MainWindow::parseFile(QString filename)
         ui->filename->setText(gfile.fileName().split(QDir::separator()).last());
         ui->filelines->setText(QString::number(gcode.size()) + QString("/0 lines"));
     }
+    else
+    {
+        ErrorWindow window(this, "Can't open file", OpenFileError);
+        ui->filename->setText("");
+        ui->filelines->setText("");
+        window.exec();
+    }
 }
 
 void MainWindow::serialupdate()
@@ -691,7 +698,7 @@ void MainWindow::serialError(QSerialPort::SerialPortError error)
     }
 
     //Spawn the error message
-    ErrorWindow errorwindow(this, errorMsg);
+    ErrorWindow errorwindow(this, errorMsg, SerialPortError);
     errorwindow.exec();
 }
 
@@ -871,7 +878,7 @@ void MainWindow::baudrateSetFailed(int b)
 {
     ErrorWindow errorwindow(this, QString("Baudrate set failed:\n" +
                                   QString::number(b) +
-                                  " baud"));
+                                  " baud"), SerialPortError);
     errorwindow.show();
 }
 
