@@ -21,7 +21,7 @@ signals:
 private slots:
     void on_buttonBox_accepted();
 
-    void on_fileslist_doubleClicked(const QModelIndex &index);
+    void on_fileslist_doubleClicked(const QModelIndex &);
 
 private:
     Ui::SDWindow *ui;

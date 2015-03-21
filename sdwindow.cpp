@@ -20,7 +20,7 @@ void SDWindow::on_buttonBox_accepted()
     emit fileSelected(ui->fileslist->currentItem()->text());
 }
 
-void SDWindow::on_fileslist_doubleClicked(const QModelIndex &index)
+void SDWindow::on_fileslist_doubleClicked(const QModelIndex &)
 {
     emit fileSelected(ui->fileslist->currentItem()->text());
     this->close();

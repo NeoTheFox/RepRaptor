@@ -4,16 +4,18 @@ ErrorIcon::ErrorIcon(QWidget *parent) : QWidget(parent)
 {
     framenum = 0;
     frame = ":icons/error_a.png";
-    animation.setInterval(300);
-    animation.start();
+    animation = new QTimer(this);
+    animation->setInterval(300);
+    animation->start();
 
-    connect(&animation, SIGNAL(timeout()), this, SLOT(changeFrame()));
+    connect(animation, &QTimer::timeout, this, &ErrorIcon::changeFrame);
 }
 
-void ErrorIcon::paintEvent(QPaintEvent *pe)
+void ErrorIcon::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-    painter.drawPixmap(0,0,128,87,QPixmap(frame));
+    QPixmap pframe(frame);
+    painter.drawPixmap(0,0,pframe.width(),pframe.height(),pframe);
 }
 
 void ErrorIcon::changeFrame()
@@ -33,6 +35,6 @@ void ErrorIcon::changeFrame()
 
 ErrorIcon::~ErrorIcon()
 {
-
+    animation->stop();
 }
 

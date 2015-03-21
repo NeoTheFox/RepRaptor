@@ -11,12 +11,12 @@ class ErrorIcon : public QWidget
 public:
     explicit ErrorIcon(QWidget *parent = 0);
     ~ErrorIcon();
-    QTimer animation;
+    QTimer *animation;
     QString frame;
     int framenum;
 
 protected:
-    virtual void paintEvent(QPaintEvent *pe);
+    virtual void paintEvent(QPaintEvent *);
 
 signals:
 

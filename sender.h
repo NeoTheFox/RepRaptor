@@ -23,11 +23,11 @@ public:
 protected:
     QSerialPort *printer;
     QTimer *sendTimer;
-    unsigned int currentLine;
-    unsigned int totalLineNum;
-    unsigned int resendNum;
-    unsigned int baudrate;
-    int flowcontrol;
+    long int currentLine;
+    long int totalLineNum;
+    long int resendNum;
+    long int baudrate;
+    long int flowcontrol;
     bool paused;
     bool sending;
     bool dtr;
