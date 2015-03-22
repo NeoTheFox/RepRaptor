@@ -553,6 +553,8 @@ void MainWindow::on_actionSettings_triggered()
 {
     SettingsWindow settingswindow(this);
 
+    connect(&settingswindow, &SettingsWindow::updatesettings, this, &MainWindow::updatesettings);
+
     settingswindow.exec();
 }
 
@@ -880,6 +882,17 @@ void MainWindow::baudrateSetFailed(int b)
                                   QString::number(b) +
                                   " baud"), SerialPortError);
     errorwindow.show();
+}
+
+void MainWindow::updatesettings()
+{
+    echo = settings.value("core/echo", 0).toBool();
+    autolock = settings.value("core/lockcontrols", 0).toBool();
+    chekingSDStatus = settings.value("core/checksdstatus", 1).toBool();
+    firmware = settings.value("printer/firmware", OtherFirmware).toInt();
+    statusTimer->setInterval(settings.value("core/statusinterval", 3000).toInt());
+    feedrate = settings.value("feedrate", 1500).toInt();
+    extruderFeedrate = settings.value("extruderfeedrate", 200).toInt();
 }
 
 //Needed for keypress handling

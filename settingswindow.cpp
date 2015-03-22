@@ -59,4 +59,6 @@ void SettingsWindow::on_buttonBox_accepted()
     settings.setValue("core/checksdstatus", ui->sdbox->isChecked());
     settings.setValue("core/dtr", ui->dtrbox->isChecked());
     settings.setValue("printer/firmware", ui->firmwarecombo->currentIndex());
+
+    emit updatesettings();
 }

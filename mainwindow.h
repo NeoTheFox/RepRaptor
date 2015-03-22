@@ -82,6 +82,7 @@ private slots:
     void open();
     void serialconnect();
     void serialupdate();
+    void updatesettings();
     void readSerial(QByteArray data);
     void printMsg(QString text);
     void checkStatus();
