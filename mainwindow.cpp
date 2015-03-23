@@ -7,6 +7,10 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    //Set parents
+    settings.setParent(this);
+    gfile.setParent(this);
+
     //Setup the UI
     ui->fileBox->setDisabled(true);
     ui->sendBtn->setDisabled(true);
@@ -188,7 +192,7 @@ void MainWindow::open()
     QString filename;
     QDir home;
     filename = QFileDialog::getOpenFileName(this,
-                                            "Open GCODE",
+                                            tr("Open GCODE"),
                                             home.home().absolutePath(),
                                             "GCODE (*.g *.gco *.gcode *.nc)");
     gfile.setFileName(filename);
@@ -224,7 +228,7 @@ void MainWindow::parseFile(QString filename)
     }
     else
     {
-        ErrorWindow window(this, "Can't open file", OpenFileError);
+        ErrorWindow window(this, tr("Can't open file"), OpenFileError);
         ui->filename->setText("");
         ui->filelines->setText("");
         window.exec();
@@ -283,7 +287,7 @@ void MainWindow::serialconnect()
         //Set the flag
         opened = false;
         //Update UI
-        ui->connectBtn->setText("Connect");
+        ui->connectBtn->setText(tr("Connect"));
         ui->sendBtn->setDisabled(true);
         ui->pauseBtn->setDisabled(true);
         ui->progressBar->setValue(0);
@@ -375,9 +379,9 @@ void MainWindow::homeall()
 
 void MainWindow::on_sendbtn_clicked()
 {
-    QString command = ui->sendtext->text();
+    QString command = ui->sendtext->text().toUpper();
     emit injectCommand(command);
-    userHistory.append(command);
+    userHistory.prepend(command);
     userHistoryPos = 0;
 }
 
@@ -487,8 +491,8 @@ void MainWindow::on_sendBtn_clicked()
     if(sending && !sdprinting)
     {
         sending = false;
-        ui->sendBtn->setText("Send");
-        ui->pauseBtn->setText("Pause");
+        ui->sendBtn->setText(tr("Send"));
+        ui->pauseBtn->setText(tr("Pause"));
         ui->pauseBtn->setDisabled(true);
         if(autolock) ui->controlBox->setChecked(true);
         paused = false;
@@ -498,8 +502,8 @@ void MainWindow::on_sendBtn_clicked()
     else if(!sending && !sdprinting)
     {
         sending=true;
-        ui->sendBtn->setText("Stop");
-        ui->pauseBtn->setText("Pause");
+        ui->sendBtn->setText(tr("Stop"));
+        ui->pauseBtn->setText(tr("Pause"));
         ui->pauseBtn->setEnabled(true);
         if(autolock) ui->controlBox->setChecked(false);
         paused = false;
@@ -511,8 +515,8 @@ void MainWindow::on_sendBtn_clicked()
         sending = false;
         emit injectCommand("M24");
         emit injectCommand("M27");
-        ui->sendBtn->setText("Start");
-        ui->pauseBtn->setText("Pause");
+        ui->sendBtn->setText(tr("Start"));
+        ui->pauseBtn->setText(tr("Pause"));
         ui->pauseBtn->setEnabled(true);
         if(autolock) ui->controlBox->setChecked(true);
         paused = false;
@@ -529,14 +533,14 @@ void MainWindow::on_pauseBtn_clicked()
         paused = false;
         emit pause(paused);
         if(autolock) ui->controlBox->setChecked(false);
-        ui->pauseBtn->setText("Pause");
+        ui->pauseBtn->setText(tr("Pause"));
     }
     else if(!paused && !sdprinting)
     {
         paused = true;
         emit pause(paused);
         if(autolock) ui->controlBox->setChecked(true);
-        ui->pauseBtn->setText("Resume");
+        ui->pauseBtn->setText(tr("Resume"));
     }
     else if(sdprinting)
     {
@@ -647,7 +651,7 @@ void MainWindow::serialError(QSerialPort::SerialPortError error)
     opened = false;
 
     //Update UI
-    ui->connectBtn->setText("Connect");
+    ui->connectBtn->setText(tr("Connect"));
     ui->sendBtn->setDisabled(true);
     ui->pauseBtn->setDisabled(true);
     ui->controlBox->setDisabled(true);
@@ -664,37 +668,37 @@ void MainWindow::serialError(QSerialPort::SerialPortError error)
     switch(error)
     {
     case QSerialPort::DeviceNotFoundError:
-        errorMsg = "Device not found";
+        errorMsg = tr("Device not found");
         break;
 
     case QSerialPort::PermissionError:
-        errorMsg = "Insufficient permissions\nAlready opened?";
+        errorMsg = tr("Insufficient permissions\nAlready opened?");
         break;
 
     case QSerialPort::OpenError:
-        errorMsg = "Cant open port\nAlready opened?";
+        errorMsg = tr("Cant open port\nAlready opened?");
         break;
 
     case QSerialPort::TimeoutError:
-        errorMsg = "Serial connection timed out";
+        errorMsg = tr("Serial connection timed out");
         break;
 
     //These errors are the same really
     case QSerialPort::WriteError:
     case QSerialPort::ReadError:
-        errorMsg = "I/O Error";
+        errorMsg = tr("I/O Error");
         break;
 
     case QSerialPort::ResourceError:
-        errorMsg = "Disconnected";
+        errorMsg = tr("Disconnected");
         break;
 
     case QSerialPort::UnsupportedOperationError:
-        errorMsg = "Operation not supported.\nUnsupported baudrate?";
+        errorMsg = tr("Operation not supported.\nUnsupported baudrate?");
         break;
 
     default:
-        errorMsg = "Unknown error\nSomething went wrong";
+        errorMsg = tr("Unknown error\nSomething went wrong");
         break;
     }
 
@@ -730,12 +734,12 @@ void MainWindow::selectSDfile(QString file)
     ui->filename->setText(filename);
     if(chekingSDStatus)
     {
-        ui->filelines->setText(bytes + QString("/0 bytes"));
+        ui->filelines->setText(bytes + tr("/0 bytes"));
         ui->progressBar->setEnabled(true);
         ui->progressBar->setValue(0);
     }
     else ui->progressBar->setDisabled(true);
-    ui->sendBtn->setText("Start");
+    ui->sendBtn->setText(tr("Start"));
     sdBytes = bytes.toDouble();
 
     emit flushInjectionBuffer();
@@ -749,7 +753,7 @@ void MainWindow::updateSDStatus(SDProgress p)
     ui->filelines->setText(QString::number(p.progress)
                            + QString("/")
                            + QString::number(p.total)
-                           + QString(" bytes"));
+                           + QString(tr(" bytes")));
     if(p.progress != 0) ui->progressBar->setValue(((double)p.progress/p.total) * 100);
     else ui->progressBar->setValue(0);
     if(p.total == p.progress) sdprinting = false;
@@ -838,7 +842,7 @@ void MainWindow::EEPROMSettingReceived(QString esetting)
 void MainWindow::receivedError()
 {
     //This should be raised if "!!" received
-    ErrorWindow errorwindow(this,"Hardware failure");
+    ErrorWindow errorwindow(this, tr("Hardware failure"));
     errorwindow.exec();
 }
 
@@ -855,7 +859,7 @@ void MainWindow::updateFileProgress(FileProgress p)
     //Check if file is at end
     if(p.P >= p.T)
     {
-        ui->sendBtn->setText("Send");
+        ui->sendBtn->setText(tr("Send"));
         ui->pauseBtn->setDisabled(true);
         sending = false;
         paused = false;
@@ -863,7 +867,7 @@ void MainWindow::updateFileProgress(FileProgress p)
     }
     else
     {
-        ui->sendBtn->setText("Stop");
+        ui->sendBtn->setText(tr("Stop"));
         ui->pauseBtn->setEnabled(true);
         sending = true;
     }
@@ -871,15 +875,15 @@ void MainWindow::updateFileProgress(FileProgress p)
     ui->filelines->setText(QString::number(p.T)
                         + QString("/")
                         + QString::number(p.P)
-                        + QString(" Lines"));
+                        + tr(" Lines"));
     ui->progressBar->setValue(((float)p.P/p.T) * 100);
 }
 
 void MainWindow::baudrateSetFailed(int b)
 {
-    ErrorWindow errorwindow(this, QString("Baudrate set failed:\n" +
+    ErrorWindow errorwindow(this, tr("Baudrate set failed:\n") +
                                   QString::number(b) +
-                                  " baud"), SerialPortError);
+                                  tr(" baud"), SerialPortError);
     errorwindow.show();
 }
 

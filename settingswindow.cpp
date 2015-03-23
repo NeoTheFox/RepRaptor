@@ -6,9 +6,9 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
     ui(new Ui::SettingsWindow)
 {
     ui->setupUi(this);
-    ui->flowcontrolbox->addItem("No control");
-    ui->flowcontrolbox->addItem("Hardware control");
-    ui->flowcontrolbox->addItem("Software control");
+    ui->flowcontrolbox->addItem(tr("No control"));
+    ui->flowcontrolbox->addItem(tr("Hardware control"));
+    ui->flowcontrolbox->addItem(tr("Software control"));
 
     //bool firstrun = !settings.value("core/firstrun").toBool(); //firstrun is inverted!
 

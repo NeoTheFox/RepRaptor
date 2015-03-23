@@ -11,13 +11,13 @@ ErrorWindow::ErrorWindow(QWidget *parent, QString errorText, int errType):
     switch(errType)
     {
     case SerialPortError:
-        ui->label->setText("Serial port error:");
+        ui->label->setText(tr("Serial port error:"));
         break;
     case OpenFileError:
-        ui->label->setText("File open error:");
+        ui->label->setText(tr("File open error:"));
         break;
     default:
-        ui->label->setText("Unknown error type:");
+        ui->label->setText(tr("Unknown error type:"));
         break;
     }
 
