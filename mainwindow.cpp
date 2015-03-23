@@ -619,7 +619,6 @@ void MainWindow::updateRecent()
             {
                 QAction *action = new QAction(this);
                 action->setText(str); //Set filepath as a title
-                action->setObjectName(str); //Also set name to the path so we can get it later
                 recentMenu->addAction(action); //Add action to the menu
                 connect(action, &QAction::triggered, this, &MainWindow::recentClicked);
             }
@@ -953,5 +952,6 @@ void MainWindow::recentClicked()
     //Actually a dirty hack, but it is fast and simple
     //So this slot is not for anything to trigger, but
     //recent files menu
-    parseFile(sender()->objectName());
+    QAction *action = qobject_cast<QAction*>(sender());
+    if(action) parseFile(action->text());
 }
