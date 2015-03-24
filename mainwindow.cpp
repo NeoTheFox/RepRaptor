@@ -964,6 +964,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
         if(sending) dialog.setText(tr("Printer is working!\nAre you shure you want to exit?"));
         else dialog.setText(tr("Printer is connected!\nAre you shure you want tot exit?"));
         dialog.setIcon(QMessageBox::Warning);
+        dialog.setWindowTitle(tr("Warning"));
 
         //Save pointer to check what button was clicked
         QPushButton *exitButton = dialog.addButton(tr("Exit"), QMessageBox::AcceptRole);
