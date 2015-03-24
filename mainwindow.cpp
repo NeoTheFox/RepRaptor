@@ -977,7 +977,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
         else event->ignore();
     }
     //Close immediately if not connected
-    else event->ignore();
+    else event->accept();
 }
 
 void MainWindow::recentClicked()
