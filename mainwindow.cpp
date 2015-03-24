@@ -952,6 +952,34 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
     return QMainWindow::eventFilter(obj, event);
 }
 
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    //If connected to printer - show warning dialog
+    if(opened)
+    {
+        //Create dialog
+        QMessageBox dialog(this);
+
+        //Set it up - different text if just connected and if printing
+        if(sending) dialog.setText(tr("Printer is working!\nAre you shure you want to exit?"));
+        else dialog.setText(tr("Printer is connected!\nAre you shure you want tot exit?"));
+        dialog.setIcon(QMessageBox::Warning);
+
+        //Save pointer to check what button was clicked
+        QPushButton *exitButton = dialog.addButton(tr("Exit"), QMessageBox::AcceptRole);
+        dialog.addButton(QMessageBox::Cancel);
+
+        //Show dialog
+        dialog.exec();
+
+        //Process responce
+        if(dialog.clickedButton() == exitButton) event->accept();
+        else event->ignore();
+    }
+    //Close immediately if not connected
+    else event->ignore();
+}
+
 void MainWindow::recentClicked()
 {
     //Actually a dirty hack, but it is fast and simple

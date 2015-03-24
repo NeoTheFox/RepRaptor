@@ -57,6 +57,7 @@ protected:
     QStringList userHistory;
     QSerialPortInfo printerinfo;
 
+    void closeEvent(QCloseEvent *event);
     bool eventFilter(QObject *target, QEvent *event);
 
 private:
