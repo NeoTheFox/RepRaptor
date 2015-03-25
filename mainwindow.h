@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QFileDialog>
+#include <QSystemTrayIcon>
 #include <QtSerialPort/QtSerialPort>
 #include <QFile>
 #include <QThread>
@@ -48,7 +49,9 @@ protected:
     QQueue <QString> userCommands;
     QTimer *progressSDTimer;
     QTimer *statusTimer;
+    QSystemTrayIcon *trayIcon;
     QMenu *recentMenu;
+    QMenu *trayIconMenu;
     QElapsedTimer *sinceLastTemp;
     QElapsedTimer *sinceLastSDStatus;
     QSettings settings;
@@ -73,6 +76,7 @@ private:
     bool sdprinting;
     bool echo;
     bool chekingSDStatus;
+    bool trayIconEnabled;
     int firmware;
     int feedrate;
     int extruderFeedrate;
@@ -103,6 +107,7 @@ private slots:
     void recentClicked();
     void updateFileProgress(FileProgress);
     void baudrateSetFailed(int b);
+    void trayIconClicked(QSystemTrayIcon::ActivationReason reason);
 
     void xplus();
     void yplus();

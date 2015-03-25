@@ -14,7 +14,7 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
 
     ui->flowcontrolbox->setCurrentIndex(settings.value("core/flowcontrol", 0).toInt());
     ui->senderbox->setValue(settings.value("core/senderinterval", 2).toInt());
-    ui->echobox->setChecked(settings.value("core/echo", 0).toBool());
+    ui->traybox->setChecked(settings.value("core/trayiconenabled", 1).toBool());
     ui->statusbox->setValue(settings.value("core/statusinterval", 2000).toInt());
     ui->bedxbox->setValue(settings.value("printer/bedx", 200).toInt());
     ui->bedybox->setValue(settings.value("printer/bedy", 200).toInt());
@@ -47,13 +47,13 @@ SettingsWindow::~SettingsWindow()
 void SettingsWindow::on_buttonBox_accepted()
 {
     settings.setValue("core/flowcontrol", ui->flowcontrolbox->currentIndex());
+    settings.setValue("core/trayiconenabled", ui->traybox->isChecked());
     settings.setValue("core/senderinterval", ui->senderbox->value());
     settings.setValue("core/statusinterval", ui->statusbox->value());
     settings.setValue("printer/bedy", ui->bedybox->value());
     settings.setValue("printer/bedx", ui->bedxbox->value());
     settings.setValue("printer/feedrate", ui->feedrateBox->value());
     settings.setValue("printer/extruderfeedrate", ui->extruderFeedrateBox->value());
-    settings.setValue("core/echo", ui->echobox->isChecked());
     settings.setValue("core/lockcontrols", ui->lockbox->isChecked());
     settings.setValue("core/checksums", ui->checksumbox->isChecked());
     settings.setValue("core/checksdstatus", ui->sdbox->isChecked());

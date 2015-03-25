@@ -29,6 +29,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->etmpspin->installEventFilter(this);
     ui->btmpspin->installEventFilter(this);
     recentMenu = new QMenu(this);
+    trayIcon = new QSystemTrayIcon(this);
+    trayIcon->setIcon(QIcon(":icons/repraptor.png"));
+    trayIconMenu = new QMenu(this);
+    trayIconMenu->addAction(ui->actionOpen);
+    trayIconMenu->addAction(ui->actionExit);
+    trayIcon->setToolTip(tr("RepRaptor running in the background"));
+    trayIcon->setContextMenu(trayIconMenu);
     recentMenu->setTitle("Recent files");
     ui->menuFile->insertMenu(ui->actionSettings, recentMenu);
     ui->menuFile->insertSeparator(ui->actionSettings);
@@ -79,6 +86,7 @@ MainWindow::MainWindow(QWidget *parent) :
     statusTimer->setInterval(settings.value("core/statusinterval", 3000).toInt());
     feedrate = settings.value("feedrate", 1500).toInt();
     extruderFeedrate = settings.value("extruderfeedrate", 200).toInt();
+    trayIconEnabled = settings.value("core/trayiconenabled", 1).toBool();
     int size = settings.beginReadArray("user/recentfiles");
     for(int i = 0; i < size; ++i)
     {
@@ -107,6 +115,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //Internal signal-slots
     connect(statusTimer, &QTimer::timeout, this, &MainWindow::checkStatus);
     connect(progressSDTimer, &QTimer::timeout, this, &MainWindow::checkSDStatus);
+    connect(trayIcon, &QSystemTrayIcon::activated, this, &MainWindow::trayIconClicked);
 
     //Parser thread signal-slots and init
     parserWorker->moveToThread(parserThread);
@@ -157,6 +166,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //Update recent files list
     updateRecent();
+
+    //Update icon
+    if(trayIconEnabled) trayIcon->show();
+    else trayIcon->hide();
 }
 
 MainWindow::~MainWindow()
@@ -189,6 +202,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::open()
 {
+    if(this->isHidden()) this->show();
     sdprinting = false;
     QString filename;
     QDir home;
@@ -851,6 +865,8 @@ void MainWindow::receivedSDDone()
 {
     sdprinting=false;
     ui->progressBar->setValue(0);
+    if(trayIconEnabled && (this->isMinimized() || this->isHidden()))
+        trayIcon->showMessage(tr("Done"), tr("Finished printing"));
     ui->filename->setText("");
     ui->fileBox->setDisabled(true);
 }
@@ -862,6 +878,8 @@ void MainWindow::updateFileProgress(FileProgress p)
     {
         ui->sendBtn->setText(tr("Send"));
         ui->pauseBtn->setDisabled(true);
+        if(trayIconEnabled && (this->isMinimized() || this->isHidden()))
+            trayIcon->showMessage(tr("Done"), tr("Finished printing"));
         sending = false;
         paused = false;
         emit pause(paused);
@@ -979,6 +997,16 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
     //Close immediately if not connected
     else event->accept();
+}
+
+void MainWindow::trayIconClicked(QSystemTrayIcon::ActivationReason reason)
+{
+    if(trayIconEnabled && reason == QSystemTrayIcon::Trigger)
+    {
+        if(this->isHidden()) this->show();
+        else this->hide();
+    }
+    else return;
 }
 
 void MainWindow::recentClicked()
