@@ -167,7 +167,11 @@
        </widget>
       </item>
       <item row="3" column="1" colspan="2">
-       <widget class="QComboBox" name="flowcontrolbox"/>
+       <widget class="QComboBox" name="flowcontrolbox">
+        <property name="toolTip">
+         <string/>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -237,6 +241,9 @@
       </item>
       <item row="2" column="1" colspan="2">
        <widget class="QSpinBox" name="feedrateBox">
+        <property name="toolTip">
+         <string>Speed of axis movements (only affect buttons)</string>
+        </property>
         <property name="maximum">
          <number>99999</number>
         </property>
@@ -255,6 +262,9 @@ feedrate</string>
       </item>
       <item row="3" column="1" colspan="2">
        <widget class="QSpinBox" name="extruderFeedrateBox">
+        <property name="toolTip">
+         <string>Extruder speed (only affect buttons)</string>
+        </property>
         <property name="maximum">
          <number>99999</number>
         </property>
