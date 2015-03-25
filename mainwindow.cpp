@@ -30,7 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->btmpspin->installEventFilter(this);
     recentMenu = new QMenu(this);
     trayIcon = new QSystemTrayIcon(this);
-    trayIcon->setIcon(QIcon(":icons/repraptor.png"));
+    trayIcon->setIcon(QIcon(QPixmap(":icons/repraptor.png")));
     trayIconMenu = new QMenu(this);
     trayIconMenu->addAction(ui->actionOpen);
     trayIconMenu->addAction(ui->actionExit);
@@ -210,6 +210,7 @@ void MainWindow::open()
                                             tr("Open GCODE"),
                                             home.home().absolutePath(),
                                             "GCODE (*.g *.gco *.gcode *.nc)");
+    if(filename.isEmpty() || filename.isNull()) return;
     gfile.setFileName(filename);
     if(!recentFiles.contains(filename))
     {
