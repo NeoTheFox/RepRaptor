@@ -12,9 +12,6 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName("RepRaptor");
     QCoreApplication::setApplicationVersion(REPRAPTOR_VERSION);
 
-    //Set the priority, so the OS would not mess up serial communication
-    QThread::currentThread()->setPriority(QThread::HighestPriority);
-
     MainWindow w;
     w.show();
 

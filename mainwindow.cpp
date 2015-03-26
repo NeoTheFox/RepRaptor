@@ -129,6 +129,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(parserWorker, &Parser::receivedSDDone, this, &MainWindow::receivedSDDone);
     connect(parserWorker, &Parser::receivedSDUpdate, this, &MainWindow::updateSDStatus);
     parserThread->start();
+    parserThread->setPriority(QThread::HighestPriority);
 
     //Sender thread signal-slots and init
     senderWorker->moveToThread(senderThread);
