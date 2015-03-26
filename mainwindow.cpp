@@ -209,6 +209,7 @@ void MainWindow::open()
                                             tr("Open GCODE"),
                                             home.home().absolutePath(),
                                             "GCODE (*.g *.gco *.gcode *.nc)");
+    if(filename.isEmpty() || filename.isNull()) return;
     gfile.setFileName(filename);
     if(!recentFiles.contains(filename))
     {
