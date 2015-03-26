@@ -7,7 +7,7 @@ SDWindow::SDWindow(QStringList files, QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->fileslist->addItems(files);
+    if(!files.isEmpty()) ui->fileslist->addItems(files);
 }
 
 SDWindow::~SDWindow()
@@ -17,11 +17,11 @@ SDWindow::~SDWindow()
 
 void SDWindow::on_buttonBox_accepted()
 {
-    emit fileSelected(ui->fileslist->currentItem()->text());
+    if(ui->fileslist->count() > 0) emit fileSelected(ui->fileslist->currentItem()->text());
 }
 
 void SDWindow::on_fileslist_doubleClicked(const QModelIndex &)
 {
-    emit fileSelected(ui->fileslist->currentItem()->text());
+    if(ui->fileslist->count() > 0) emit fileSelected(ui->fileslist->currentItem()->text());
     this->close();
 }
