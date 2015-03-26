@@ -29,7 +29,7 @@ void Parser::parse(QByteArray data)
     {
         if(readingFiles) //SD files list reading mode
         {
-            if(!data.contains("End file list")) SDFilesList.append(data);
+            if(!data.contains("End file list")) SDFilesList.append(data.remove(data.size()-2, 2));
             else
             {
                 readingFiles = false;

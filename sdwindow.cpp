@@ -7,7 +7,13 @@ SDWindow::SDWindow(QStringList files, QWidget *parent) :
 {
     ui->setupUi(this);
 
-    if(!files.isEmpty()) ui->fileslist->addItems(files);
+    ui->fileslist->setSelectionMode(QListView::SingleSelection);
+
+    if(!files.isEmpty())
+    {
+        ui->fileslist->addItems(files);
+        ui->fileslist->setCurrentItem(ui->fileslist->itemAt(0,0));
+    }
 }
 
 SDWindow::~SDWindow()
