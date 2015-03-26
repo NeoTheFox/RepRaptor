@@ -16,7 +16,7 @@ Sender::Sender(QObject *parent) : QObject(parent)
     sendTimer = new QTimer(this);
 
     //Fetch settings
-    QSettings settings;
+    QSettings settings(this);
     sendTimer->setInterval(settings.value("core/senderinterval", 2).toInt());
     sendingChecksum = settings.value("core/checksums", 0).toBool();
     dtr = settings.value("core/dtr", 1).toBool();
