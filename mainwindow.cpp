@@ -71,7 +71,6 @@ MainWindow::MainWindow(QWidget *parent) :
     //them inherit parent's priority
     parserThread = new QThread(this);
     senderThread = new QThread(this);
-    senderThread->setPriority(QThread::TimeCriticalPriority);
 
     //Restore settings
     firstrun = !settings.value("core/firstrun").toBool(); //firstrun is inverted!
@@ -153,6 +152,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, &MainWindow::injectCommand, senderWorker, &Sender::injectCommand);
     connect(this, &MainWindow::flushInjectionBuffer, senderWorker, &Sender::flushInjectionBuffer);
     senderThread->start();
+    senderThread->setPriority(QThread::TimeCriticalPriority);
 
     //Timers init
     statusTimer->start();
