@@ -101,8 +101,7 @@ MainWindow::MainWindow(QWidget *parent) :
     sdprinting = false;
     opened = false;
     sdBytes = 0;
-    userHistoryPos = 0;
-    userHistory.append("");
+    userHistoryPos = -1;
 
     //Register all the types
     qRegisterMetaType<TemperatureReadings>("TemperatureReadings");
@@ -397,7 +396,7 @@ void MainWindow::on_sendbtn_clicked()
     QString command = ui->sendtext->text().toUpper();
     emit injectCommand(command);
     userHistory.prepend(command);
-    userHistoryPos = 0;
+    userHistoryPos = -1;
 }
 
 void MainWindow::on_fanonbtn_clicked()
@@ -929,7 +928,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 
             if (keyEvent->key() == Qt::Key_Up) //Scroll up with up arrow
             {
-                if(++userHistoryPos <= userHistory.size()-1)
+                if(++userHistoryPos < userHistory.size())
                     ui->sendtext->setText(userHistory.at(userHistoryPos));
                 else userHistoryPos--;
                 return true;
@@ -938,7 +937,11 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
             {
                 if(--userHistoryPos >= 0)
                     ui->sendtext->setText(userHistory.at(userHistoryPos));
-                else userHistoryPos++;
+                else
+                {
+                    userHistoryPos++;
+                    ui->sendtext->clear();
+                }
                 return true;
             }
         }
