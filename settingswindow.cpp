@@ -12,6 +12,7 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
 
     //bool firstrun = !settings.value("core/firstrun").toBool(); //firstrun is inverted!
 
+    settings.setParent(this);
     ui->flowcontrolbox->setCurrentIndex(settings.value("core/flowcontrol", 0).toInt());
     ui->senderbox->setValue(settings.value("core/senderinterval", 2).toInt());
     ui->traybox->setChecked(settings.value("core/trayiconenabled", 1).toBool());
