@@ -29,6 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->etmpspin->installEventFilter(this);
     ui->btmpspin->installEventFilter(this);
     recentMenu = new QMenu(this);
+    //Note about tray icon - possible bug with Qt 5.4
     trayIcon = new QSystemTrayIcon(this);
     trayIcon->setIcon(QIcon(":icons/repraptor.png"));
     trayIconMenu = new QMenu(this);
