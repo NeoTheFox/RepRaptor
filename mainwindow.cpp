@@ -128,6 +128,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(parserWorker, &Parser::receivedError, this, &MainWindow::receivedError);
     connect(parserWorker, &Parser::receivedSDDone, this, &MainWindow::receivedSDDone);
     connect(parserWorker, &Parser::receivedSDUpdate, this, &MainWindow::updateSDStatus);
+    connect(parserWorker, &Parser::receivedNotSDPrinting, this, &MainWindow::receivedNotSDPrinting);
     parserThread->start();
     parserThread->setPriority(QThread::HighestPriority);
 
@@ -782,6 +783,13 @@ void MainWindow::checkSDStatus()
     //Same as temperature check
     if(sdprinting && chekingSDStatus && sinceLastSDStatus->elapsed() > progressSDTimer->interval())
         emit injectCommand("M27");
+}
+
+void MainWindow::receivedNotSDPrinting()
+{
+    sdprinting = false;
+    ui->fileBox->setDisabled(true);
+    ui->filename->setText(tr("Filename: "));
 }
 
 void MainWindow::on_stepspin_valueChanged(const QString &arg1)

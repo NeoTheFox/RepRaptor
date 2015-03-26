@@ -105,7 +105,7 @@ void Parser::parse(QByteArray data)
             emit receivedSDUpdate(p);
 
         }
-        else if(data.startsWith("Not SD "));
+        else if(data.startsWith("Not SD ")) emit receivedNotSDPrinting();
         else if(data.contains("Begin file list"))
         {
             SDFilesList.clear();

@@ -103,6 +103,7 @@ private slots:
     void EEPROMSettingReceived(QString esetting);
     void receivedError();
     void receivedSDDone();
+    void receivedNotSDPrinting();
     void parseFile(QString filename);
     void recentClicked();
     void updateFileProgress(FileProgress);
