@@ -525,6 +525,8 @@ void MainWindow::on_sendBtn_clicked()
         ui->pauseBtn->setEnabled(true);
         if(autolock) ui->controlBox->setChecked(false);
         paused = false;
+
+        emit flushInjectionBuffer();
         emit pause(paused);
         emit startPrinting();
     }
