@@ -27,7 +27,8 @@ namespace RepRaptor
     enum ErrorType
     {
         SerialPortError,
-        OpenFileError
+        OpenFileError,
+        HardwareFailure
     };
 
     typedef struct

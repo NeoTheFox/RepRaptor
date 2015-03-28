@@ -16,6 +16,9 @@ ErrorWindow::ErrorWindow(QWidget *parent, QString errorText, int errType):
     case OpenFileError:
         ui->label->setText(tr("File open error:"));
         break;
+    case HardwareFailure:
+        ui->label->setText(tr("Hardware failure:"));
+        break;
     default:
         ui->label->setText(tr("Unknown error type:"));
         break;

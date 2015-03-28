@@ -869,7 +869,7 @@ void MainWindow::EEPROMSettingReceived(QString esetting)
 void MainWindow::receivedError()
 {
     //This should be raised if "!!" received
-    ErrorWindow errorwindow(this, tr("Hardware failure"));
+    ErrorWindow errorwindow(this, tr("Hardware failure"), 3);
     errorwindow.exec();
 }
 
