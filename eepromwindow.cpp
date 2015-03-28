@@ -64,7 +64,7 @@ EEPROMWindow::EEPROMWindow(QStringList eepromLines, QWidget *parent) :
                 break;
             }
 
-            connect(edit, SIGNAL(textChanged(QString)), this, SLOT(lineChanged(QString)));
+            connect(edit, &QLineEdit::textChanged, this, &EEPROMWindow::lineChanged);
 
             line->addWidget(label);
             line->addWidget(edit);

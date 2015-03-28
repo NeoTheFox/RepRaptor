@@ -869,7 +869,7 @@ void MainWindow::EEPROMSettingReceived(QString esetting)
 void MainWindow::receivedError()
 {
     //This should be raised if "!!" received
-    ErrorWindow errorwindow(this, tr("Hardware failure"), 3);
+    ErrorWindow errorwindow(this, tr("Hardware failure"), 2);
     errorwindow.exec();
 }
 
@@ -879,7 +879,7 @@ void MainWindow::receivedSDDone()
     ui->progressBar->setValue(0);
     if(trayIconEnabled && (this->isMinimized() || this->isHidden()))
         trayIcon->showMessage(tr("Done"), tr("Finished printing"));
-    ui->filename->setText("");
+    ui->filename->setText(tr("Filename:"));
     ui->fileBox->setDisabled(true);
 }
 
