@@ -77,6 +77,7 @@ private:
     bool echo;
     bool chekingSDStatus;
     bool trayIconEnabled;
+    bool supressWait;
     int firmware;
     int feedrate;
     int extruderFeedrate;

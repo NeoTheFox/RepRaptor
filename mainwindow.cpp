@@ -87,6 +87,7 @@ MainWindow::MainWindow(QWidget *parent) :
     feedrate = settings.value("feedrate", 1500).toInt();
     extruderFeedrate = settings.value("extruderfeedrate", 200).toInt();
     trayIconEnabled = settings.value("core/trayiconenabled", 1).toBool();
+    supressWait = settings.value("user/supresswait", 0).toBool();
     int size = settings.beginReadArray("user/recentfiles");
     for(int i = 0; i < size; ++i)
     {
@@ -603,6 +604,7 @@ void MainWindow::readSerial(QByteArray data)
 
 void MainWindow::printMsg(QString text)
 {
+    if(supressWait && text.startsWith("wait")) return;
     //Get the cursor and set it to the end
     QTextCursor cursor = ui->terminal->textCursor();
     cursor.movePosition(QTextCursor::End);

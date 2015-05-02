@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>483</width>
-    <height>341</height>
+    <width>484</width>
+    <height>357</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -59,6 +59,13 @@
         </property>
        </widget>
       </item>
+      <item row="1" column="2">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>ms</string>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="1">
        <widget class="QDoubleSpinBox" name="senderbox">
         <property name="toolTip">
@@ -100,10 +107,10 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="2">
-       <widget class="QLabel" name="label_3">
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>ms</string>
+         <string>Status</string>
         </property>
        </widget>
       </item>
@@ -114,6 +121,13 @@
         </property>
         <property name="text">
          <string>Checksums</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="0" colspan="3">
+       <widget class="QCheckBox" name="sdbox">
+        <property name="text">
+         <string>Check SD printing status</string>
         </property>
        </widget>
       </item>
@@ -139,20 +153,6 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Status</string>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="0" colspan="3">
-       <widget class="QCheckBox" name="sdbox">
-        <property name="text">
-         <string>Check SD printing status</string>
-        </property>
-       </widget>
-      </item>
       <item row="7" column="0" colspan="3">
        <widget class="QCheckBox" name="lockbox">
         <property name="text">
@@ -170,6 +170,13 @@
         </property>
         <property name="text">
          <string>Tray icon</string>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="0" colspan="2">
+       <widget class="QCheckBox" name="supresswaitbox">
+        <property name="text">
+         <string>Supress &quot;wait&quot; responce</string>
         </property>
        </widget>
       </item>
