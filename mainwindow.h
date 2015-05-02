@@ -156,7 +156,6 @@ private slots:
 
 signals:
     void sdReady();
-    void receivedData(QByteArray);
     void startedReadingEEPROM();
 
     void openPort(QSerialPortInfo i);

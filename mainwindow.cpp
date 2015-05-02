@@ -119,7 +119,6 @@ MainWindow::MainWindow(QWidget *parent) :
     //Parser thread signal-slots and init
     parserWorker->moveToThread(parserThread);
     connect(parserThread, &QThread::finished, parserWorker, &QObject::deleteLater);
-    connect(this, &MainWindow::receivedData, parserWorker, &Parser::parse);
     connect(this, &MainWindow::startedReadingEEPROM, parserWorker, &Parser::setEEPROMReadingMode);
     connect(parserWorker, &Parser::receivedTemperature, this, &MainWindow::updateTemperature);
     connect(parserWorker, &Parser::receivedSDFilesList, this, &MainWindow::initSDprinting);
@@ -140,8 +139,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(parserWorker, &Parser::receivedResend, senderWorker, &Sender::receivedResend);
     connect(parserWorker, &Parser::receivedStart, senderWorker, &Sender::receivedStart);
     connect(senderWorker, &Sender::errorReceived, this, &MainWindow::serialError);
-    connect(senderWorker, &Sender::dataReceived, parserWorker, &Parser::parse, Qt::QueuedConnection);
-    connect(senderWorker, &Sender::dataReceived, this, &MainWindow::readSerial, Qt::QueuedConnection);
+    connect(senderWorker, &Sender::dataReceived, parserWorker, &Parser::parse);
+    connect(senderWorker, &Sender::dataReceived, this, &MainWindow::readSerial);
     connect(senderWorker, &Sender::reportProgress, this, &MainWindow::updateFileProgress);
     connect(senderWorker, &Sender::baudrateSetFailed, this, &MainWindow::baudrateSetFailed);
     connect(this, &MainWindow::setFile, senderWorker, &Sender::setFile);
