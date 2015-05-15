@@ -79,6 +79,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->checktemp->setChecked(checkingTemperature);
     ui->etmpspin->setValue(settings.value("user/extrudertemp", 210).toInt());
     ui->btmpspin->setValue(settings.value("user/bedtemp", 60).toInt());
+    ui->stepspin->setValue(settings.value("user/step", 1).toInt());
+    ui->estepspin->setValue(settings.value("user/estep", 1).toInt());
     echo = settings.value("core/echo", 0).toBool();
     autolock = settings.value("core/lockcontrols", 0).toBool();
     chekingSDStatus = settings.value("core/checksdstatus", 1).toBool();
@@ -182,6 +184,8 @@ MainWindow::~MainWindow()
     settings.setValue("core/checktemperature", ui->checktemp->isChecked());
     settings.setValue("user/extrudertemp", ui->etmpspin->value());
     settings.setValue("user/bedtemp", ui->btmpspin->value());
+    settings.setValue("user/step", ui->stepspin->value());
+    settings.setValue("user/estep", ui->estepspin->value());
     settings.beginWriteArray("user/recentfiles");
     for(int i = 0; i < recentFiles.size(); ++i)
     {
