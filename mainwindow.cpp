@@ -90,6 +90,7 @@ MainWindow::MainWindow(QWidget *parent) :
     extruderFeedrate = settings.value("extruderfeedrate", 200).toInt();
     trayIconEnabled = settings.value("core/trayiconenabled", 1).toBool();
     supressWait = settings.value("user/supresswait", 0).toBool();
+    lastDir.append(settings.value("user/lastdir", "").toString());
     int size = settings.beginReadArray("user/recentfiles");
     for(int i = 0; i < size; ++i)
     {
@@ -186,6 +187,7 @@ MainWindow::~MainWindow()
     settings.setValue("user/bedtemp", ui->btmpspin->value());
     settings.setValue("user/step", ui->stepspin->value());
     settings.setValue("user/estep", ui->estepspin->value());
+    settings.setValue("user/lastdir", lastDir);
     settings.beginWriteArray("user/recentfiles");
     for(int i = 0; i < recentFiles.size(); ++i)
     {
@@ -212,11 +214,30 @@ void MainWindow::open()
     sdprinting = false;
     QString filename;
     QDir home;
-    filename = QFileDialog::getOpenFileName(this,
-                                            tr("Open GCODE"),
-                                            home.home().absolutePath(),
-                                            "GCODE (*.g *.gco *.gcode *.nc)");
+    if(lastDir == "")
+    {
+        filename = QFileDialog::getOpenFileName(this,
+                                                tr("Open GCODE"),
+                                                home.home().absolutePath(),
+                                                "GCODE (*.g *.gco *.gcode *.nc)");
+    }
+    else
+    {
+        filename = QFileDialog::getOpenFileName(this,
+                                                tr("Open GCODE"),
+                                                lastDir,
+                                                "GCODE (*.g *.gco *.gcode *.nc)");
+    }
     if(filename.isEmpty() || filename.isNull()) return;
+    //Remember the last folder
+    lastDir.clear();
+    lastDir.append(filename);
+    int filenameChars = 0;
+    for(int i = filename.count()-1; filename.at(i) != QDir::separator(); i--)
+    {
+        filenameChars++; //Count how many characters are in the filename
+    }
+    lastDir.remove(lastDir.count()-filenameChars, filenameChars);//remove filename
     gfile.setFileName(filename);
     if(!recentFiles.contains(filename))
     {

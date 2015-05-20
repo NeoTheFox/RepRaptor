@@ -66,6 +66,7 @@ protected:
 private:
     Ui::MainWindow *ui;
 
+    QString lastDir;
     bool opened;
     bool firstrun;
     bool autolock;
