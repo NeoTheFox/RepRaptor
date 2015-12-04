@@ -1,0 +1,8 @@
+install:
+  - sudo apt-get update
+  - sudo apt-get install libqt-dev qmake
+
+script:
+  - qmake -project
+  - qmake RepRaptor.pro
+  - make

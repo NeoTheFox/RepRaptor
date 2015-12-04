@@ -71,4 +71,5 @@ RESOURCES += \
 DISTFILES += \
     LICENCE \
     README.md \
-    RepRaptor.desktop
+    RepRaptor.desktop \
+    .travis.yml
