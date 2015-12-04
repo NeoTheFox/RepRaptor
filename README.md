@@ -1,5 +1,5 @@
 ![RepRaptor logo](http://reprap.org/mediawiki/images/b/b0/RepRaptor_logo2.png)
-# RepRaptor
+# RepRaptor [![Build Status](https://travis-ci.org/NeoTheFox/RepRaptor.svg?branch=master)](https://travis-ci.org/NeoTheFox/RepRaptor)
 A Qt RepRap gcode sender/host controller aimed to be fast and minimalistic.
 
 Right now the project is in early stage. This means some features are still absent, but it is already usable.
