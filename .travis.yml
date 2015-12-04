@@ -1,6 +1,6 @@
 install:
   - sudo apt-get update
-  - sudo apt-get install libqt-dev qmake
+  - sudo apt-get install libqt5-dev qmake
 
 script:
   - qmake -project
