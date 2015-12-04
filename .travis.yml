@@ -1,8 +1,7 @@
 install:
   - sudo apt-add-repository --yes ppa:beineri/opt-qt55
   - sudo apt-get update -qq
-  - apt-cache search libqt5serialport
-  - sudo apt-get install qt55base qt55serialport qt55tools
+  - sudo apt-get install -qq qt55base qt55serialport qt55tools
   - which qmake
 
 script:
