@@ -1,7 +1,9 @@
 install:
   - sudo add-apt-repository --yes ppa:ubuntu-sdk-team/ppa
   - sudo apt-get update -qq
-  - sudo apt-get install qtbase5-dev qt5-default qttools5-dev-tools libqt5serialport libqt5serialport5-dev
+  - apt-cache search libqt5serialport
+  - sudo apt-get install qtbase5-dev qt5-default qttools5-dev-tools qtdeclarative5-dev
+  - which qmake
 
 script:
   - qt5-qmake RepRaptor.pro
