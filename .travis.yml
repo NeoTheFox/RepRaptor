@@ -1,10 +1,11 @@
 install:
-  - sudo add-apt-repository --yes ppa:ubuntu-sdk-team/ppa
+  - sudo apt-add-repository ppa:beineri/opt-qt55
   - sudo apt-get update -qq
   - apt-cache search libqt5serialport
-  - sudo apt-get install qtbase5-dev qt5-default qttools5-dev-tools qtdeclarative5-dev
+  - sudo apt-get install qt55base qt55serialport qt55tools
   - which qmake
 
 script:
-  - qt5-qmake RepRaptor.pro
+  - source /opt/qt55/bin/qt55-env.sh
+  - qmake RepRaptor.pro
   - make
