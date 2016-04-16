@@ -40,6 +40,7 @@ MainWindow::MainWindow(QWidget *parent) :
     recentMenu->setTitle("Recent files");
     ui->menuFile->insertMenu(ui->actionSettings, recentMenu);
     ui->menuFile->insertSeparator(ui->actionSettings);
+    terminalCursor = ui->terminal->textCursor();
 
     //Init baudrate combobox
     ui->baudbox->addItem(QString::number(4800));
@@ -631,14 +632,14 @@ void MainWindow::printMsg(QString text)
 {
     if(supressWait && text.startsWith("wait")) return;
     //Get the cursor and set it to the end
-    QTextCursor cursor = ui->terminal->textCursor();
-    cursor.movePosition(QTextCursor::End);
+    terminalCursor.movePosition(QTextCursor::End);
 
     //Paste the text
-    cursor.insertText(text);
+    terminalCursor.insertText(text);
 
-    //Apply
-    ui->terminal->setTextCursor(cursor);
+    //Scroll to the bottom
+    ui->terminal->verticalScrollBar()->setValue(
+                ui->terminal->verticalScrollBar()->maximum());
 }
 
 void MainWindow::checkStatus()

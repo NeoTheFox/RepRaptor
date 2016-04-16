@@ -59,6 +59,7 @@ protected:
     QStringList EEPROMSettings;
     QStringList userHistory;
     QSerialPortInfo printerinfo;
+    QTextCursor terminalCursor;
 
     void closeEvent(QCloseEvent *event);
     bool eventFilter(QObject *target, QEvent *event);
