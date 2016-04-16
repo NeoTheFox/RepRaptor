@@ -82,6 +82,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->btmpspin->setValue(settings.value("user/bedtemp", 60).toInt());
     ui->stepspin->setValue(settings.value("user/step", 1).toInt());
     ui->estepspin->setValue(settings.value("user/estep", 1).toInt());
+    ui->terminal->document()->setMaximumBlockCount(
+                settings.value("core/logbuffersize", 1000).toInt());
     echo = settings.value("core/echo", 0).toBool();
     autolock = settings.value("core/lockcontrols", 0).toBool();
     chekingSDStatus = settings.value("core/checksdstatus", 1).toBool();
@@ -954,6 +956,8 @@ void MainWindow::updatesettings()
     statusTimer->setInterval(settings.value("core/statusinterval", 3000).toInt());
     feedrate = settings.value("feedrate", 1500).toInt();
     extruderFeedrate = settings.value("extruderfeedrate", 200).toInt();
+    ui->terminal->document()->setMaximumBlockCount(
+                settings.value("core/logbuffersize", 1000).toInt());
 }
 
 //Needed for keypress handling

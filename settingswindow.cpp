@@ -26,6 +26,7 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
     ui->sdbox->setChecked(settings.value("core/checksdstatus", 1).toBool());
     ui->dtrbox->setChecked(settings.value("core/dtr", 1).toBool());
     ui->supresswaitbox->setChecked(settings.value("user/supresswait").toBool());
+    ui->bufferbox->setValue(settings.value("core/logbuffersize", 1000).toInt());
 
     ui->firmwarecombo->addItem("Marlin"); //0
     ui->firmwarecombo->addItem("Repetier"); //1
@@ -62,6 +63,7 @@ void SettingsWindow::on_buttonBox_accepted()
     settings.setValue("core/dtr", ui->dtrbox->isChecked());
     settings.setValue("printer/firmware", ui->firmwarecombo->currentIndex());
     settings.setValue("user/supresswait", ui->supresswaitbox->isChecked());
+    settings.setValue("core/logbuffersize", ui->bufferbox->value());
 
     emit updatesettings();
 }
