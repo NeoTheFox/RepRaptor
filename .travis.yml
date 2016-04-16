@@ -1,5 +1,5 @@
 install:
-  - sudo apt-add-repository --yes ppa:beineri/opt-qt551-trusty
+  - sudo apt-add-repository --yes ppa:beineri/opt-qt551
   - sudo apt-get update -qq
   - sudo apt-get install -qq qt55base qt55serialport qt55tools
   - which qmake

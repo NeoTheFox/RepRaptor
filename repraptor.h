@@ -6,7 +6,7 @@
 #define REPRAPTOR_H
 
 #ifndef REPRAPTOR_VERSION
-#define REPRAPTOR_VERSION "0.3.8"
+#define REPRAPTOR_VERSION "0.3.9"
 #endif
 
 namespace RepRaptor
