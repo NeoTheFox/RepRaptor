@@ -1,9 +1,8 @@
 [Desktop Entry]
 Name=RepRaptor
 Comment=A Qt RepRap gcode sender/host controller aimed to be fast and minimalistic.
-Exec=/usr/bin/RepRaptor
-Icon=/usr/share/icons/repraptor.png
+Exec=RepRaptor
+Icon=repraptor
 Terminal=false
 Type=Application
 Categories=Utility;Application;
-
