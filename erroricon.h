@@ -1,6 +1,5 @@
 #ifndef ERRORICON_H
 #define ERRORICON_H
-
 #include <QWidget>
 #include <QTimer>
 #include <QPainter>
@@ -9,7 +8,7 @@ class ErrorIcon : public QWidget
 {
     Q_OBJECT
 public:
-    explicit ErrorIcon(QWidget *parent = 0);
+    explicit ErrorIcon(QWidget *parent = nullptr);
     ~ErrorIcon();
     QTimer *animation;
     QString frame;

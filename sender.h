@@ -1,6 +1,5 @@
 #ifndef SENDER_H
 #define SENDER_H
-
 #include <QObject>
 #include <QSerialPort>
 #include <QSerialPortInfo>
@@ -8,7 +7,6 @@
 #include <QTimer>
 #include <QSettings>
 #include <QVector>
-
 #include "repraptor.h"
 
 using namespace RepRaptor;
@@ -17,7 +15,7 @@ class Sender : public QObject
 {
     Q_OBJECT
 public:
-    explicit Sender(QObject *parent = 0);
+    explicit Sender(QObject *parent = nullptr);
     ~Sender();
 
 protected:
@@ -37,7 +35,6 @@ protected:
     QQueue <QString> userCommands;
     QStringList sentCommands;
     QVector <QString> gcode;
-
     bool sendLine(QString s);
 
 signals:

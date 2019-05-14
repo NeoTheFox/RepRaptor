@@ -6,7 +6,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
     //Set parents
     settings.setParent(this);
     gfile.setParent(this);
@@ -207,7 +206,6 @@ MainWindow::~MainWindow()
     parserThread->wait();
     senderThread->quit();
     senderThread->wait();
-
     delete ui;
 }
 

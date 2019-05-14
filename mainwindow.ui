@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>791</width>
-    <height>514</height>
+    <width>800</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -15,6 +15,12 @@
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>800</width>
+    <height>600</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>RepRaptor</string>
@@ -35,7 +41,7 @@
       </property>
       <property name="maximumSize">
        <size>
-        <width>200</width>
+        <width>250</width>
         <height>16777215</height>
        </size>
       </property>
@@ -83,15 +89,21 @@
     <item row="0" column="1" rowspan="3">
      <widget class="QGroupBox" name="controlBox">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
       <property name="maximumSize">
        <size>
-        <width>261</width>
-        <height>500</height>
+        <width>320</width>
+        <height>16777215</height>
        </size>
       </property>
       <property name="title">
@@ -314,7 +326,7 @@
         <widget class="QLineEdit" name="flowedit">
          <property name="font">
           <font>
-           <pointsize>9</pointsize>
+           <pointsize>12</pointsize>
           </font>
          </property>
          <property name="text">
@@ -351,34 +363,6 @@
         <widget class="QPushButton" name="flowbutton">
          <property name="text">
           <string>Set</string>
-         </property>
-        </widget>
-       </item>
-       <item row="10" column="2" colspan="2">
-        <widget class="QPushButton" name="fanonbtn">
-         <property name="text">
-          <string>Fan On</string>
-         </property>
-        </widget>
-       </item>
-       <item row="10" column="4" colspan="3">
-        <widget class="QPushButton" name="fanoffbtn">
-         <property name="text">
-          <string>Fan Off</string>
-         </property>
-        </widget>
-       </item>
-       <item row="11" column="2" colspan="2">
-        <widget class="QPushButton" name="atxonbtn">
-         <property name="text">
-          <string>ATX On</string>
-         </property>
-        </widget>
-       </item>
-       <item row="11" column="4" colspan="3">
-        <widget class="QPushButton" name="atxoffbtn">
-         <property name="text">
-          <string>ATX Off</string>
          </property>
         </widget>
        </item>
@@ -459,6 +443,47 @@
         <widget class="QLabel" name="flowtext">
          <property name="text">
           <string>Flow</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0" colspan="3">
+        <widget class="QLabel" name="label_2">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>15</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Step Increment</string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="4" colspan="3">
+        <widget class="QPushButton" name="fanoffbtn">
+         <property name="text">
+          <string>Fan Off</string>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="4" colspan="3">
+        <widget class="QPushButton" name="atxoffbtn">
+         <property name="text">
+          <string>ATX Off</string>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="2" colspan="2">
+        <widget class="QPushButton" name="atxonbtn">
+         <property name="text">
+          <string>ATX On</string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="2" colspan="2">
+        <widget class="QPushButton" name="fanonbtn">
+         <property name="text">
+          <string>Fan On</string>
          </property>
         </widget>
        </item>
@@ -897,19 +922,6 @@ STOP</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="0" colspan="3">
-        <widget class="QLabel" name="label_2">
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>15</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Step Increment</string>
-         </property>
-        </widget>
-       </item>
       </layout>
      </widget>
     </item>
@@ -971,7 +983,7 @@ STOP</string>
       </property>
       <property name="maximumSize">
        <size>
-        <width>200</width>
+        <width>250</width>
         <height>16777215</height>
        </size>
       </property>
@@ -1051,7 +1063,7 @@ STOP</string>
       </property>
       <property name="maximumSize">
        <size>
-        <width>200</width>
+        <width>250</width>
         <height>16777215</height>
        </size>
       </property>
@@ -1129,8 +1141,8 @@ STOP</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>791</width>
-     <height>20</height>
+     <width>800</width>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
