@@ -1,6 +1,5 @@
 #ifndef PARSETHREAD_H
 #define PARSETHREAD_H
-
 #include <QThread>
 #include <QSettings>
 
@@ -13,7 +12,7 @@ class Parser : public QObject
     Q_OBJECT
 
 public:
-    explicit Parser(QObject *parent = 0);
+    explicit Parser(QObject *parent = nullptr);
     ~Parser();
 
 protected:

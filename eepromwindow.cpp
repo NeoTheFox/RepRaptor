@@ -53,7 +53,7 @@ EEPROMWindow::EEPROMWindow(QStringList eepromLines, QWidget *parent) :
             {
             case 0:
                 edit->setValidator(new QIntValidator(-128, 255, this));
-            case 1:
+                break;
             case 2:
                 edit->setValidator(new QIntValidator(this));
                 break;

@@ -1,6 +1,5 @@
 #ifndef SETTINGSWINDOW_H
 #define SETTINGSWINDOW_H
-
 #include <QDialog>
 #include <QSettings>
 #include "repraptor.h"
@@ -8,7 +7,7 @@
 using namespace RepRaptor;
 
 namespace Ui {
-class SettingsWindow;
+    class SettingsWindow;
 }
 
 class SettingsWindow : public QDialog
@@ -16,7 +15,7 @@ class SettingsWindow : public QDialog
     Q_OBJECT
 
 public:
-    explicit SettingsWindow(QWidget *parent = 0);
+    explicit SettingsWindow(QWidget *parent = nullptr);
 
     QSettings settings;
 

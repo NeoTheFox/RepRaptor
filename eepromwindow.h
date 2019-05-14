@@ -1,6 +1,5 @@
 #ifndef EEPROMWINDOW_H
 #define EEPROMWINDOW_H
-
 #include <QDialog>
 #include <QtWidgets>
 
@@ -9,7 +8,7 @@
 using namespace RepRaptor;
 
 namespace Ui {
-class EEPROMWindow;
+    class EEPROMWindow;
 }
 
 class EEPROMWindow : public QDialog
@@ -17,7 +16,7 @@ class EEPROMWindow : public QDialog
     Q_OBJECT
 
 public:
-    explicit EEPROMWindow(QStringList eepromLines, QWidget *parent = 0);
+    explicit EEPROMWindow(QStringList eepromLines, QWidget *parent = nullptr);
     ~EEPROMWindow();
 
 private:
