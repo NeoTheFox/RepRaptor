@@ -7,7 +7,7 @@
 #include <QQueue>
 #include <QTimer>
 #include <QSettings>
-#include <QVector>
+#include <QList>
 
 #include "repraptor.h"
 
@@ -36,7 +36,7 @@ protected:
     bool resending;
     QQueue <QString> userCommands;
     QStringList sentCommands;
-    QVector <QString> gcode;
+    QList <QString> gcode;
 
     bool sendLine(QString s);
 
@@ -53,7 +53,7 @@ public slots:
     void stopPrinting();
     void pause(bool p);
     void setBaudrate(int b);
-    void setFile(QVector <QString> f);
+    void setFile(QList <QString> f);
     void injectCommand(QString);
     void flushInjectionBuffer();
 

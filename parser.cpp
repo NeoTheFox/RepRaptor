@@ -4,9 +4,8 @@ Parser::Parser(QObject *parent):
     QObject(parent)
 {
     //Init regexp
-    temperatureRegxp.setCaseSensitivity(Qt::CaseInsensitive);
-    temperatureRegxp.setPatternSyntax(QRegExp::RegExp);
     temperatureRegxp.setPattern("\\d+\\.\\d+"); // Find float in string
+    temperatureRegxp.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
 
     //Init values
     readingFiles = false;
@@ -69,12 +68,16 @@ void Parser::parse(QByteArray data)
         else if(data.contains("T:"))
         {
             TemperatureReadings r;
+            QRegularExpressionMatch match;
 
-            if(temperatureRegxp.indexIn(QString(data)) != -1)
-                r.e = temperatureRegxp.cap(0).toDouble();
+            match = temperatureRegxp.match(QString(data));
+            if(match.hasMatch())
+                r.e = match.captured(0).toDouble();
             else r.e = 0;
-            if(temperatureRegxp.indexIn(QString(data), temperatureRegxp.matchedLength()) != -1)
-                r.b = temperatureRegxp.cap(0).toDouble();
+            
+            match = temperatureRegxp.match(QString(data), match.capturedEnd());
+            if(match.hasMatch())
+                r.b = match.captured(0).toDouble();
             else r.b = 0;
 
             r.raw = QString(data);
@@ -90,12 +93,14 @@ void Parser::parse(QByteArray data)
         else if(data.startsWith("SD pr"))
         {
             SDProgress p;
-            QRegExp rxp("\\d+/\\d+");
+            QRegularExpression rxp("\\d+/\\d+");
+            QRegularExpressionMatch match;
             QStringList tmp;
 
-            if(rxp.indexIn(data) != -1)
+            match = rxp.match(QString(data));
+            if(match.hasMatch())
             {
-                tmp = rxp.cap(0).split('/');
+                tmp = match.captured(0).split('/');
 
                 p.progress = tmp.at(0).toLong();
                 p.total = tmp.at(1).toLong();

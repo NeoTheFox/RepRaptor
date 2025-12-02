@@ -4,14 +4,15 @@
 #include <QMainWindow>
 #include <QFileDialog>
 #include <QSystemTrayIcon>
-#include <QtSerialPort/QtSerialPort>
+#include <QSerialPort>
+#include <QSerialPortInfo>
 #include <QFile>
 #include <QThread>
-#include <QVector>
+#include <QList>
 #include <QTextStream>
 #include <QSettings>
 #include <QElapsedTimer>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QMap>
 
 #include "settingswindow.h"
@@ -45,7 +46,7 @@ public:
 protected:
     QMap <QString, QString> macros;
     QFile gfile;
-    QVector<QString> gcode;
+    QList<QString> gcode;
     QQueue <QString> userCommands;
     QTimer *progressSDTimer;
     QTimer *statusTimer;
@@ -148,8 +149,8 @@ private slots:
     void on_flowbutton_clicked();
     void on_checktemp_stateChanged(int arg1);
     void on_actionSettings_triggered();
-    void on_stepspin_valueChanged(const QString &arg1);
-    void on_estepspin_valueChanged(const QString &arg1);
+    void on_stepspin_valueChanged(double arg1);
+    void on_estepspin_valueChanged(double arg1);
     void on_releasebtn_clicked();
     void on_actionAbout_triggered();
     void serialError(QSerialPort::SerialPortError error);
@@ -167,7 +168,7 @@ signals:
     void stopPrinting();
     void pause(bool p);
     void setBaudrate(int b);
-    void setFile(QVector <QString> f);
+    void setFile(QList <QString> f);
     void injectCommand(QString command);
     void flushInjectionBuffer();
 };

@@ -1,5 +1,7 @@
 #include "eepromwindow.h"
 #include "ui_eepromwindow.h"
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
 
 EEPROMWindow::EEPROMWindow(QStringList eepromLines, QWidget *parent) :
     QDialog(parent),
@@ -44,9 +46,9 @@ EEPROMWindow::EEPROMWindow(QStringList eepromLines, QWidget *parent) :
 
             edit->setObjectName("e"+QString::number(j)); //Name the LineEdit, so when it emits signal we know where it came from
 
-            QRegExpValidator *doublevalidator = new QRegExpValidator(
-                                                    QRegExp("^\\-?\\d+\\.?\\d+(e\\-?\\d+)?$",
-                                                    Qt::CaseInsensitive), this);
+            QRegularExpressionValidator *doublevalidator = new QRegularExpressionValidator(
+                                                    QRegularExpression("^\\-?\\d+\\.?\\d+(e\\-?\\d+)?$",
+                                                    QRegularExpression::CaseInsensitiveOption), this);
             doublevalidator->setLocale(QLocale::English);
 
             switch(currentLine.T) // set right validator for the line
@@ -69,7 +71,7 @@ EEPROMWindow::EEPROMWindow(QStringList eepromLines, QWidget *parent) :
             line->addWidget(label);
             line->addWidget(edit);
 
-            line->setMargin(2);
+            line->setContentsMargins(2, 2, 2, 2);
 
             layout->addItem(line);
 

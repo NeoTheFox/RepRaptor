@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QtWidgets>
+#include <QList>
 
 #include "repraptor.h"
 
@@ -22,8 +23,8 @@ public:
 
 private:
     Ui::EEPROMWindow *ui;
-    QVector <repetierEEPROMline> lines;
-    QVector <bool> changed;
+    QList <repetierEEPROMline> lines;
+    QList <bool> changed;
     int firmware;
 
 signals:

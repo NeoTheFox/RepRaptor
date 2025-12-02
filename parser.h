@@ -3,6 +3,7 @@
 
 #include <QThread>
 #include <QSettings>
+#include <QRegularExpression>
 
 #include "repraptor.h"
 
@@ -19,7 +20,7 @@ public:
 protected:
     QByteArray data;
     QStringList SDFilesList;
-    QRegExp temperatureRegxp;
+    QRegularExpression temperatureRegxp;
     int firmware;
     bool readingFiles;
     bool readingEEPROM;

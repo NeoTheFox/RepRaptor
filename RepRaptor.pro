@@ -11,7 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = RepRaptor
 TEMPLATE = app
-CONFIG += static
+CONFIG += c++17
 
 unix {
     #VARIABLES

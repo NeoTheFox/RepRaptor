@@ -24,7 +24,7 @@ Sender::Sender(QObject *parent) : QObject(parent)
 
     sendTimer->start();
 
-    connect(printer, SIGNAL(error(QSerialPort::SerialPortError)), this, SLOT(receivedError(QSerialPort::SerialPortError)));
+    connect(printer, &QSerialPort::errorOccurred, this, &Sender::receivedError);
     connect(printer, &QSerialPort::readyRead, this, &Sender::receivedData);
     connect(sendTimer, &QTimer::timeout, this, &Sender::sendNext);
 }
@@ -162,7 +162,7 @@ void Sender::setBaudrate(int b)
     baudrate = b;
 }
 
-void Sender::setFile(QVector <QString> f)
+void Sender::setFile(QList <QString> f)
 {
     gcode = f;
 }

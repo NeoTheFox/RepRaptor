@@ -114,7 +114,7 @@ MainWindow::MainWindow(QWidget *parent) :
     qRegisterMetaType<TemperatureReadings>("TemperatureReadings");
     qRegisterMetaType<SDProgress>("SDProgress");
     qRegisterMetaType<QSerialPortInfo>("QSerialPortInfo");
-    qRegisterMetaType< QVector<QString> >("QVector<QString>");
+    qRegisterMetaType< QList<QString> >("QList<QString>");
     qRegisterMetaType<FileProgress>("FileProgress");
     qRegisterMetaType<QSerialPort::SerialPortError>("QSerialPort::SerialPortError");
 
@@ -236,11 +236,11 @@ void MainWindow::open()
     lastDir.clear();
     lastDir.append(filename);
     int filenameChars = 0;
-    for(int i = filename.count()-1; filename.at(i) != QDir::separator(); i--)
+    for(int i = filename.size()-1; filename.at(i) != QDir::separator(); i--)
     {
         filenameChars++; //Count how many characters are in the filename
     }
-    lastDir.remove(lastDir.count()-filenameChars, filenameChars);//remove filename
+    lastDir.remove(lastDir.size()-filenameChars, filenameChars);//remove filename
     gfile.setFileName(filename);
     if(!recentFiles.contains(filename))
     {
@@ -823,18 +823,18 @@ void MainWindow::receivedNotSDPrinting()
     ui->filename->setText(tr("Filename: "));
 }
 
-void MainWindow::on_stepspin_valueChanged(const QString &arg1)
+void MainWindow::on_stepspin_valueChanged(double arg1)
 {
-    if(arg1.toFloat() < 1) ui->stepspin->setSingleStep(0.1);
-    else if(arg1.toFloat() >=10) ui->stepspin->setSingleStep(10);
-    else if(arg1.toFloat() >= 1) ui->stepspin->setSingleStep(1);
+    if(arg1 < 1) ui->stepspin->setSingleStep(0.1);
+    else if(arg1 >=10) ui->stepspin->setSingleStep(10);
+    else if(arg1 >= 1) ui->stepspin->setSingleStep(1);
 }
 
-void MainWindow::on_estepspin_valueChanged(const QString &arg1)
+void MainWindow::on_estepspin_valueChanged(double arg1)
 {
-    if(arg1.toFloat() < 1) ui->estepspin->setSingleStep(0.1);
-    else if(arg1.toFloat() >=10) ui->estepspin->setSingleStep(10);
-    else if(arg1.toFloat() >= 1) ui->estepspin->setSingleStep(1);
+    if(arg1 < 1) ui->estepspin->setSingleStep(0.1);
+    else if(arg1 >=10) ui->estepspin->setSingleStep(10);
+    else if(arg1 >= 1) ui->estepspin->setSingleStep(1);
 }
 
 void MainWindow::on_actionSet_SD_printing_mode_triggered()
